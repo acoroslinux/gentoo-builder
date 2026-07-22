@@ -16,11 +16,12 @@ class SystemCustomizer:
 
     def setup_live_users(self):
         live_user_cfg = self.config.get("live_user", {})
-        username = live_user_cfg.get("username", "gentoo")
+        username = live_user_cfg.get("username", "live")
+        password = live_user_cfg.get("password", "live")
         groups = live_user_cfg.get("groups", ["wheel", "audio", "video", "input", "plugdev"])
         groups_str = ",".join(groups)
 
-        logger.info(f"Setting up live user '{username}' with groups: {groups_str}")
+        logger.info(f"Setting up live user '{username}' (password: '{password}') and root (password: 'root')...")
 
         if self.chroot.mode == "mock":
             logger.info(f"[MOCK CUSTOMIZER] Adding user {username}")
@@ -29,6 +30,18 @@ class SystemCustomizer:
         self.chroot.run_in_chroot(f"groupadd -f {username}")
         user_cmd = f"useradd -m -g {username} -G {groups_str} -s /bin/bash {username}"
         self.chroot.run_in_chroot(user_cmd)
+
+        # Set live user password
+        if password:
+            self.chroot.run_in_chroot(f"sh -c \"echo '{username}:{password}' | chpasswd\"")
+
+        # Set root user password to 'root'
+        self.chroot.run_in_chroot("sh -c \"echo 'root:root' | chpasswd\"")
+
+        # Fix authentication files permissions and ownership so login/PAM works properly
+        self.chroot.run_in_chroot("chown 0:0 /etc/passwd /etc/shadow /etc/group /etc/gshadow")
+        self.chroot.run_in_chroot("chmod 0644 /etc/passwd /etc/group")
+        self.chroot.run_in_chroot("chmod 0600 /etc/shadow /etc/gshadow")
 
         sudoers_file = self.target_root / "etc" / "sudoers.d" / "live_user"
         sudoers_file.parent.mkdir(parents=True, exist_ok=True)
@@ -106,6 +119,11 @@ class SystemCustomizer:
                 shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
             else:
                 shutil.copy2(src_path, dest_path)
+
+            # Ensure all custom files copied to system paths (/etc, /usr, /var) belong to root:root
+            if dest_rel.startswith(("/etc/", "/usr/", "/var/", "/boot/")):
+                self.chroot.run_in_chroot(f"chown -R 0:0 '{dest_rel}'")
+
             logger.info(f"Copied custom file: {src_rel} -> {dest_rel}")
 
             # Propagate files destination under /etc/skel/ to existing home directories
@@ -121,7 +139,7 @@ class SystemCustomizer:
                                 shutil.copytree(src_path, user_dest, dirs_exist_ok=True)
                             else:
                                 shutil.copy2(src_path, user_dest)
-                            self.chroot.run_in_chroot(f"chown -R {user_dir.name}:{user_dir.name} /home/{user_dir.name}/{rel_skel.split('/')[0]}")
+                            self.chroot.run_in_chroot(f"chown -R {user_dir.name}:{user_dir.name} '/home/{user_dir.name}/{rel_skel.split('/')[0]}'")
 
     def configure_system_defaults(self):
         logger.info("Applying Gentoo live system defaults (hostname, sshd, fstab, timezone)...")
@@ -153,3 +171,14 @@ class SystemCustomizer:
             content = sshd_cfg.read_text()
             content = content.replace("#PermitRootLogin prohibit-password", "PermitRootLogin yes")
             sshd_cfg.write_text(content)
+
+        # Setup /usr/src/linux symlink if kernel sources directory exists
+        usr_src = self.target_root / "usr" / "src"
+        if usr_src.exists():
+            kernel_dirs = [d for d in usr_src.iterdir() if d.is_dir() and d.name.startswith("linux-")]
+            if kernel_dirs:
+                latest_kernel_dir = sorted(kernel_dirs, key=lambda d: d.name)[-1]
+                linux_symlink = usr_src / "linux"
+                if not linux_symlink.exists() and not linux_symlink.is_symlink():
+                    logger.info(f"Creating /usr/src/linux symlink -> {latest_kernel_dir.name}")
+                    linux_symlink.symlink_to(latest_kernel_dir.name)

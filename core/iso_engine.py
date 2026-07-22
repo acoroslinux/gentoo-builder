@@ -170,7 +170,7 @@ class ISOEngine:
             logger.info(f"[MOCK ISO ENGINE] Creating dummy ISO image: {output_iso}")
             output_iso.write_text("MOCK GENTOO ISO IMAGE CONTENT")
         else:
-            vol_id = self.config.get("vol_id", "GENTOO_LIVE")
+            vol_id = self.config.get("vol_id", "gentoo_modern")
             btype = self.config.get("type", "grub-uefi")
 
             if "syslinux" in btype or "isolinux" in btype:

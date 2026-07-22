@@ -16,5 +16,16 @@
     "kde",
     "policykit",
     "udisks"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "kde",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/kde",
+        "destination": "/etc/skel/.config"
+      }
+    ]
+  }
 }

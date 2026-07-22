@@ -4,7 +4,7 @@
   ],
   "bootloader": {
     "type": "grub-uefi",
-    "vol_id": "GENTOO_LIVE",
+    "vol_id": "gentoo_modern",
     "bootargs": "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs"
   }
 }

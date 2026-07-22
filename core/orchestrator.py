@@ -120,7 +120,8 @@ class BuildOrchestrator:
             chroot_setup.prepare_default_profile_symlink()
 
             # 5. Setup Target Chroot Environment & Virtual Filesystems
-            chroot = ChrootManager(self.target_root, mode=self.mode)
+            cache_dir = self.workdir / "cache"
+            chroot = ChrootManager(self.target_root, mode=self.mode, cache_dir=cache_dir)
             chroot.mount_virtual_fs()
 
             try:

@@ -11,9 +11,10 @@ class ChrootManagerError(Exception):
     pass
 
 class ChrootManager:
-    def __init__(self, target_root: Path, mode: str = "mock"):
+    def __init__(self, target_root: Path, mode: str = "mock", cache_dir: Optional[Path] = None):
         self.target_root = Path(target_root).resolve()
         self.mode = mode.lower()
+        self.cache_dir = Path(cache_dir).resolve() if cache_dir else None
         self.is_mounted = False
 
     def mount_virtual_fs(self):
@@ -44,6 +45,25 @@ class ChrootManager:
             if res.returncode != 0 and "already mounted" not in res.stderr:
                 logger.warning(f"Failed to mount {target}: {res.stderr.strip()}")
 
+        # Bind-mount persistent cache for Portage packages (distfiles & binpkgs)
+        if self.cache_dir:
+            distfiles_host = self.cache_dir / "distfiles"
+            binpkgs_host = self.cache_dir / "binpkgs"
+            distfiles_host.mkdir(parents=True, exist_ok=True)
+            binpkgs_host.mkdir(parents=True, exist_ok=True)
+
+            distfiles_target = self.target_root / "var" / "cache" / "distfiles"
+            binpkgs_target = self.target_root / "var" / "cache" / "binpkgs"
+            distfiles_target.mkdir(parents=True, exist_ok=True)
+            binpkgs_target.mkdir(parents=True, exist_ok=True)
+
+            logger.info(f"Bind-mounting Portage package cache from {self.cache_dir} into chroot...")
+            for host_path, target_path in [(distfiles_host, distfiles_target), (binpkgs_host, binpkgs_target)]:
+                cmd = ["mount", "--bind", str(host_path), str(target_path)]
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode != 0 and "already mounted" not in res.stderr:
+                    logger.warning(f"Failed to bind mount {host_path} -> {target_path}: {res.stderr.strip()}")
+
         self.is_mounted = True
 
     def umount_virtual_fs(self):
@@ -57,6 +77,8 @@ class ChrootManager:
 
         logger.info(f"Unmounting virtual filesystems from {self.target_root}")
         targets = [
+            self.target_root / "var" / "cache" / "binpkgs",
+            self.target_root / "var" / "cache" / "distfiles",
             self.target_root / "dev" / "shm",
             self.target_root / "dev" / "pts",
             self.target_root / "dev",

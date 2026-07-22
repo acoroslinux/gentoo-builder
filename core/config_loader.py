@@ -92,13 +92,16 @@ class ConfigLoader:
             base_srv = self.load_json(base_srv_path)
             merged["services"].extend(base_srv.get("services", []))
 
-        # Desktop profile
+                # Desktop profile
         if desktop:
             d_cfg = self.load_profile("desktops", desktop)
             merged["packages"].extend(d_cfg.get("packages", []))
             merged["services"].extend(d_cfg.get("services", []))
             merged["use_flags"].extend(d_cfg.get("use_flags", []))
             merged["make_conf"].update(d_cfg.get("make_conf", {}))
+            # Merge desktop_environment block (customizations_path, use_common_config, copy_files)
+            if "desktop_environment" in d_cfg:
+                merged["desktop_environment"] = d_cfg["desktop_environment"]
 
         # Kernel profile
         if kernel:

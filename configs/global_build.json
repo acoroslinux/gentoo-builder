@@ -9,7 +9,6 @@
   },
   "make_conf": {
     "CFLAGS": "-O2 -pipe -march=x86-64",
-    "MAKEOPTS": "-j2",
     "ACCEPT_KEYWORDS": "~amd64",
     "ACCEPT_LICENSE": "*"
   },
@@ -30,7 +29,8 @@
     "NetworkManager"
   ],
   "live_user": {
-    "username": "gentoo",
-    "groups": ["wheel", "audio", "video", "input"]
+    "username": "live",
+    "password": "live",
+    "groups": ["wheel", "audio", "video", "input", "plugdev"]
   }
 }

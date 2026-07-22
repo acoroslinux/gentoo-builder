@@ -11,5 +11,16 @@
     "gtk",
     "gtk3",
     "mate"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "mate",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/mate",
+        "destination": "/etc/skel/.config/mate"
+      }
+    ]
+  }
 }

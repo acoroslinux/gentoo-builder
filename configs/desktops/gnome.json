@@ -15,5 +15,16 @@
     "systemd",
     "introspection",
     "policykit"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "gnome",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/gnome",
+        "destination": "/etc/skel/.config"
+      }
+    ]
+  }
 }
