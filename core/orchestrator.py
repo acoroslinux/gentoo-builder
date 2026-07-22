@@ -1,4 +1,5 @@
 import shutil
+import os
 from pathlib import Path
 from typing import List, Optional
 from core.config_loader import ConfigLoader
@@ -49,15 +50,40 @@ class BuildOrchestrator:
         self.target_root = self.workdir / "chroot"
         self.config_loader = ConfigLoader()
 
+    def _safe_clean_workdir(self):
+        """Clean workdir, handling permission issues if previously created by root."""
+        if not self.workdir.exists():
+            return
+
+        logger.info(f"Cleaning workspace directory: {self.workdir}")
+        if self.mode != "mock":
+            chroot_tmp = ChrootManager(self.target_root, self.mode)
+            chroot_tmp.umount_virtual_fs()
+
+        try:
+            shutil.rmtree(self.workdir)
+        except PermissionError:
+            # Handle files created by root during real build when running mock without sudo
+            for root, dirs, files in os.walk(self.workdir, topdown=False):
+                for name in files:
+                    file_p = Path(root) / name
+                    try:
+                        file_p.unlink()
+                    except Exception:
+                        pass
+                for name in dirs:
+                    dir_p = Path(root) / name
+                    try:
+                        dir_p.rmdir()
+                    except Exception:
+                        pass
+            shutil.rmtree(self.workdir, ignore_errors=True)
+
     def build(self) -> Path:
         logger.info(f"Starting Gentoo-Builder pipeline [{self.init_system.upper()}] in [{self.mode.upper()}] mode...")
         
-        if self.clean and self.workdir.exists():
-            logger.info(f"Cleaning workspace directory: {self.workdir}")
-            if self.mode != "mock":
-                chroot_tmp = ChrootManager(self.target_root, self.mode)
-                chroot_tmp.umount_virtual_fs()
-            shutil.rmtree(self.workdir, ignore_errors=True)
+        if self.clean:
+            self._safe_clean_workdir()
 
         self.workdir.mkdir(parents=True, exist_ok=True)
 
