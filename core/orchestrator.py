@@ -90,8 +90,8 @@ class BuildOrchestrator:
             customizer.setup_live_users()
             customizer.setup_services()
 
-            # 6. Build ISO
-            iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, mode=self.mode)
+            # 6. Build ISO with GRUB bootloader options
+            iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
             iso_file = iso_engine.build_iso()
             
             logger.info(f"Build completed successfully! Output: {iso_file}")
