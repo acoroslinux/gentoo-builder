@@ -5,6 +5,7 @@ from typing import List, Optional
 from core.config_loader import ConfigLoader
 from core.chroot_manager import ChrootManager
 from core.chroot_setup import ChrootSetup
+from core.toolchain_manager import ToolchainManager
 from core.stage3_manager import Stage3Manager
 from core.portage_manager import PortageManager
 from core.customizer import SystemCustomizer
@@ -31,7 +32,8 @@ class BuildOrchestrator:
         package_profiles: Optional[List[str]] = None,
         service_profiles: Optional[List[str]] = None,
         live_profile: Optional[str] = None,
-        output_name: Optional[str] = None
+        output_name: Optional[str] = None,
+        force_isolated_toolchain: bool = False
     ):
         self.arch = arch
         self.config_path = resolve_from_project(config_path)
@@ -45,13 +47,13 @@ class BuildOrchestrator:
         self.service_profiles = service_profiles or []
         self.live_profile = live_profile
         self.output_name = output_name or f"gentoo-builder-{self.init_system}-{desktop or 'base'}-{arch}.iso"
+        self.force_isolated_toolchain = force_isolated_toolchain
 
         self.workdir = resolve_from_project("workdir") / self.arch
         self.target_root = self.workdir / "chroot"
         self.config_loader = ConfigLoader()
 
     def _safe_clean_workdir(self):
-        """Clean workdir, handling permission issues if previously created by root."""
         if not self.workdir.exists():
             return
 
@@ -59,11 +61,12 @@ class BuildOrchestrator:
         if self.mode != "mock":
             chroot_tmp = ChrootManager(self.target_root, self.mode)
             chroot_tmp.umount_virtual_fs()
+            toolchain_tmp = ToolchainManager(self.workdir, self.mode)
+            toolchain_tmp.umount_virtual_fs()
 
         try:
             shutil.rmtree(self.workdir)
         except PermissionError:
-            # Handle files created by root during real build when running mock without sudo
             for root, dirs, files in os.walk(self.workdir, topdown=False):
                 for name in files:
                     file_p = Path(root) / name
@@ -99,37 +102,47 @@ class BuildOrchestrator:
             live_profile=self.live_profile
         )
 
-        # 2. Stage3 Bootstrap
-        stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode)
-        stage3.fetch_and_extract(self.target_root)
-
-        # 3. Setup Host Network and Profile Symlinks inside Chroot
-        chroot_setup = ChrootSetup(self.target_root, mode=self.mode)
-        chroot_setup.prepare_resolv_conf()
-        chroot_setup.prepare_default_profile_symlink()
-
-        # 4. Setup Chroot Environment & Virtual Filesystems
-        chroot = ChrootManager(self.target_root, mode=self.mode)
-        chroot.mount_virtual_fs()
+        # 2. Toolchain / Build Host Setup (Isolated Environment)
+        toolchain = ToolchainManager(self.workdir, mode=self.mode, force_isolated=self.force_isolated_toolchain)
+        if self.force_isolated_toolchain or not toolchain.check_host_tools():
+            toolchain.bootstrap_build_host()
+            toolchain.mount_virtual_fs()
 
         try:
-            # 5. Configure Portage & Install Packages
-            portage = PortageManager(chroot, build_config)
-            portage.configure_make_conf()
-            portage.sync_portage()
-            portage.install_packages(build_config.get("packages", []))
+            # 3. Target Stage3 Bootstrap
+            stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode)
+            stage3.fetch_and_extract(self.target_root)
 
-            # 6. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
-            customizer = SystemCustomizer(chroot, build_config)
-            customizer.configure_system_defaults()
-            customizer.setup_live_users()
-            customizer.setup_services()
+            # 4. Setup Host Network and Profile Symlinks inside Chroot
+            chroot_setup = ChrootSetup(self.target_root, mode=self.mode)
+            chroot_setup.prepare_resolv_conf()
+            chroot_setup.prepare_default_profile_symlink()
 
-            # 7. Build ISO with GRUB bootloader options
-            iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
-            iso_file = iso_engine.build_iso()
-            
-            logger.info(f"Build completed successfully! Output: {iso_file}")
-            return iso_file
+            # 5. Setup Target Chroot Environment & Virtual Filesystems
+            chroot = ChrootManager(self.target_root, mode=self.mode)
+            chroot.mount_virtual_fs()
+
+            try:
+                # 6. Configure Portage & Install Packages
+                portage = PortageManager(chroot, build_config)
+                portage.configure_make_conf()
+                portage.sync_portage()
+                portage.install_packages(build_config.get("packages", []))
+
+                # 7. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
+                customizer = SystemCustomizer(chroot, build_config)
+                customizer.configure_system_defaults()
+                customizer.setup_live_users()
+                customizer.setup_services()
+
+                # 8. Build ISO with GRUB bootloader options
+                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
+                iso_file = iso_engine.build_iso()
+                
+                logger.info(f"Build completed successfully! Output: {iso_file}")
+                return iso_file
+            finally:
+                chroot.umount_virtual_fs()
         finally:
-            chroot.umount_virtual_fs()
+            if toolchain.is_mounted:
+                toolchain.umount_virtual_fs()

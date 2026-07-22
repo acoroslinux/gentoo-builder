@@ -50,6 +50,12 @@ def main():
     )
     parser.set_defaults(clean=True)
 
+    parser.add_argument(
+        "--force-isolated-toolchain",
+        action="store_true",
+        help="Force isolated Gentoo build_host toolchain in real mode, even if host tools are available."
+    )
+
     parser.add_argument("--init", type=str, default="openrc", help="Init system profile (openrc, systemd, runit, s6). Default: openrc")
     parser.add_argument("--desktop", type=str, help="Desktop environment profile (e.g. xfce, gnome)")
     parser.add_argument("--kernel", type=str, help="Kernel profile (e.g. gentoo-kernel-bin)")
@@ -78,7 +84,8 @@ def main():
             desktop=args.desktop,
             kernel=args.kernel,
             bootloader=args.bootloader,
-            output_name=args.output
+            output_name=args.output,
+            force_isolated_toolchain=args.force_isolated_toolchain
         )
         orchestrator.build()
     except BuildOrchestratorError as e:
