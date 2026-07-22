@@ -68,9 +68,17 @@ class Stage3Manager:
         logger.info(f"Extracting Gentoo Stage3 into {target_root}...")
         target_root.mkdir(parents=True, exist_ok=True)
 
-        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner"]
+        if os.geteuid() != 0:
+            raise Stage3ManagerError(
+                "Modo real requer privilégios de super-utilizador (root/sudo).\n"
+                "A extração do Stage3 cria nós de dispositivo (/dev/null, /dev/console) via mknod.\n"
+                "Por favor execute o comando com sudo:\n"
+                "  sudo python3 cli.py x86_64 --mode real ..."
+            )
+
+        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner", "--xattrs-include='*.*'"]
         res = subprocess.run(tar_cmd, capture_output=True, text=True)
         if res.returncode != 0:
-            raise Stage3ManagerError(f"Failed to extract Stage3 tarball: {res.stderr}\nNote: Real Gentoo stage3 extraction requires root/sudo to create device nodes (mknod).")
+            raise Stage3ManagerError(f"Failed to extract Stage3 tarball: {res.stderr}")
 
         logger.info("Stage3 extracted successfully.")
