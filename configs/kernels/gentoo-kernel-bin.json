@@ -1,5 +1,9 @@
 {
   "packages": [
     "sys-kernel/gentoo-kernel-bin"
+  ],
+  "use_flags": [
+    "dracut",
+    "initramfs"
   ]
 }

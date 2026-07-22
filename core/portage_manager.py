@@ -32,7 +32,7 @@ class PortageManager:
             'ACCEPT_KEYWORDS="' + make_conf_data.get("ACCEPT_KEYWORDS", "~amd64") + '"',
             'ACCEPT_LICENSE="' + make_conf_data.get("ACCEPT_LICENSE", "*") + '"',
             'USE="' + " ".join(use_flags) + '"',
-            'EMERGE_DEFAULT_OPTS="--jobs=2 --load-average=2"',
+            'EMERGE_DEFAULT_OPTS="--jobs=2 --load-average=2 --autounmask-write=y --autounmask-continue=y"',
             'FEATURES="binpkg-logs parallel-install"',
             'DISTDIR="/var/cache/distfiles"',
             'PKGDIR="/var/cache/binpkgs"'
@@ -50,12 +50,21 @@ class PortageManager:
         if res.returncode != 0 and self.chroot.mode == "real":
             raise PortageManagerError(f"emerge-webrsync failed to sync Portage repository:\n{res.stderr}")
 
+    def update_world(self):
+        """Atualiza a árvore world do Gentoo (ex: perl/systemd/glibc) para resolver conflitos de slots."""
+        logger.info("Atualizando pacotes base e dependências de slot (emerge --update --deep --newuse @world)...")
+        res = self.chroot.run_in_chroot(["emerge", "--update", "--deep", "--newuse", "--with-bdeps=y", "@world"])
+        if res.returncode != 0 and self.chroot.mode == "real":
+            logger.warning(f"emerge @world retornou avisos: {res.stderr}")
+
     def install_packages(self, packages: List[str]):
         if not packages:
             return
 
+        self.update_world()
+
         logger.info(f"Installing packages via emerge: {' '.join(packages)}")
-        cmd = ["emerge", "--noreplace", "--verbose"] + packages
+        cmd = ["emerge", "--noreplace", "--verbose", "--autounmask-write=y", "--autounmask-continue=y"] + packages
         res = self.chroot.run_in_chroot(cmd)
         if res.returncode != 0 and self.chroot.mode == "real":
             raise PortageManagerError(f"Failed to install packages via emerge:\n{res.stderr}")
