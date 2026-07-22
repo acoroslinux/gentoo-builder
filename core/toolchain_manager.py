@@ -44,6 +44,24 @@ class ToolchainManager:
             return False
         return True
 
+    def _resolve_latest_stage3_url(self) -> str:
+        txt_url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
+        try:
+            req = urllib.request.Request(txt_url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req) as resp:
+                content = resp.read().decode("utf-8")
+                for line in content.splitlines():
+                    line = line.strip()
+                    if line and not line.startswith("#") and not line.startswith("-----") and "stage3-amd64-openrc" in line:
+                        rel_path = line.split()[0]
+                        full_url = f"https://distfiles.gentoo.org/releases/amd64/autobuilds/{rel_path}"
+                        logger.info(f"Resolved latest build_host Stage3 URL: {full_url}")
+                        return full_url
+        except Exception as e:
+            logger.warning(f"Could not resolve dynamic build_host stage3 URL: {e}")
+
+        return "https://distfiles.gentoo.org/releases/amd64/autobuilds/20260719T170103Z/stage3-amd64-openrc-20260719T170103Z.tar.xz"
+
     def bootstrap_build_host(self):
         """Prepara o ambiente isolado build_host extraindo um Stage3 dedicado."""
         logger.info(f"Inicializando o ambiente de compilação isolado (build_host) em: {self.build_host_dir}")
@@ -58,7 +76,7 @@ class ToolchainManager:
             logger.info("Ambiente build_host já existente.")
             return
 
-        url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64-openrc/stage3-amd64-openrc-latest.tar.xz"
+        url = self._resolve_latest_stage3_url()
         tarball_path = self.cache_dir / "stage3-build-host.tar.xz"
 
         if not tarball_path.exists():
