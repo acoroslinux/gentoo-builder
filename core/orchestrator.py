@@ -5,6 +5,7 @@ from core.config_loader import ConfigLoader
 from core.chroot_manager import ChrootManager
 from core.stage3_manager import Stage3Manager
 from core.portage_manager import PortageManager
+from core.customizer import SystemCustomizer
 from core.iso_engine import ISOEngine
 from core.path_utils import resolve_from_project
 from core.logger_setup import setup_logger
@@ -83,7 +84,13 @@ class BuildOrchestrator:
             portage.sync_portage()
             portage.install_packages(build_config.get("packages", []))
 
-            # 5. Build ISO
+            # 5. LiveCD Customizations (inspired by Gentoo Catalyst)
+            customizer = SystemCustomizer(chroot, build_config)
+            customizer.configure_system_defaults()
+            customizer.setup_live_users()
+            customizer.setup_services()
+
+            # 6. Build ISO
             iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, mode=self.mode)
             iso_file = iso_engine.build_iso()
             
