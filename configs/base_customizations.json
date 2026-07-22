@@ -1,0 +1,9 @@
+{
+  "make_conf": {
+    "FEATURES": "binpkg-logs parallel-install"
+  },
+  "use_flags": [
+    "elogind",
+    "policykit"
+  ]
+}

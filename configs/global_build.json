@@ -1,0 +1,36 @@
+{
+  "global": {
+    "distro": "Gentoo Linux",
+    "version": "rolling",
+    "maintainer": "AçorOS Linux Team"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64-openrc/stage3-amd64-openrc-latest.tar.xz"
+  },
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=x86-64",
+    "MAKEOPTS": "-j2",
+    "ACCEPT_KEYWORDS": "~amd64",
+    "ACCEPT_LICENSE": "*"
+  },
+  "use_flags": [
+    "unicode",
+    "nls",
+    "udev",
+    "dbus"
+  ],
+  "packages": [
+    "app-admin/sudo",
+    "net-misc/dhcpcd",
+    "net-misc/networkmanager",
+    "sys-apps/util-linux"
+  ],
+  "services": [
+    "dbus",
+    "NetworkManager"
+  ],
+  "live_user": {
+    "username": "gentoo",
+    "groups": ["wheel", "audio", "video", "input"]
+  }
+}
