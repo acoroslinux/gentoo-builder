@@ -5,6 +5,9 @@ from core.logger_setup import setup_logger
 
 logger = setup_logger("portage_manager")
 
+class PortageManagerError(Exception):
+    pass
+
 class PortageManager:
     def __init__(self, chroot: ChrootManager, config: Dict[str, Any]):
         self.chroot = chroot
@@ -40,10 +43,10 @@ class PortageManager:
                 f.write("\n".join(lines) + "\n")
 
     def sync_portage(self):
-        logger.info("Syncing Portage ebuild repository...")
+        logger.info("Syncing Portage ebuild repository (emerge-webrsync)...")
         res = self.chroot.run_in_chroot(["emerge-webrsync"])
         if res.returncode != 0 and self.chroot.mode == "real":
-            logger.warning(f"emerge-webrsync returned non-zero code: {res.stderr}")
+            raise PortageManagerError(f"emerge-webrsync failed to sync Portage repository:\n{res.stderr}")
 
     def install_packages(self, packages: List[str]):
         if not packages:
@@ -53,4 +56,4 @@ class PortageManager:
         cmd = ["emerge", "--noreplace", "--verbose"] + packages
         res = self.chroot.run_in_chroot(cmd)
         if res.returncode != 0 and self.chroot.mode == "real":
-            logger.error(f"Failed to install packages: {res.stderr}")
+            raise PortageManagerError(f"Failed to install packages via emerge:\n{res.stderr}")

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional
 from core.config_loader import ConfigLoader
 from core.chroot_manager import ChrootManager
+from core.chroot_setup import ChrootSetup
 from core.stage3_manager import Stage3Manager
 from core.portage_manager import PortageManager
 from core.customizer import SystemCustomizer
@@ -76,24 +77,29 @@ class BuildOrchestrator:
         stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode)
         stage3.fetch_and_extract(self.target_root)
 
-        # 3. Setup Chroot Environment
+        # 3. Setup Host Network and Profile Symlinks inside Chroot
+        chroot_setup = ChrootSetup(self.target_root, mode=self.mode)
+        chroot_setup.prepare_resolv_conf()
+        chroot_setup.prepare_default_profile_symlink()
+
+        # 4. Setup Chroot Environment & Virtual Filesystems
         chroot = ChrootManager(self.target_root, mode=self.mode)
         chroot.mount_virtual_fs()
 
         try:
-            # 4. Configure Portage & Install Packages
+            # 5. Configure Portage & Install Packages
             portage = PortageManager(chroot, build_config)
             portage.configure_make_conf()
             portage.sync_portage()
             portage.install_packages(build_config.get("packages", []))
 
-            # 5. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
+            # 6. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
             customizer = SystemCustomizer(chroot, build_config)
             customizer.configure_system_defaults()
             customizer.setup_live_users()
             customizer.setup_services()
 
-            # 6. Build ISO with GRUB bootloader options
+            # 7. Build ISO with GRUB bootloader options
             iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
             iso_file = iso_engine.build_iso()
             
