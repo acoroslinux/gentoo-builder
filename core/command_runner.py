@@ -15,8 +15,8 @@ class CommandRunner:
         mode: str = "mock"
     ) -> subprocess.CompletedProcess:
         """
-        Executa um comando em chroot fazendo STREAMING em tempo real de cada linha no console,
-        para que o utilizador veja o avanço da compilação e não pense que o sistema travou.
+        Executes a command inside chroot streaming stdout in real time to the console,
+        so the user can observe build progress continuously.
         """
         if isinstance(command, str):
             cmd_str = command

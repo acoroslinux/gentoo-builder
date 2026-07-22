@@ -37,7 +37,7 @@ class ISOEngine:
                 if self.mode != "mock":
                     raise
 
-        # Copiar kernel e initramfs do chroot se existirem
+        # Copy kernel and initramfs from chroot if available
         chroot_boot = self.target_root / "boot"
         iso_boot = self.iso_dir / "boot"
         if chroot_boot.exists():

@@ -65,14 +65,14 @@ class PortageManager:
             raise PortageManagerError(f"emerge-webrsync failed to sync Portage repository:\n{res.stderr}")
 
     def update_world(self):
-        """Atualiza a árvore world do Gentoo de forma totalmente não-interativa (--ask=n)."""
-        logger.info("Atualizando pacotes base e dependências de slot (emerge --ask=n --update --deep --newuse @world)...")
+        """Update Gentoo world set non-interactively (--ask=n)."""
+        logger.info("Updating base packages and slot dependencies (emerge --ask=n --update --deep --newuse @world)...")
         res = self.chroot.run_in_chroot(["emerge", "--ask=n", "--update", "--deep", "--newuse", "--with-bdeps=y", "@world"])
         if res.returncode != 0 and self.chroot.mode == "real":
-            logger.warning(f"emerge @world retornou avisos: {res.stderr}")
+            logger.warning(f"emerge @world returned warnings: {res.stderr}")
 
     def setup_custom_overlay(self, custom_ebuilds_dir: Path = None):
-        """Injeta overlay e ebuilds personalizadas na árvore do Portage chroot."""
+        """Inject custom overlay and ebuilds into Portage chroot tree."""
         local_repo_dir = self.target_root / "var" / "db" / "repos" / "local_repo"
         repos_conf_dir = self.target_root / "etc" / "portage" / "repos.conf"
 

@@ -70,7 +70,7 @@ class SystemCustomizer:
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
     def copy_custom_files(self):
-        """Copia ficheiros estruturados de configs/custom_files/ para o chroot conforme especificado nas configs."""
+        """Copies structured files from configs/custom_files/ into the chroot as specified in configs."""
         custom_files_list = self.config.get("custom_files", [])
         desktop_env = self.config.get("desktop_environment", {})
         

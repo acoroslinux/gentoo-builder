@@ -93,7 +93,7 @@ class ChrootManager:
         self.is_mounted = False
 
     def run_in_chroot(self, command: List[str] | str, env: Optional[dict] = None) -> subprocess.CompletedProcess:
-        """Executa comandos dentro do chroot com streaming em tempo real dos logs na tela."""
+        """Executes commands inside chroot with real-time log streaming to console."""
         return CommandRunner.run_chroot_stream(
             chroot_path=str(self.target_root),
             command=command,

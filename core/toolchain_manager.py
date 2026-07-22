@@ -13,9 +13,9 @@ class ToolchainManagerError(Exception):
 
 class ToolchainManager:
     """
-    Gerencia um chroot secundário isolado (build_host), contendo todas as
-    ferramentas de compilação e criação de imagem (emerge, mksquashfs, grub-mkrescue, xorriso).
-    Isso garante que o projeto seja 100% agnóstico da distribuição host.
+    Manages an isolated secondary chroot (build_host), containing all
+    build and ISO creation tools (emerge, mksquashfs, grub-mkrescue, xorriso).
+    This ensures the project is 100% host distribution agnostic.
     """
 
     def __init__(
@@ -36,11 +36,11 @@ class ToolchainManager:
         self.is_mounted = False
 
     def check_host_tools(self) -> bool:
-        """Verifica se as ferramentas primárias de empacotamento de ISO existem no host."""
+        """Check if primary ISO packaging tools exist on the host."""
         required_tools = ["mksquashfs", "grub-mkrescue", "xorriso"]
         missing = [tool for tool in required_tools if shutil.which(tool) is None]
         if missing:
-            logger.info(f"Ferramentas ausentes no host: {', '.join(missing)}")
+            logger.info(f"Missing tools on host: {', '.join(missing)}")
             return False
         return True
 
@@ -63,36 +63,36 @@ class ToolchainManager:
         return "https://distfiles.gentoo.org/releases/amd64/autobuilds/20260719T170103Z/stage3-amd64-openrc-20260719T170103Z.tar.xz"
 
     def bootstrap_build_host(self):
-        """Prepara o ambiente isolado build_host extraindo um Stage3 dedicado."""
-        logger.info(f"Inicializando o ambiente de compilação isolado (build_host) em: {self.build_host_dir}")
+        """Prepare the isolated build_host environment by extracting a dedicated Stage3."""
+        logger.info(f"Initializing isolated build environment (build_host) at: {self.build_host_dir}")
 
         if self.mode == "mock":
-            logger.info("[MOCK TOOLCHAIN] Criando estrutura mock para build_host")
+            logger.info("[MOCK TOOLCHAIN] Creating mock structure for build_host")
             self.build_host_dir.mkdir(parents=True, exist_ok=True)
             (self.build_host_dir / "usr" / "bin").mkdir(parents=True, exist_ok=True)
             return
 
         if self.build_host_dir.exists() and (self.build_host_dir / "bin").exists():
-            logger.info("Ambiente build_host já existente.")
+            logger.info("Environment build_host already exists.")
             return
 
         url = self._resolve_latest_stage3_url()
         tarball_path = self.cache_dir / "stage3-build-host.tar.xz"
 
         if not tarball_path.exists():
-            logger.info(f"Descarregando Stage3 para o build_host de {url}...")
+            logger.info(f"Downloading Stage3 for build_host from {url}...")
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
                 with urllib.request.urlopen(req) as response, open(tarball_path, "wb") as out_file:
                     shutil.copyfileobj(response, out_file)
             except Exception as e:
-                raise ToolchainManagerError(f"Falha no download do Stage3 do build_host: {e}")
+                raise ToolchainManagerError(f"Failed to download build_host Stage3: {e}")
 
-        logger.info(f"Extraindo Stage3 isolado no build_host ({self.build_host_dir})...")
+        logger.info(f"Extracting isolated Stage3 into build_host ({self.build_host_dir})...")
         self.build_host_dir.mkdir(parents=True, exist_ok=True)
         res = subprocess.run(["tar", "xpf", str(tarball_path), "-C", str(self.build_host_dir), "--numeric-owner"], capture_output=True, text=True)
         if res.returncode != 0:
-            raise ToolchainManagerError(f"Falha ao extrair Stage3 do build_host: {res.stderr}")
+            raise ToolchainManagerError(f"Failed to extract build_host Stage3: {res.stderr}")
 
         host_resolv = Path("/etc/resolv.conf")
         if host_resolv.exists():
@@ -100,14 +100,14 @@ class ToolchainManager:
 
     def mount_virtual_fs(self):
         if self.mode == "mock":
-            logger.info(f"[MOCK TOOLCHAIN] Montando sistemas de arquivos virtuais no build_host")
+            logger.info(f"[MOCK TOOLCHAIN] Mounting virtual filesystems into build_host")
             self.is_mounted = True
             return
 
         if os.geteuid() != 0:
-            raise ToolchainManagerError("Privilégios de root necessários para montar o build_host.")
+            raise ToolchainManagerError("Root privileges required to mount build_host.")
 
-        logger.info(f"Montando proc, sys, dev no build_host em {self.build_host_dir}")
+        logger.info(f"Mounting proc, sys, dev into build_host at {self.build_host_dir}")
         mounts = [
             ("proc", self.build_host_dir / "proc", "proc", None),
             ("sysfs", self.build_host_dir / "sys", "sysfs", None),
@@ -124,20 +124,20 @@ class ToolchainManager:
             cmd.extend([src, str(target)])
             res = subprocess.run(cmd, capture_output=True, text=True)
             if res.returncode != 0 and "already mounted" not in res.stderr:
-                logger.warning(f"Aviso ao montar {target}: {res.stderr.strip()}")
+                logger.warning(f"Warning mounting {target}: {res.stderr.strip()}")
 
         self.is_mounted = True
 
     def umount_virtual_fs(self):
         if self.mode == "mock":
-            logger.info(f"[MOCK TOOLCHAIN] Desmontando sistemas de arquivos do build_host")
+            logger.info(f"[MOCK TOOLCHAIN] Unmounting filesystems from build_host")
             self.is_mounted = False
             return
 
         if not self.is_mounted and os.geteuid() != 0:
             return
 
-        logger.info(f"Desmontando sistemas de arquivos do build_host em {self.build_host_dir}")
+        logger.info(f"Unmounting filesystems from build_host at {self.build_host_dir}")
         targets = [
             self.build_host_dir / "dev" / "shm",
             self.build_host_dir / "dev" / "pts",
@@ -165,7 +165,7 @@ class ToolchainManager:
             return subprocess.CompletedProcess(args=cmd_args, returncode=0, stdout="[MOCK TOOLCHAIN OUTPUT]", stderr="")
 
         if os.geteuid() != 0:
-            raise ToolchainManagerError("Execução no build_host chroot requer privilégios de root.")
+            raise ToolchainManagerError("Execution in build_host chroot requires root privileges.")
 
         return CommandRunner.run_chroot_stream(
             chroot_path=str(self.build_host_dir),

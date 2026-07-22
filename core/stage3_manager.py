@@ -70,9 +70,9 @@ class Stage3Manager:
 
         if os.geteuid() != 0:
             raise Stage3ManagerError(
-                "Modo real requer privilégios de super-utilizador (root/sudo).\n"
-                "A extração do Stage3 cria nós de dispositivo (/dev/null, /dev/console) via mknod.\n"
-                "Por favor execute o comando com sudo:\n"
+                "Real mode requires root privileges (root/sudo).\n"
+                "Extracting Stage3 creates device nodes (/dev/null, /dev/console) via mknod.\n"
+                "Please run the command with sudo:\n"
                 "  sudo python3 cli.py x86_64 --mode real ..."
             )
 
