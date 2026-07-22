@@ -22,6 +22,7 @@ class BuildOrchestrator:
         config_path: str = "configs/global_build.json",
         mode: str = "mock",
         clean: bool = True,
+        init_system: Optional[str] = "openrc",
         desktop: Optional[str] = None,
         kernel: Optional[str] = None,
         bootloader: Optional[str] = None,
@@ -34,20 +35,21 @@ class BuildOrchestrator:
         self.config_path = resolve_from_project(config_path)
         self.mode = mode
         self.clean = clean
+        self.init_system = init_system or "openrc"
         self.desktop = desktop
         self.kernel = kernel
         self.bootloader = bootloader
         self.package_profiles = package_profiles or []
         self.service_profiles = service_profiles or []
         self.live_profile = live_profile
-        self.output_name = output_name or f"gentoo-builder-{desktop or 'base'}-{arch}.iso"
+        self.output_name = output_name or f"gentoo-builder-{self.init_system}-{desktop or 'base'}-{arch}.iso"
 
         self.workdir = resolve_from_project("workdir") / self.arch
         self.target_root = self.workdir / "chroot"
         self.config_loader = ConfigLoader()
 
     def build(self) -> Path:
-        logger.info(f"Starting Gentoo-Builder pipeline in [{self.mode.upper()}] mode...")
+        logger.info(f"Starting Gentoo-Builder pipeline [{self.init_system.upper()}] in [{self.mode.upper()}] mode...")
         
         if self.clean and self.workdir.exists():
             logger.info(f"Cleaning workspace directory: {self.workdir}")
@@ -61,6 +63,7 @@ class BuildOrchestrator:
         # 1. Load merged configurations
         build_config = self.config_loader.assemble_build_config(
             global_config_path=self.config_path,
+            init_system=self.init_system,
             desktop=self.desktop,
             kernel=self.kernel,
             bootloader=self.bootloader,
@@ -84,7 +87,7 @@ class BuildOrchestrator:
             portage.sync_portage()
             portage.install_packages(build_config.get("packages", []))
 
-            # 5. LiveCD Customizations (inspired by Gentoo Catalyst)
+            # 5. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
             customizer = SystemCustomizer(chroot, build_config)
             customizer.configure_system_defaults()
             customizer.setup_live_users()

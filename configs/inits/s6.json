@@ -1,0 +1,10 @@
+{
+  "init_system": "s6",
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
+  },
+  "packages": [
+    "sys-apps/s6",
+    "sys-apps/s6-rc"
+  ]
+}

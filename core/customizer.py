@@ -11,6 +11,7 @@ class SystemCustomizer:
     def __init__(self, chroot: ChrootManager, config: Dict[str, Any]):
         self.chroot = chroot
         self.config = config
+        self.init_system = config.get("init_system", "openrc")
         self.target_root = chroot.target_root
 
     def setup_live_users(self):
@@ -25,12 +26,10 @@ class SystemCustomizer:
             logger.info(f"[MOCK CUSTOMIZER] Adding user {username}")
             return
 
-        # Ensure groups exist and create user
         self.chroot.run_in_chroot(f"groupadd -f {username}")
         user_cmd = f"useradd -m -g {username} -G {groups_str} -s /bin/bash {username}"
         self.chroot.run_in_chroot(user_cmd)
 
-        # Allow passwordless sudo for wheel group
         sudoers_file = self.target_root / "etc" / "sudoers.d" / "live_user"
         sudoers_file.parent.mkdir(parents=True, exist_ok=True)
         sudoers_file.write_text(f"{username} ALL=(ALL) NOPASSWD: ALL\n")
@@ -41,14 +40,21 @@ class SystemCustomizer:
         if not services:
             return
 
-        logger.info(f"Enabling OpenRC services: {', '.join(services)}")
+        logger.info(f"Enabling [{self.init_system.upper()}] services: {', '.join(services)}")
 
         if self.chroot.mode == "mock":
-            logger.info(f"[MOCK CUSTOMIZER] Enabling services: {services}")
+            logger.info(f"[MOCK CUSTOMIZER] Enabling {self.init_system} services: {services}")
             return
 
         for srv in services:
-            self.chroot.run_in_chroot(f"rc-update add {srv} default")
+            if self.init_system == "systemd":
+                self.chroot.run_in_chroot(f"systemctl enable {srv}")
+            elif self.init_system == "openrc":
+                self.chroot.run_in_chroot(f"rc-update add {srv} default")
+            elif self.init_system == "runit":
+                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/")
+            elif self.init_system == "s6":
+                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
     def configure_system_defaults(self):
         logger.info("Applying Gentoo live system defaults (hostname, sshd, fstab, timezone)...")
@@ -57,9 +63,13 @@ class SystemCustomizer:
             return
 
         # Hostname
-        hostname_path = self.target_root / "etc" / "conf.d" / "hostname"
-        hostname_path.parent.mkdir(parents=True, exist_ok=True)
-        hostname_path.write_text('hostname="gentoo-live"\n')
+        if self.init_system == "openrc":
+            hostname_path = self.target_root / "etc" / "conf.d" / "hostname"
+            hostname_path.parent.mkdir(parents=True, exist_ok=True)
+            hostname_path.write_text('hostname="gentoo-live"\n')
+        else:
+            hostname_path = self.target_root / "etc" / "hostname"
+            hostname_path.write_text('gentoo-live\n')
 
         # Fstab
         fstab_path = self.target_root / "etc" / "fstab"

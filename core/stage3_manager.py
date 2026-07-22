@@ -21,13 +21,10 @@ class Stage3Manager:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _resolve_latest_stage3_url(self, base_url: str) -> str:
-        if not base_url.endswith("latest-stage3-amd64-openrc.txt"):
-            if "stage3-amd64-openrc-latest.tar.xz" in base_url:
-                txt_url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
-            else:
-                return base_url
-        else:
+        if base_url.endswith(".txt"):
             txt_url = base_url
+        else:
+            return base_url
 
         try:
             req = urllib.request.Request(txt_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -35,7 +32,7 @@ class Stage3Manager:
                 content = resp.read().decode("utf-8")
                 for line in content.splitlines():
                     line = line.strip()
-                    if line and not line.startswith("#") and not line.startswith("-----") and "stage3-amd64-openrc" in line:
+                    if line and not line.startswith("#") and not line.startswith("-----") and "stage3-amd64" in line:
                         rel_path = line.split()[0]
                         full_url = f"https://distfiles.gentoo.org/releases/amd64/autobuilds/{rel_path}"
                         logger.info(f"Resolved latest Gentoo Stage3 URL: {full_url}")
@@ -71,10 +68,7 @@ class Stage3Manager:
         logger.info(f"Extracting Gentoo Stage3 into {target_root}...")
         target_root.mkdir(parents=True, exist_ok=True)
 
-        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner", "--xattrs-include='*.*'"]
-        if os.geteuid() != 0:
-            tar_cmd.append("--warning=no-unknown-keyword")
-
+        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner"]
         res = subprocess.run(tar_cmd, capture_output=True, text=True)
         if res.returncode != 0:
             raise Stage3ManagerError(f"Failed to extract Stage3 tarball: {res.stderr}\nNote: Real Gentoo stage3 extraction requires root/sudo to create device nodes (mknod).")

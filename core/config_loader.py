@@ -16,7 +16,6 @@ class ConfigLoader:
     def load_json(self, relative_or_abs_path: str | Path) -> Dict[str, Any]:
         path = Path(relative_or_abs_path)
         if not path.is_absolute():
-            # Check if path is relative to project root or config root
             candidate = resolve_from_project(path)
             if candidate.exists():
                 path = candidate
@@ -41,6 +40,7 @@ class ConfigLoader:
     def assemble_build_config(
         self,
         global_config_path: str | Path,
+        init_system: Optional[str] = "openrc",
         desktop: Optional[str] = None,
         kernel: Optional[str] = None,
         bootloader: Optional[str] = None,
@@ -59,8 +59,18 @@ class ConfigLoader:
             "kernel": {},
             "bootloader": {},
             "live_user": base_cfg.get("live_user", {}),
-            "custom_files": base_cfg.get("custom_files", [])
+            "custom_files": base_cfg.get("custom_files", []),
+            "init_system": "openrc"
         }
+
+        # Apply Init system profile (openrc, systemd, runit, s6)
+        if init_system:
+            init_cfg = self.load_profile("inits", init_system)
+            merged["init_system"] = init_cfg.get("init_system", init_system)
+            if "stage3" in init_cfg:
+                merged["stage3"].update(init_cfg["stage3"])
+            merged["packages"].extend(init_cfg.get("packages", []))
+            merged["use_flags"].extend(init_cfg.get("use_flags", []))
 
         # Apply base customizations if existing
         base_custom_path = self.config_root / "base_customizations.json"

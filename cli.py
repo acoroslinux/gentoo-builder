@@ -50,6 +50,7 @@ def main():
     )
     parser.set_defaults(clean=True)
 
+    parser.add_argument("--init", type=str, default="openrc", help="Init system profile (openrc, systemd, runit, s6). Default: openrc")
     parser.add_argument("--desktop", type=str, help="Desktop environment profile (e.g. xfce, gnome)")
     parser.add_argument("--kernel", type=str, help="Kernel profile (e.g. gentoo-kernel-bin)")
     parser.add_argument("--bootloader", type=str, help="Bootloader profile (e.g. grub-uefi)")
@@ -62,7 +63,7 @@ def main():
 
     if args.list_options:
         print("Available Gentoo-Builder Profiles:")
-        for category in ["architectures", "desktops", "kernels", "bootloaders", "packages", "services", "live-users"]:
+        for category in ["architectures", "inits", "desktops", "kernels", "bootloaders", "packages", "services", "live-users"]:
             profs = _available_profiles(config_root, category)
             print(f"  {category:<15}: {', '.join(profs) if profs else 'None'}")
         sys.exit(0)
@@ -73,6 +74,7 @@ def main():
             config_path=args.config,
             mode=args.mode,
             clean=args.clean,
+            init_system=args.init,
             desktop=args.desktop,
             kernel=args.kernel,
             bootloader=args.bootloader,
