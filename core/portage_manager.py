@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from typing import Dict, Any, List
 from core.chroot_manager import ChrootManager
@@ -57,10 +58,48 @@ class PortageManager:
         if res.returncode != 0 and self.chroot.mode == "real":
             logger.warning(f"emerge @world retornou avisos: {res.stderr}")
 
+    def setup_custom_overlay(self, custom_ebuilds_dir: Path = None):
+        """Injeta overlay e ebuilds personalizadas na árvore do Portage chroot."""
+        local_repo_dir = self.target_root / "var" / "db" / "repos" / "local_repo"
+        repos_conf_dir = self.target_root / "etc" / "portage" / "repos.conf"
+
+        if self.chroot.mode == "mock":
+            logger.info("[MOCK PORTAGE] Setting up custom overlay repository")
+            return
+
+        repos_conf_dir.mkdir(parents=True, exist_ok=True)
+        local_repo_dir.mkdir(parents=True, exist_ok=True)
+        (local_repo_dir / "profiles").mkdir(parents=True, exist_ok=True)
+        (local_repo_dir / "metadata").mkdir(parents=True, exist_ok=True)
+
+        repo_name_file = local_repo_dir / "profiles" / "repo_name"
+        repo_name_file.write_text("local_repo\n")
+
+        layout_conf = local_repo_dir / "metadata" / "layout.conf"
+        layout_conf.write_text("masters = gentoo\nauto-sync = no\n")
+
+        local_repo_conf = repos_conf_dir / "local_repo.conf"
+        local_repo_conf.write_text(
+            "[local_repo]\n"
+            "location = /var/db/repos/local_repo\n"
+            "masters = gentoo\n"
+            "auto-sync = no\n"
+        )
+
+        if custom_ebuilds_dir and Path(custom_ebuilds_dir).exists():
+            logger.info(f"Copying custom ebuilds from {custom_ebuilds_dir} -> {local_repo_dir}")
+            for item in Path(custom_ebuilds_dir).glob("*"):
+                if item.is_dir():
+                    shutil.copytree(item, local_repo_dir / item.name, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(item, local_repo_dir / item.name)
+            self.chroot.run_in_chroot("ebuild $(find /var/db/repos/local_repo -name '*.ebuild') digest", env={"PORTDIR": "/var/db/repos/gentoo"})
+
     def install_packages(self, packages: List[str]):
         if not packages:
             return
 
+        self.setup_custom_overlay()
         self.update_world()
 
         logger.info(f"Installing packages via emerge: {' '.join(packages)}")

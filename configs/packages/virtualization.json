@@ -1,0 +1,19 @@
+{
+  "name": "virtualization",
+  "description": "Virtualization stack (QEMU, KVM, Libvirt, Docker)",
+  "packages": [
+    "app-emulation/qemu",
+    "app-emulation/libvirt",
+    "app-containers/docker",
+    "app-emulation/virt-manager"
+  ],
+  "services": [
+    "libvirtd",
+    "docker"
+  ],
+  "use_flags": [
+    "qemu",
+    "kvm",
+    "virt-network"
+  ]
+}

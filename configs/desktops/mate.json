@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "mate-base/mate",
+    "x11-terms/mate-terminal"
+  ],
+  "services": [
+    "lightdm"
+  ],
+  "use_flags": [
+    "X",
+    "gtk",
+    "gtk3",
+    "mate"
+  ]
+}

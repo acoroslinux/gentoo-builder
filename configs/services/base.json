@@ -1,0 +1,8 @@
+{
+  "name": "base-services",
+  "description": "Base services active across all builds",
+  "services": [
+    "dbus",
+    "NetworkManager"
+  ]
+}

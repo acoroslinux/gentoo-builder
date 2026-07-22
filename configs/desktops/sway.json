@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "gui-wm/sway",
+    "x11-terms/foot",
+    "gui-apps/waybar",
+    "gui-apps/wofi",
+    "gui-libs/wlroots"
+  ],
+  "services": [],
+  "use_flags": [
+    "wayland",
+    "gles2",
+    "sway",
+    "elogind",
+    "polkit"
+  ]
+}

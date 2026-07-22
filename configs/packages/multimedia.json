@@ -1,0 +1,16 @@
+{
+  "name": "multimedia",
+  "description": "Multimedia codecs and playback applications",
+  "packages": [
+    "media-video/mpv",
+    "media-video/vlc",
+    "media-libs/ffmpeg",
+    "media-gfx/gimp"
+  ],
+  "use_flags": [
+    "ffmpeg",
+    "mp4",
+    "h264",
+    "aom"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "lxqt-base/lxqt-meta",
+    "x11-terms/qterminal"
+  ],
+  "services": [
+    "sddm"
+  ],
+  "use_flags": [
+    "X",
+    "qt5",
+    "qt6",
+    "lxqt"
+  ]
+}

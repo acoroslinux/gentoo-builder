@@ -1,0 +1,13 @@
+{
+  "name": "filesystems",
+  "description": "Filesystem management tools (Btrfs, ZFS, Ext4, XFS, NTFS, FAT)",
+  "packages": [
+    "sys-fs/btrfs-progs",
+    "sys-fs/e2fsprogs",
+    "sys-fs/xfsprogs",
+    "sys-fs/dosfstools",
+    "sys-fs/ntfs3g",
+    "sys-fs/f2fs-tools",
+    "sys-fs/squashfs-tools"
+  ]
+}

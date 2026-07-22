@@ -1,0 +1,14 @@
+{
+  "packages": [
+    "lxde-base/lxde-meta",
+    "x11-terms/lxterminal"
+  ],
+  "services": [
+    "lightdm"
+  ],
+  "use_flags": [
+    "X",
+    "gtk",
+    "lxde"
+  ]
+}

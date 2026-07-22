@@ -1,0 +1,20 @@
+{
+  "packages": [
+    "kde-plasma/plasma-meta",
+    "kde-apps/konsole",
+    "kde-apps/dolphin"
+  ],
+  "services": [
+    "sddm"
+  ],
+  "use_flags": [
+    "X",
+    "plasma",
+    "wayland",
+    "qt5",
+    "qt6",
+    "kde",
+    "policykit",
+    "udisks"
+  ]
+}

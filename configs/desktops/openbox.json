@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "x11-wm/openbox",
+    "x11-misc/obconf",
+    "x11-misc/tint2",
+    "x11-terms/alacritty"
+  ],
+  "services": [
+    "lightdm"
+  ],
+  "use_flags": [
+    "X",
+    "startup-notification"
+  ]
+}

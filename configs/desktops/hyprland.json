@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "gui-wm/hyprland",
+    "gui-apps/waybar",
+    "gui-apps/rofi-wayland",
+    "gui-apps/kitty",
+    "gui-libs/xdg-desktop-portal-hyprland"
+  ],
+  "services": [
+    "sddm"
+  ],
+  "use_flags": [
+    "wayland",
+    "gles2",
+    "hyprland"
+  ]
+}

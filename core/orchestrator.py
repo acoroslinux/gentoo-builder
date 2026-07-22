@@ -132,8 +132,8 @@ class BuildOrchestrator:
 
                 # 7. LiveCD Customizations (supporting OpenRC, Systemd, Runit, s6)
                 customizer = SystemCustomizer(chroot, build_config)
-                customizer.configure_system_defaults()
                 customizer.setup_live_users()
+                customizer.configure_system_defaults()
                 customizer.setup_services()
 
                 # 8. Build ISO with GRUB bootloader options

@@ -1,0 +1,13 @@
+{
+  "name": "dev-tools",
+  "description": "Essential development tools, compilers and build system headers",
+  "packages": [
+    "sys-devel/gcc",
+    "sys-devel/make",
+    "dev-vcs/git",
+    "sys-devel/cmake",
+    "sys-devel/ninja",
+    "dev-build/autoconf",
+    "dev-build/automake"
+  ]
+}

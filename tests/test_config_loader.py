@@ -9,3 +9,4 @@ def test_load_global_config():
     assert "xfce-base/xfce4-meta" in cfg["packages"]
     assert "sys-kernel/gentoo-kernel-bin" in cfg["packages"]
     assert "systemd" in cfg["use_flags"]
+    assert "dracut" in cfg["use_flags"]

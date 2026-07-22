@@ -1,0 +1,26 @@
+{
+  "name": "base",
+  "description": "Base common packages required for all Gentoo-Builder live builds",
+  "packages": [
+    "app-admin/sudo",
+    "acct-user/polkitd",
+    "acct-group/polkitd",
+    "net-misc/dhcpcd",
+    "net-misc/networkmanager",
+    "sys-apps/util-linux",
+    "sys-apps/openrc",
+    "net-misc/iputils",
+    "sys-apps/coreutils",
+    "sys-apps/findutils",
+    "sys-apps/grep",
+    "sys-apps/sed"
+  ],
+  "use_flags": [
+    "unicode",
+    "nls",
+    "udev",
+    "dbus",
+    "elogind",
+    "policykit"
+  ]
+}

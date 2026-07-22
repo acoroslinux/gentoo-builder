@@ -1,0 +1,17 @@
+{
+  "name": "audio",
+  "description": "Audio stack (PipeWire, PulseAudio and ALSA support)",
+  "packages": [
+    "media-video/pipewire",
+    "media-session/wireplumber",
+    "media-sound/pulseaudio",
+    "media-sound/alsa-utils",
+    "media-sound/pavucontrol"
+  ],
+  "use_flags": [
+    "sound",
+    "alsa",
+    "pulseaudio",
+    "pipewire"
+  ]
+}

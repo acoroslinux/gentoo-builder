@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "sys-boot/efibootmgr"
+  ],
+  "bootloader": {
+    "type": "systemd-boot",
+    "vol_id": "GENTOO_LIVE",
+    "bootargs": "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs"
+  }
+}

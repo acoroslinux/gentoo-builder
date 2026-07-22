@@ -1,5 +1,10 @@
 {
   "packages": [
     "sys-boot/grub"
-  ]
+  ],
+  "bootloader": {
+    "type": "grub-uefi",
+    "vol_id": "GENTOO_LIVE",
+    "bootargs": "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs"
+  }
 }

@@ -167,6 +167,8 @@ class ToolchainManager:
         if os.geteuid() != 0:
             raise ToolchainManagerError("Execução no build_host chroot requer privilégios de root.")
 
-        full_cmd = ["chroot", str(self.build_host_dir)] + cmd_args
-        logger.info(f"[BUILD_HOST CHROOT] Execute: {cmd_str}")
-        return subprocess.run(full_cmd, capture_output=True, text=True)
+        return CommandRunner.run_chroot_stream(
+            chroot_path=str(self.build_host_dir),
+            command=command,
+            mode=self.mode
+        )

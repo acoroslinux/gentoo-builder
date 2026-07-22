@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "app-editors/neovim",
+    "app-shells/zsh",
+    "app-admin/htop",
+    "net-misc/curl",
+    "net-misc/wget",
+    "sys-apps/ripgrep",
+    "sys-apps/fd",
+    "app-arch/p7zip"
+  ]
+}

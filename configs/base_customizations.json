@@ -1,9 +1,28 @@
 {
-  "make_conf": {
-    "FEATURES": "binpkg-logs parallel-install"
-  },
-  "use_flags": [
-    "elogind",
-    "policykit"
+  "base_copy_files": [
+    {
+      "source": "skel",
+      "destination": "/etc/skel"
+    },
+    {
+      "source": "autostart",
+      "destination": "/etc/xdg/autostart"
+    },
+    {
+      "source": "applications",
+      "destination": "/usr/share/applications"
+    },
+    {
+      "source": "sudoers.d",
+      "destination": "/etc/sudoers.d"
+    },
+    {
+      "source": "backgrounds",
+      "destination": "/usr/share/backgrounds"
+    },
+    {
+      "source": "scripts",
+      "destination": "/usr/local/bin"
+    }
   ]
 }

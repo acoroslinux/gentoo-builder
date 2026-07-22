@@ -1,0 +1,10 @@
+{
+  "name": "desktop-services",
+  "description": "Essential desktop system services (DBus, ACPI, Polkit, CUPS)",
+  "services": [
+    "dbus",
+    "acpid",
+    "cupsd",
+    "udisks2"
+  ]
+}

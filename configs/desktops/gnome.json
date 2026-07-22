@@ -1,0 +1,19 @@
+{
+  "packages": [
+    "gnome-base/gnome",
+    "gnome-extra/gnome-tweaks"
+  ],
+  "services": [
+    "gdm"
+  ],
+  "use_flags": [
+    "X",
+    "gnome",
+    "wayland",
+    "gtk",
+    "gtk4",
+    "systemd",
+    "introspection",
+    "policykit"
+  ]
+}

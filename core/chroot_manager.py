@@ -1,8 +1,8 @@
 import os
 import subprocess
-import shutil
 from pathlib import Path
 from typing import List, Optional
+from core.command_runner import CommandRunner
 from core.logger_setup import setup_logger
 
 logger = setup_logger("chroot_manager")
@@ -71,24 +71,10 @@ class ChrootManager:
         self.is_mounted = False
 
     def run_in_chroot(self, command: List[str] | str, env: Optional[dict] = None) -> subprocess.CompletedProcess:
-        if isinstance(command, str):
-            cmd_str = command
-            cmd_args = ["/bin/sh", "-c", command]
-        else:
-            cmd_str = " ".join(command)
-            cmd_args = command
-
-        if self.mode == "mock":
-            logger.info(f"[MOCK CHROOT] Execute: {cmd_str}")
-            return subprocess.CompletedProcess(args=cmd_args, returncode=0, stdout="[MOCK OUTPUT]", stderr="")
-
-        if os.geteuid() != 0:
-            raise ChrootManagerError("Real chroot execution requires root privileges.")
-
-        full_cmd = ["chroot", str(self.target_root)] + cmd_args
-        logger.info(f"[REAL CHROOT] Execute: {cmd_str}")
-        full_env = os.environ.copy()
-        if env:
-            full_env.update(env)
-
-        return subprocess.run(full_cmd, capture_output=True, text=True, env=full_env)
+        """Executa comandos dentro do chroot com streaming em tempo real dos logs na tela."""
+        return CommandRunner.run_chroot_stream(
+            chroot_path=str(self.target_root),
+            command=command,
+            env=env,
+            mode=self.mode
+        )

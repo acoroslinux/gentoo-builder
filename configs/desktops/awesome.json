@@ -1,0 +1,14 @@
+{
+  "packages": [
+    "x11-wm/awesome",
+    "x11-misc/dmenu",
+    "x11-terms/alacritty"
+  ],
+  "services": [
+    "lightdm"
+  ],
+  "use_flags": [
+    "X",
+    "lua"
+  ]
+}

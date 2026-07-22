@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install System
+Name[pt]=Instalar o Sistema
+GenericName=System Installer
+Comment=Install the operating system to your hard drive
+Exec=sudo calamares
+Icon=calamares
+Terminal=false
+Categories=System;

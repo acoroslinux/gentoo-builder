@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Void Modern
+Description=Void Modern Custom Splash Theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/void-modern
+ScriptFile=/usr/share/plymouth/themes/void-modern/void-modern.script

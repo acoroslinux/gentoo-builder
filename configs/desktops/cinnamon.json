@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "gnome-extra/cinnamon",
+    "x11-terms/gnome-terminal"
+  ],
+  "services": [
+    "lightdm"
+  ],
+  "use_flags": [
+    "X",
+    "gtk",
+    "gtk3",
+    "cinnamon"
+  ]
+}

@@ -78,6 +78,19 @@ class ConfigLoader:
             base_custom = self.load_json(base_custom_path)
             merged["make_conf"].update(base_custom.get("make_conf", {}))
             merged["use_flags"].extend(base_custom.get("use_flags", []))
+            merged["custom_files"].extend(base_custom.get("base_copy_files", []))
+
+        # Always merge base common package & service profiles
+        base_pkg_path = self.config_root / "packages" / "base.json"
+        if base_pkg_path.exists():
+            base_pkg = self.load_json(base_pkg_path)
+            merged["packages"].extend(base_pkg.get("packages", []))
+            merged["use_flags"].extend(base_pkg.get("use_flags", []))
+
+        base_srv_path = self.config_root / "services" / "base.json"
+        if base_srv_path.exists():
+            base_srv = self.load_json(base_srv_path)
+            merged["services"].extend(base_srv.get("services", []))
 
         # Desktop profile
         if desktop:
@@ -92,6 +105,7 @@ class ConfigLoader:
             k_cfg = self.load_profile("kernels", kernel)
             merged["kernel"] = k_cfg
             merged["packages"].extend(k_cfg.get("packages", []))
+            merged["use_flags"].extend(k_cfg.get("use_flags", []))
 
         # Bootloader profile
         if bootloader:

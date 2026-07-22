@@ -1,0 +1,13 @@
+{
+  "packages": [
+    "sys-boot/calamares",
+    "sys-boot/calamares-gentoo-configs"
+  ],
+  "services": [],
+  "use_flags": [
+    "qt5",
+    "qt6",
+    "kpmcore",
+    "networkmanager"
+  ]
+}

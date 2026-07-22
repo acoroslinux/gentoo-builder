@@ -1,0 +1,9 @@
+{
+  "name": "system-monitoring",
+  "description": "System logging, time sync, cron and monitoring services",
+  "services": [
+    "sysklogd",
+    "chronyd",
+    "vixie-cron"
+  ]
+}

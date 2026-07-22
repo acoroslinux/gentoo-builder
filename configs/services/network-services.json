@@ -1,0 +1,10 @@
+{
+  "name": "network-services",
+  "description": "Network connectivity and resolution services",
+  "services": [
+    "NetworkManager",
+    "dhcpcd",
+    "sshd",
+    "wpa_supplicant"
+  ]
+}

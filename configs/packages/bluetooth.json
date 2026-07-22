@@ -1,0 +1,15 @@
+{
+  "name": "bluetooth",
+  "description": "Bluetooth support and management tools",
+  "packages": [
+    "net-wireless/bluez",
+    "net-wireless/bluez-utils",
+    "net-wireless/blueman"
+  ],
+  "services": [
+    "bluetooth"
+  ],
+  "use_flags": [
+    "bluetooth"
+  ]
+}

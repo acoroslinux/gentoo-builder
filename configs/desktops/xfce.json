@@ -13,5 +13,16 @@
     "harfbuzz",
     "udisks",
     "gtk3"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "xfce",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/xfce",
+        "destination": "/etc/skel/.config/xfce4"
+      }
+    ]
+  }
 }

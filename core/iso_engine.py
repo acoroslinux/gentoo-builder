@@ -21,9 +21,34 @@ class ISOEngine:
 
     def prepare_iso_root(self):
         logger.info(f"Preparing ISO root structure at {self.iso_dir}")
-        self.iso_dir.mkdir(parents=True, exist_ok=True)
-        (self.iso_dir / "live").mkdir(parents=True, exist_ok=True)
-        (self.iso_dir / "boot" / "grub").mkdir(parents=True, exist_ok=True)
+        try:
+            self.iso_dir.mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            if self.mode == "mock":
+                logger.warning(f"[MOCK ISO ENGINE] Permission denied creating {self.iso_dir}. Using existing root.")
+            else:
+                raise
+
+        for sub in ["live", "boot/grub", "isolinux", "loader/entries"]:
+            p = self.iso_dir / sub
+            try:
+                p.mkdir(parents=True, exist_ok=True)
+            except PermissionError:
+                if self.mode != "mock":
+                    raise
+
+        # Copiar kernel e initramfs do chroot se existirem
+        chroot_boot = self.target_root / "boot"
+        iso_boot = self.iso_dir / "boot"
+        if chroot_boot.exists():
+            for kfile in chroot_boot.glob("vmlinuz*"):
+                shutil.copy2(kfile, iso_boot / "vmlinuz")
+                logger.info(f"Copied kernel {kfile.name} -> {iso_boot / 'vmlinuz'}")
+                break
+            for ifile in chroot_boot.glob("initramfs*"):
+                shutil.copy2(ifile, iso_boot / "initramfs")
+                logger.info(f"Copied initramfs {ifile.name} -> {iso_boot / 'initramfs'}")
+                break
 
     def create_squashfs(self):
         squash_path = self.iso_dir / "live" / "filesystem.squashfs"
@@ -41,7 +66,7 @@ class ISOEngine:
     def generate_grub_config(self):
         grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
         vol_id = self.config.get("vol_id", "GENTOO_LIVE")
-        bootargs = self.config.get("bootargs", "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs")
+        bootargs = self.config.get("bootargs", f"root=live:CDLABEL={vol_id} rd.live.dir=/ rd.live.squashimg=filesystem.squashfs cdroot")
 
         lines = [
             "set default=0",
@@ -54,16 +79,19 @@ class ISOEngine:
             "set gfxmode=auto",
             "",
             "menuentry 'Boot Gentoo LiveCD (Default)' --class gnu-linux --class os {",
+            f"    search --no-floppy --set=root -l {vol_id}",
             f"    linux /boot/vmlinuz {bootargs}",
             "    initrd /boot/initramfs",
             "}",
             "",
             "menuentry 'Boot Gentoo LiveCD (Copy to RAM)' --class gnu-linux --class os {",
-            f"    linux /boot/vmlinuz {bootargs} docache",
+            f"    search --no-floppy --set=root -l {vol_id}",
+            f"    linux /boot/vmlinuz {bootargs} docache rd.live.ram=1",
             "    initrd /boot/initramfs",
             "}",
             "",
             "menuentry 'Boot Gentoo LiveCD (Safe Graphics)' --class gnu-linux --class os {",
+            f"    search --no-floppy --set=root -l {vol_id}",
             f"    linux /boot/vmlinuz {bootargs} nomodeset",
             "    initrd /boot/initramfs",
             "}"
@@ -73,10 +101,67 @@ class ISOEngine:
             logger.info(f"[MOCK ISO ENGINE] Writing GRUB config to {grub_cfg}")
         grub_cfg.write_text("\n".join(lines) + "\n")
 
+    def generate_syslinux_config(self):
+        syslinux_cfg = self.iso_dir / "isolinux" / "isolinux.cfg"
+        bootargs = self.config.get("bootargs", "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs")
+
+        lines = [
+            "UI vesamenu.c32",
+            "DEFAULT gentoo",
+            "TIMEOUT 100",
+            "PROMPT 0",
+            "",
+            "LABEL gentoo",
+            "  MENU LABEL Boot Gentoo LiveCD (Default)",
+            "  KERNEL /boot/vmlinuz",
+            f"  APPEND initrd=/boot/initramfs {bootargs}",
+            "",
+            "LABEL gentoo-ram",
+            "  MENU LABEL Boot Gentoo LiveCD (Copy to RAM)",
+            "  KERNEL /boot/vmlinuz",
+            f"  APPEND initrd=/boot/initramfs {bootargs} docache",
+            "",
+            "LABEL gentoo-safe",
+            "  MENU LABEL Boot Gentoo LiveCD (Safe Graphics)",
+            "  KERNEL /boot/vmlinuz",
+            f"  APPEND initrd=/boot/initramfs {bootargs} nomodeset"
+        ]
+
+        if self.mode == "mock":
+            logger.info(f"[MOCK ISO ENGINE] Writing ISOLINUX config to {syslinux_cfg}")
+        syslinux_cfg.write_text("\n".join(lines) + "\n")
+
+    def generate_systemd_boot_config(self):
+        loader_conf = self.iso_dir / "loader" / "loader.conf"
+        entry_conf = self.iso_dir / "loader" / "entries" / "gentoo.conf"
+        bootargs = self.config.get("bootargs", "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs")
+
+        loader_conf.write_text("default gentoo.conf\ntimeout 10\nconsole-mode max\n")
+        entry_conf.write_text(
+            "title Gentoo LiveCD\n"
+            "linux /boot/vmlinuz\n"
+            "initrd /boot/initramfs\n"
+            f"options {bootargs}\n"
+        )
+        if self.mode == "mock":
+            logger.info(f"[MOCK ISO ENGINE] Writing Systemd-boot config to {loader_conf}")
+
+    def generate_bootloader_configs(self):
+        btype = self.config.get("type", "grub-uefi")
+        logger.info(f"Generating bootloader configurations for type: {btype}")
+
+        if "syslinux" in btype or "isolinux" in btype:
+            self.generate_syslinux_config()
+        elif "systemd-boot" in btype:
+            self.generate_systemd_boot_config()
+            self.generate_grub_config()
+        else:
+            self.generate_grub_config()
+
     def build_iso(self) -> Path:
         self.prepare_iso_root()
         self.create_squashfs()
-        self.generate_grub_config()
+        self.generate_bootloader_configs()
 
         output_iso = self.workdir / self.output_name
         logger.info(f"Building ISO file: {output_iso}")
@@ -86,15 +171,31 @@ class ISOEngine:
             output_iso.write_text("MOCK GENTOO ISO IMAGE CONTENT")
         else:
             vol_id = self.config.get("vol_id", "GENTOO_LIVE")
-            cmd = [
-                "grub-mkrescue",
-                "-volid", vol_id,
-                "-o", str(output_iso),
-                str(self.iso_dir)
-            ]
+            btype = self.config.get("type", "grub-uefi")
+
+            if "syslinux" in btype or "isolinux" in btype:
+                cmd = [
+                    "xorriso", "-as", "mkisofs",
+                    "-iso-level", "3",
+                    "-full-iso9660-filenames",
+                    "-volid", vol_id,
+                    "-eltorito-boot", "isolinux/isolinux.bin",
+                    "-eltorito-catalog", "isolinux/boot.cat",
+                    "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table",
+                    "-output", str(output_iso),
+                    str(self.iso_dir)
+                ]
+            else:
+                cmd = [
+                    "grub-mkrescue",
+                    "-volid", vol_id,
+                    "-o", str(output_iso),
+                    str(self.iso_dir)
+                ]
+
             res = subprocess.run(cmd, capture_output=True, text=True)
             if res.returncode != 0:
-                raise ISOEngineError(f"grub-mkrescue failed: {res.stderr}")
+                raise ISOEngineError(f"ISO creation failed: {res.stderr}")
 
         self._generate_checksums(output_iso)
         return output_iso

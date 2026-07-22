@@ -1,0 +1,33 @@
+[Plymouth Theme]
+Name=Modern
+Description=Modern Arch-Builder Theme with Glowing Logo
+ModuleName=two-step
+
+[two-step]
+Font=Cantarell 12
+TitleFont=Cantarell Light 30
+ImageDir=/usr/share/plymouth/themes/modern
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.55
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.382
+Transition=fade
+TransitionDuration=1.0
+BackgroundStartColor=0x0f0f15
+BackgroundEndColor=0x0f0f15
+ProgressBarBackgroundColor=0x303030
+ProgressBarForegroundColor=0x58a6ff
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+
+[shutdown]
+UseEndAnimation=false
+
+[reboot]
+UseEndAnimation=false

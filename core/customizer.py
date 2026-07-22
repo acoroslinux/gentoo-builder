@@ -56,8 +56,77 @@ class SystemCustomizer:
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
+    def copy_custom_files(self):
+        """Copia ficheiros estruturados de configs/custom_files/ para o chroot conforme especificado nas configs."""
+        custom_files_list = self.config.get("custom_files", [])
+        desktop_env = self.config.get("desktop_environment", {})
+        
+        if desktop_env and isinstance(desktop_env, dict):
+            desktop_copy_files = desktop_env.get("copy_files", [])
+            for item in desktop_copy_files:
+                if item not in custom_files_list:
+                    custom_files_list.append(item)
+
+        if not custom_files_list:
+            return
+
+        logger.info(f"Copying {len(custom_files_list)} custom file entries from configs/custom_files/ into chroot...")
+        
+        if self.chroot.mode == "mock":
+            for entry in custom_files_list:
+                logger.info(f"[MOCK CUSTOMIZER] Copy file entry: {entry.get('source')} -> {entry.get('destination')}")
+            return
+
+        project_root = resolve_from_project("")
+        custom_files_root = project_root / "configs" / "custom_files"
+
+        # Resolve python version in chroot if {python_version} is present in destinations
+        py_ver = "3.12"
+        if self.chroot.mode == "real":
+            python_dirs = list(self.target_root.glob("usr/lib/python3.*"))
+            if python_dirs:
+                py_ver = python_dirs[0].name.replace("python", "")
+
+        for entry in custom_files_list:
+            src_rel = entry.get("source")
+            dest_rel = entry.get("destination")
+            if not src_rel or not dest_rel:
+                continue
+
+            dest_rel = dest_rel.format(python_version=py_ver)
+            src_path = custom_files_root / src_rel
+            dest_path = self.target_root / dest_rel.lstrip("/")
+
+            if not src_path.exists():
+                logger.warning(f"Custom source path does not exist, skipping: {src_path}")
+                continue
+
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            if src_path.is_dir():
+                shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src_path, dest_path)
+            logger.info(f"Copied custom file: {src_rel} -> {dest_rel}")
+
+            # Propagate files destination under /etc/skel/ to existing home directories
+            if dest_rel.startswith("/etc/skel/"):
+                rel_skel = dest_rel[len("/etc/skel/"):]
+                home_dir = self.target_root / "home"
+                if home_dir.exists():
+                    for user_dir in home_dir.iterdir():
+                        if user_dir.is_dir() and user_dir.name not in ["lost+found"]:
+                            user_dest = user_dir / rel_skel
+                            user_dest.parent.mkdir(parents=True, exist_ok=True)
+                            if src_path.is_dir():
+                                shutil.copytree(src_path, user_dest, dirs_exist_ok=True)
+                            else:
+                                shutil.copy2(src_path, user_dest)
+                            self.chroot.run_in_chroot(f"chown -R {user_dir.name}:{user_dir.name} /home/{user_dir.name}/{rel_skel.split('/')[0]}")
+
     def configure_system_defaults(self):
         logger.info("Applying Gentoo live system defaults (hostname, sshd, fstab, timezone)...")
+        self.copy_custom_files()
+
         if self.chroot.mode == "mock":
             logger.info("[MOCK CUSTOMIZER] Setting up livecd defaults")
             return

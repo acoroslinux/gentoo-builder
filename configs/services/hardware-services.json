@@ -1,0 +1,9 @@
+{
+  "name": "hardware-services",
+  "description": "Hardware management, thermal control and bluetooth services",
+  "services": [
+    "bluetooth",
+    "tlp",
+    "lm_sensors"
+  ]
+}
