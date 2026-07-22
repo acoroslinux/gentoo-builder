@@ -43,12 +43,12 @@ def main():
 
     clean_group = parser.add_mutually_exclusive_group()
     clean_group.add_argument(
-        "--clean", dest="clean", action="store_true", help="Clean previous build artifacts (default)."
+        "--clean", dest="clean", action="store_true", help="Clean previous build artifacts."
     )
     clean_group.add_argument(
-        "--no-clean", dest="clean", action="store_false", help="Reuse previous build tree."
+        "--no-clean", dest="clean", action="store_false", help="Reuse previous build tree without pre-build cleanup."
     )
-    parser.set_defaults(clean=True)
+    parser.set_defaults(clean=False)
 
     parser.add_argument(
         "--force-isolated-toolchain",
