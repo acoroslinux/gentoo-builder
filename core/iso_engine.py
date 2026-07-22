@@ -70,27 +70,21 @@ class ISOEngine:
 
         lines = [
             "set default=0",
-            "set gfxpayload=keep",
             "set timeout=10",
-            "insmod all_video",
-            "insmod png",
-            "insmod gfxterm",
-            "terminal_output gfxterm",
-            "set gfxmode=auto",
             "",
-            "menuentry 'Boot Gentoo LiveCD (Default)' --class gnu-linux --class os {",
+            "menuentry 'Boot Gentoo Modern (Default)' --class gnu-linux --class os {",
             f"    search --no-floppy --set=root -l {vol_id}",
             f"    linux /boot/vmlinuz {bootargs}",
             "    initrd /boot/initramfs",
             "}",
             "",
-            "menuentry 'Boot Gentoo LiveCD (Copy to RAM)' --class gnu-linux --class os {",
+            "menuentry 'Boot Gentoo Modern (Copy to RAM)' --class gnu-linux --class os {",
             f"    search --no-floppy --set=root -l {vol_id}",
             f"    linux /boot/vmlinuz {bootargs} docache rd.live.ram=1",
             "    initrd /boot/initramfs",
             "}",
             "",
-            "menuentry 'Boot Gentoo LiveCD (Safe Graphics)' --class gnu-linux --class os {",
+            "menuentry 'Boot Gentoo Modern (Safe Graphics)' --class gnu-linux --class os {",
             f"    search --no-floppy --set=root -l {vol_id}",
             f"    linux /boot/vmlinuz {bootargs} nomodeset",
             "    initrd /boot/initramfs",
@@ -112,17 +106,17 @@ class ISOEngine:
             "PROMPT 0",
             "",
             "LABEL gentoo",
-            "  MENU LABEL Boot Gentoo LiveCD (Default)",
+            "  MENU LABEL Boot Gentoo Modern (Default)",
             "  KERNEL /boot/vmlinuz",
             f"  APPEND initrd=/boot/initramfs {bootargs}",
             "",
             "LABEL gentoo-ram",
-            "  MENU LABEL Boot Gentoo LiveCD (Copy to RAM)",
+            "  MENU LABEL Boot Gentoo Modern (Copy to RAM)",
             "  KERNEL /boot/vmlinuz",
             f"  APPEND initrd=/boot/initramfs {bootargs} docache",
             "",
             "LABEL gentoo-safe",
-            "  MENU LABEL Boot Gentoo LiveCD (Safe Graphics)",
+            "  MENU LABEL Boot Gentoo Modern (Safe Graphics)",
             "  KERNEL /boot/vmlinuz",
             f"  APPEND initrd=/boot/initramfs {bootargs} nomodeset"
         ]
@@ -138,7 +132,7 @@ class ISOEngine:
 
         loader_conf.write_text("default gentoo.conf\ntimeout 10\nconsole-mode max\n")
         entry_conf.write_text(
-            "title Gentoo LiveCD\n"
+            "title Gentoo Modern\n"
             "linux /boot/vmlinuz\n"
             "initrd /boot/initramfs\n"
             f"options {bootargs}\n"
