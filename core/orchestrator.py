@@ -1,5 +1,6 @@
 import shutil
 import os
+import subprocess
 from pathlib import Path
 from typing import List, Optional
 from core.config_loader import ConfigLoader
@@ -54,6 +55,7 @@ class BuildOrchestrator:
         self.config_loader = ConfigLoader()
 
     def _safe_clean_workdir(self):
+        """Clean workdir safely, unmounting all virtual filesystems first."""
         if not self.workdir.exists():
             return
 
@@ -64,9 +66,15 @@ class BuildOrchestrator:
             toolchain_tmp = ToolchainManager(self.workdir, self.mode)
             toolchain_tmp.umount_virtual_fs()
 
+            # Ensure any lazy leftover mounts in workdir are unmounted
+            for mount_point in [self.target_root / "dev" / "pts", self.target_root / "dev" / "shm", self.target_root / "dev", self.target_root / "sys", self.target_root / "proc"]:
+                if mount_point.exists():
+                    subprocess.run(["umount", "-l", str(mount_point)], capture_output=True)
+
         try:
             shutil.rmtree(self.workdir)
-        except PermissionError:
+        except Exception as e:
+            logger.warning(f"Standard rmtree failed: {e}. Attempting lazy unmount cleanup...")
             for root, dirs, files in os.walk(self.workdir, topdown=False):
                 for name in files:
                     file_p = Path(root) / name
