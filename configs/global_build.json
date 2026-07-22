@@ -5,7 +5,7 @@
     "maintainer": "AçorOS Linux Team"
   },
   "stage3": {
-    "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64-openrc/stage3-amd64-openrc-latest.tar.xz"
+    "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
   },
   "make_conf": {
     "CFLAGS": "-O2 -pipe -march=x86-64",
