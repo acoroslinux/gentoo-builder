@@ -54,47 +54,40 @@ class BuildOrchestrator:
         self.target_root = self.workdir / "chroot"
         self.config_loader = ConfigLoader()
 
-    def _safe_clean_workdir(self):
-        """Clean workdir safely, unmounting all virtual filesystems first."""
+    def _safe_clean_build_tree(self):
+        """
+        Limpa APENAS as pastas de build (chroot e iso_root),
+        PRESERVANDO a pasta 'cache' com o Stage3 e os pacotes baixados.
+        """
         if not self.workdir.exists():
             return
 
-        logger.info(f"Cleaning workspace directory: {self.workdir}")
+        logger.info(f"Limpar pastas de compilação (preservando cache de downloads) em: {self.workdir}")
         if self.mode != "mock":
             chroot_tmp = ChrootManager(self.target_root, self.mode)
             chroot_tmp.umount_virtual_fs()
             toolchain_tmp = ToolchainManager(self.workdir, self.mode)
             toolchain_tmp.umount_virtual_fs()
 
-            # Ensure any lazy leftover mounts in workdir are unmounted
             for mount_point in [self.target_root / "dev" / "pts", self.target_root / "dev" / "shm", self.target_root / "dev", self.target_root / "sys", self.target_root / "proc"]:
                 if mount_point.exists():
                     subprocess.run(["umount", "-l", str(mount_point)], capture_output=True)
 
-        try:
-            shutil.rmtree(self.workdir)
-        except Exception as e:
-            logger.warning(f"Standard rmtree failed: {e}. Attempting lazy unmount cleanup...")
-            for root, dirs, files in os.walk(self.workdir, topdown=False):
-                for name in files:
-                    file_p = Path(root) / name
-                    try:
-                        file_p.unlink()
-                    except Exception:
-                        pass
-                for name in dirs:
-                    dir_p = Path(root) / name
-                    try:
-                        dir_p.rmdir()
-                    except Exception:
-                        pass
-            shutil.rmtree(self.workdir, ignore_errors=True)
+        # Apagar apenas chroot e iso_root, preservando a pasta cache/
+        targets_to_clean = [self.workdir / "chroot", self.workdir / "iso_root"]
+        for target in targets_to_clean:
+            if target.exists():
+                try:
+                    shutil.rmtree(target)
+                except Exception as e:
+                    logger.warning(f"Não foi possível remover {target} diretamente: {e}. A tentar remoção recursiva...")
+                    shutil.rmtree(target, ignore_errors=True)
 
     def build(self) -> Path:
         logger.info(f"Starting Gentoo-Builder pipeline [{self.init_system.upper()}] in [{self.mode.upper()}] mode...")
         
         if self.clean:
-            self._safe_clean_workdir()
+            self._safe_clean_build_tree()
 
         self.workdir.mkdir(parents=True, exist_ok=True)
 

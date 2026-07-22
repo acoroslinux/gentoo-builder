@@ -33,7 +33,9 @@ class PortageManager:
             'ACCEPT_LICENSE="' + make_conf_data.get("ACCEPT_LICENSE", "*") + '"',
             'USE="' + " ".join(use_flags) + '"',
             'EMERGE_DEFAULT_OPTS="--jobs=2 --load-average=2"',
-            'FEATURES="binpkg-logs parallel-install"'
+            'FEATURES="binpkg-logs parallel-install"',
+            'DISTDIR="/var/cache/distfiles"',
+            'PKGDIR="/var/cache/binpkgs"'
         ]
 
         if self.chroot.mode == "mock":
