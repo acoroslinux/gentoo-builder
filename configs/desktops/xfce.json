@@ -1,7 +1,6 @@
 {
   "packages": [
     "xfce-base/xfce4-meta",
-    "xfce-extra/xfce4-terminal",
     "x11-terms/xterm"
   ],
   "services": [
