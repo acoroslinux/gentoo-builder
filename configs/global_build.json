@@ -8,8 +8,7 @@
     "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
   },
   "make_conf": {
-    "CFLAGS": "-O2 -pipe -march=x86-64",
-    "ACCEPT_KEYWORDS": "~amd64",
+    "COMMON_FLAGS": "-O2 -pipe",
     "ACCEPT_LICENSE": "*",
     "VIDEO_CARDS": "amdgpu radeon radeonsi nouveau intel fbdev vesa",
     "INPUT_DEVICES": "libinput synaptics evdev"
@@ -22,6 +21,7 @@
     "opengl",
     "egl",
     "text",
+    "python",
     "dist-kernel"
   ],
   "packages": [

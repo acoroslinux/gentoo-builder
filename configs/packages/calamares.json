@@ -9,7 +9,8 @@
     "qt5",
     "qt6",
     "kpmcore",
-    "networkmanager"
+    "networkmanager",
+    "python"
   ],
   "custom_files": [
     {
