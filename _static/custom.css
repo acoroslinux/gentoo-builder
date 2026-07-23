@@ -1,0 +1,10 @@
+/* Custom Styles for Gentoo-Builder Documentation */
+body {
+    font-size: 16px;
+}
+.wy-side-nav-search {
+    background-color: #7A5B95 !important;
+}
+.wy-nav-top {
+    background-color: #7A5B95 !important;
+}

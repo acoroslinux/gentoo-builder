@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.customizer &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=87052346" />
+
+  
+      <script src="../../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials &amp; Practical Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Python API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.customizer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.customizer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">core.chroot_manager</span> <span class="kn">import</span> <span class="n">ChrootManager</span>
+<span class="kn">from</span> <span class="nn">core.logger_setup</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="s2">&quot;customizer&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SystemCustomizer">
+<a class="viewcode-back" href="../../api.html#core.customizer.SystemCustomizer">[docs]</a>
+<span class="k">class</span> <span class="nc">SystemCustomizer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chroot</span><span class="p">:</span> <span class="n">ChrootManager</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span> <span class="o">=</span> <span class="n">chroot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;init_system&quot;</span><span class="p">,</span> <span class="s2">&quot;openrc&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">=</span> <span class="n">chroot</span><span class="o">.</span><span class="n">target_root</span>
+
+<div class="viewcode-block" id="SystemCustomizer.setup_live_users">
+<a class="viewcode-back" href="../../api.html#core.customizer.SystemCustomizer.setup_live_users">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_live_users</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">live_user_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;live_user&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">live_user_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;live&quot;</span><span class="p">)</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">live_user_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;live&quot;</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">live_user_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;wheel&quot;</span><span class="p">,</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;plugdev&quot;</span><span class="p">])</span>
+        <span class="n">groups_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting up live user &#39;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; (password: &#39;</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&#39;) and root (password: &#39;root&#39;)...&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK CUSTOMIZER] Adding user </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;groupadd -f </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">user_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;useradd -m -g </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> -G </span><span class="si">{</span><span class="n">groups_str</span><span class="si">}</span><span class="s2"> -s /bin/bash </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="n">user_cmd</span><span class="p">)</span>
+
+        <span class="c1"># Set live user password</span>
+        <span class="k">if</span> <span class="n">password</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sh -c </span><span class="se">\&quot;</span><span class="s2">echo &#39;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&#39; | chpasswd</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set root user password to &#39;root&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="s2">&quot;sh -c </span><span class="se">\&quot;</span><span class="s2">echo &#39;root:root&#39; | chpasswd</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Fix authentication files permissions and ownership so login/PAM works properly</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="s2">&quot;chown 0:0 /etc/passwd /etc/shadow /etc/group /etc/gshadow&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="s2">&quot;chmod 0644 /etc/passwd /etc/group&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="s2">&quot;chmod 0600 /etc/shadow /etc/gshadow&quot;</span><span class="p">)</span>
+
+        <span class="n">sudoers_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;sudoers.d&quot;</span> <span class="o">/</span> <span class="s2">&quot;live_user&quot;</span>
+        <span class="n">sudoers_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sudoers_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> ALL=(ALL) NOPASSWD: ALL</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">sudoers_file</span><span class="p">,</span> <span class="mo">0o440</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SystemCustomizer.setup_services">
+<a class="viewcode-back" href="../../api.html#core.customizer.SystemCustomizer.setup_services">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_services</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">services</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;services&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">services</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Enabling [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">init_system</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">] services: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">services</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK CUSTOMIZER] Enabling </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">init_system</span><span class="si">}</span><span class="s2"> services: </span><span class="si">{</span><span class="n">services</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">srv</span> <span class="ow">in</span> <span class="n">services</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;systemd&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;systemctl enable </span><span class="si">{</span><span class="n">srv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;openrc&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rc-update add </span><span class="si">{</span><span class="n">srv</span><span class="si">}</span><span class="s2"> default&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;runit&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ln -s /etc/runit/runsvdir/all/</span><span class="si">{</span><span class="n">srv</span><span class="si">}</span><span class="s2"> /etc/runit/runsvdir/default/&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;s6&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;s6-rc-bundle add default </span><span class="si">{</span><span class="n">srv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SystemCustomizer.copy_custom_files">
+<a class="viewcode-back" href="../../api.html#core.customizer.SystemCustomizer.copy_custom_files">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy_custom_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Copies structured files from configs/custom_files/ into the chroot as specified in configs.&quot;&quot;&quot;</span>
+        <span class="n">custom_files_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_files&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">desktop_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;desktop_environment&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        
+        <span class="k">if</span> <span class="n">desktop_env</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">desktop_env</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">desktop_copy_files</span> <span class="o">=</span> <span class="n">desktop_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;copy_files&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">desktop_copy_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">custom_files_list</span><span class="p">:</span>
+                    <span class="n">custom_files_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_files_list</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_files_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> custom file entries from configs/custom_files/ into chroot...&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">custom_files_list</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK CUSTOMIZER] Copy file entry: </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;destination&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">project_root</span> <span class="o">=</span> <span class="n">resolve_from_project</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">custom_files_root</span> <span class="o">=</span> <span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;configs&quot;</span> <span class="o">/</span> <span class="s2">&quot;custom_files&quot;</span>
+
+        <span class="c1"># Resolve python version in chroot if {python_version} is present in destinations</span>
+        <span class="n">py_ver</span> <span class="o">=</span> <span class="s2">&quot;3.12&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;real&quot;</span><span class="p">:</span>
+            <span class="n">python_dirs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;usr/lib/python3.*&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">python_dirs</span><span class="p">:</span>
+                <span class="n">py_ver</span> <span class="o">=</span> <span class="n">python_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">custom_files_list</span><span class="p">:</span>
+            <span class="n">src_rel</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span>
+            <span class="n">dest_rel</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">src_rel</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">dest_rel</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">dest_rel</span> <span class="o">=</span> <span class="n">dest_rel</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">python_version</span><span class="o">=</span><span class="n">py_ver</span><span class="p">)</span>
+            <span class="n">src_path</span> <span class="o">=</span> <span class="n">custom_files_root</span> <span class="o">/</span> <span class="n">src_rel</span>
+            <span class="n">dest_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="n">dest_rel</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">src_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom source path does not exist, skipping: </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">dest_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">src_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">)</span>
+
+            <span class="c1"># Ensure all custom files copied to system paths (/etc, /usr, /var) belong to root:root</span>
+            <span class="k">if</span> <span class="n">dest_rel</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;/etc/&quot;</span><span class="p">,</span> <span class="s2">&quot;/usr/&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/&quot;</span><span class="p">,</span> <span class="s2">&quot;/boot/&quot;</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chown -R 0:0 &#39;</span><span class="si">{</span><span class="n">dest_rel</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied custom file: </span><span class="si">{</span><span class="n">src_rel</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">dest_rel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Propagate files destination under /etc/skel/ to existing home directories</span>
+            <span class="k">if</span> <span class="n">dest_rel</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/etc/skel/&quot;</span><span class="p">):</span>
+                <span class="n">rel_skel</span> <span class="o">=</span> <span class="n">dest_rel</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;/etc/skel/&quot;</span><span class="p">):]</span>
+                <span class="n">home_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;home&quot;</span>
+                <span class="k">if</span> <span class="n">home_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">user_dir</span> <span class="ow">in</span> <span class="n">home_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">user_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="n">user_dir</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;lost+found&quot;</span><span class="p">]:</span>
+                            <span class="n">user_dest</span> <span class="o">=</span> <span class="n">user_dir</span> <span class="o">/</span> <span class="n">rel_skel</span>
+                            <span class="n">user_dest</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">src_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">user_dest</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">user_dest</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">run_in_chroot</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chown -R </span><span class="si">{</span><span class="n">user_dir</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">user_dir</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> &#39;/home/</span><span class="si">{</span><span class="n">user_dir</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">rel_skel</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SystemCustomizer.configure_system_defaults">
+<a class="viewcode-back" href="../../api.html#core.customizer.SystemCustomizer.configure_system_defaults">[docs]</a>
+    <span class="k">def</span> <span class="nf">configure_system_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Applying Gentoo live system defaults (hostname, sshd, fstab, timezone)...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_custom_files</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroot</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[MOCK CUSTOMIZER] Setting up livecd defaults&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Hostname</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;openrc&quot;</span><span class="p">:</span>
+            <span class="n">hostname_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;conf.d&quot;</span> <span class="o">/</span> <span class="s2">&quot;hostname&quot;</span>
+            <span class="n">hostname_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;hostname=&quot;gentoo-live&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hostname_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;hostname&quot;</span>
+            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;gentoo-live</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Fstab</span>
+        <span class="n">fstab_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;fstab&quot;</span>
+        <span class="n">fstab_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+            <span class="s2">&quot;# LiveCD fstab</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;tmpfs / tmpfs defaults 0 0</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># SSHD PermitRootLogin if sshd_config exists</span>
+        <span class="n">sshd_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;ssh&quot;</span> <span class="o">/</span> <span class="s2">&quot;sshd_config&quot;</span>
+        <span class="k">if</span> <span class="n">sshd_cfg</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">sshd_cfg</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;#PermitRootLogin prohibit-password&quot;</span><span class="p">,</span> <span class="s2">&quot;PermitRootLogin yes&quot;</span><span class="p">)</span>
+            <span class="n">sshd_cfg</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="c1"># Setup /usr/src/linux symlink if kernel sources directory exists</span>
+        <span class="n">usr_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;usr&quot;</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span>
+        <span class="k">if</span> <span class="n">usr_src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">kernel_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">usr_src</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;linux-&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">kernel_dirs</span><span class="p">:</span>
+                <span class="n">latest_kernel_dir</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kernel_dirs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">linux_symlink</span> <span class="o">=</span> <span class="n">usr_src</span> <span class="o">/</span> <span class="s2">&quot;linux&quot;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">linux_symlink</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">linux_symlink</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">():</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating /usr/src/linux symlink -&gt; </span><span class="si">{</span><span class="n">latest_kernel_dir</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">linux_symlink</span><span class="o">.</span><span class="n">symlink_to</span><span class="p">(</span><span class="n">latest_kernel_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
