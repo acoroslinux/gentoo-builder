@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=i686",
+    "ACCEPT_KEYWORDS": "~x86"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/x86/autobuilds/latest-stage3-i686-{init_system}.txt",
+    "pattern": "stage3-i686"
+  },
+  "default_profile": "default/linux/x86/23.0/split-usr"
+}

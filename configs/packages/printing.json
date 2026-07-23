@@ -1,0 +1,15 @@
+{
+  "name": "printing",
+  "description": "CUPS printing stack and driver packages",
+  "packages": [
+    "net-print/cups",
+    "net-print/cups-filters",
+    "net-print/foomatic-db-engine",
+    "net-print/gutenprint",
+    "app-admin/system-config-printer"
+  ],
+  "use_flags": [
+    "cups",
+    "usb"
+  ]
+}

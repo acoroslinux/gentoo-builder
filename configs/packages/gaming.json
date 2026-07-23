@@ -1,0 +1,12 @@
+{
+  "name": "gaming",
+  "description": "Gaming runtime, compatibility layers, and packages",
+  "packages": [
+    "app-emulation/wine-vanilla",
+    "games-util/lutris"
+  ],
+  "use_flags": [
+    "vulkan",
+    "opengl"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ide",
+  "description": "IDE and advanced text editor packages",
+  "packages": [
+    "app-editors/vscodium",
+    "app-editors/emacs"
+  ],
+  "use_flags": [
+    "emacs",
+    "gtk"
+  ]
+}

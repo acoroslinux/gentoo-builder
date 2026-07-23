@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python API Reference &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=87052346" />
+
+  
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorials &amp; Practical Examples" href="tutorials.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Practical Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.orchestrator">Orchestrator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.orchestrator.BuildOrchestratorError"><code class="docutils literal notranslate"><span class="pre">BuildOrchestratorError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.orchestrator.BuildOrchestrator"><code class="docutils literal notranslate"><span class="pre">BuildOrchestrator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.orchestrator.BuildOrchestrator.build"><code class="docutils literal notranslate"><span class="pre">BuildOrchestrator.build()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.config_loader">Config Loader</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.config_loader.ConfigLoaderError"><code class="docutils literal notranslate"><span class="pre">ConfigLoaderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.config_loader.ConfigLoader"><code class="docutils literal notranslate"><span class="pre">ConfigLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.config_loader.ConfigLoader.load_json"><code class="docutils literal notranslate"><span class="pre">ConfigLoader.load_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.config_loader.ConfigLoader.load_profile"><code class="docutils literal notranslate"><span class="pre">ConfigLoader.load_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.config_loader.ConfigLoader.assemble_build_config"><code class="docutils literal notranslate"><span class="pre">ConfigLoader.assemble_build_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.stage3_manager">Stage3 Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.stage3_manager.Stage3ManagerError"><code class="docutils literal notranslate"><span class="pre">Stage3ManagerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.stage3_manager.Stage3Manager"><code class="docutils literal notranslate"><span class="pre">Stage3Manager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.stage3_manager.Stage3Manager.fetch_and_extract"><code class="docutils literal notranslate"><span class="pre">Stage3Manager.fetch_and_extract()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.chroot_manager">Chroot Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.chroot_manager.ChrootManagerError"><code class="docutils literal notranslate"><span class="pre">ChrootManagerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.chroot_manager.ChrootManager"><code class="docutils literal notranslate"><span class="pre">ChrootManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.chroot_manager.ChrootManager.mount_virtual_fs"><code class="docutils literal notranslate"><span class="pre">ChrootManager.mount_virtual_fs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.chroot_manager.ChrootManager.umount_virtual_fs"><code class="docutils literal notranslate"><span class="pre">ChrootManager.umount_virtual_fs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.chroot_manager.ChrootManager.run_in_chroot"><code class="docutils literal notranslate"><span class="pre">ChrootManager.run_in_chroot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.chroot_setup">Chroot Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.chroot_setup.ChrootSetup"><code class="docutils literal notranslate"><span class="pre">ChrootSetup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.chroot_setup.ChrootSetup.prepare_resolv_conf"><code class="docutils literal notranslate"><span class="pre">ChrootSetup.prepare_resolv_conf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.chroot_setup.ChrootSetup.prepare_default_profile_symlink"><code class="docutils literal notranslate"><span class="pre">ChrootSetup.prepare_default_profile_symlink()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.portage_manager">Portage Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.portage_manager.PortageManagerError"><code class="docutils literal notranslate"><span class="pre">PortageManagerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.portage_manager.PortageManager"><code class="docutils literal notranslate"><span class="pre">PortageManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.portage_manager.PortageManager.configure_make_conf"><code class="docutils literal notranslate"><span class="pre">PortageManager.configure_make_conf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.portage_manager.PortageManager.sync_portage"><code class="docutils literal notranslate"><span class="pre">PortageManager.sync_portage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.portage_manager.PortageManager.update_world"><code class="docutils literal notranslate"><span class="pre">PortageManager.update_world()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.portage_manager.PortageManager.setup_custom_overlay"><code class="docutils literal notranslate"><span class="pre">PortageManager.setup_custom_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.portage_manager.PortageManager.install_packages"><code class="docutils literal notranslate"><span class="pre">PortageManager.install_packages()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.customizer">System Customizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.customizer.SystemCustomizer"><code class="docutils literal notranslate"><span class="pre">SystemCustomizer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.customizer.SystemCustomizer.setup_live_users"><code class="docutils literal notranslate"><span class="pre">SystemCustomizer.setup_live_users()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.customizer.SystemCustomizer.setup_services"><code class="docutils literal notranslate"><span class="pre">SystemCustomizer.setup_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.customizer.SystemCustomizer.copy_custom_files"><code class="docutils literal notranslate"><span class="pre">SystemCustomizer.copy_custom_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.customizer.SystemCustomizer.configure_system_defaults"><code class="docutils literal notranslate"><span class="pre">SystemCustomizer.configure_system_defaults()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.iso_engine">ISO Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.iso_engine.ISOEngineError"><code class="docutils literal notranslate"><span class="pre">ISOEngineError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.iso_engine.ISOEngine"><code class="docutils literal notranslate"><span class="pre">ISOEngine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.prepare_iso_root"><code class="docutils literal notranslate"><span class="pre">ISOEngine.prepare_iso_root()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.create_squashfs"><code class="docutils literal notranslate"><span class="pre">ISOEngine.create_squashfs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.generate_grub_config"><code class="docutils literal notranslate"><span class="pre">ISOEngine.generate_grub_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.generate_syslinux_config"><code class="docutils literal notranslate"><span class="pre">ISOEngine.generate_syslinux_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.generate_systemd_boot_config"><code class="docutils literal notranslate"><span class="pre">ISOEngine.generate_systemd_boot_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.generate_bootloader_configs"><code class="docutils literal notranslate"><span class="pre">ISOEngine.generate_bootloader_configs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.iso_engine.ISOEngine.build_iso"><code class="docutils literal notranslate"><span class="pre">ISOEngine.build_iso()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.disk_engine">Disk Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core.disk_engine.DiskEngineError"><code class="docutils literal notranslate"><span class="pre">DiskEngineError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core.disk_engine.DiskEngine"><code class="docutils literal notranslate"><span class="pre">DiskEngine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.disk_engine.DiskEngine.build_disk_image"><code class="docutils literal notranslate"><span class="pre">DiskEngine.build_disk_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="python-api-reference">
+<h1>Python API Reference<a class="headerlink" href="#python-api-reference" title="Link to this heading"></a></h1>
+<p>This page provides the automatically generated documentation for the Gentoo-Builder Python modules.</p>
+<section id="module-core.orchestrator">
+<span id="orchestrator"></span><h2>Orchestrator<a class="headerlink" href="#module-core.orchestrator" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.orchestrator.BuildOrchestratorError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.orchestrator.</span></span><span class="sig-name descname"><span class="pre">BuildOrchestratorError</span></span><a class="reference internal" href="_modules/core/orchestrator.html#BuildOrchestratorError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.orchestrator.BuildOrchestratorError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.orchestrator.BuildOrchestrator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.orchestrator.</span></span><span class="sig-name descname"><span class="pre">BuildOrchestrator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'configs/global_build.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_system</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openrc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desktop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootloader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_profiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_profiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_isolated_toolchain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'livecd-stage2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/orchestrator.html#BuildOrchestrator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.orchestrator.BuildOrchestrator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>clean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>init_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>desktop</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bootloader</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>package_profiles</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>service_profiles</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>live_profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>output_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>force_isolated_toolchain</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.orchestrator.BuildOrchestrator.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/orchestrator.html#BuildOrchestrator.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.orchestrator.BuildOrchestrator.build" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.config_loader">
+<span id="config-loader"></span><h2>Config Loader<a class="headerlink" href="#module-core.config_loader" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.config_loader.ConfigLoaderError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.config_loader.</span></span><span class="sig-name descname"><span class="pre">ConfigLoaderError</span></span><a class="reference internal" href="_modules/core/config_loader.html#ConfigLoaderError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.config_loader.ConfigLoaderError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.config_loader.ConfigLoader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.config_loader.</span></span><span class="sig-name descname"><span class="pre">ConfigLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/config_loader.html#ConfigLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.config_loader.ConfigLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.config_loader.ConfigLoader.load_json">
+<span class="sig-name descname"><span class="pre">load_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relative_or_abs_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/config_loader.html#ConfigLoader.load_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.config_loader.ConfigLoader.load_json" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>relative_or_abs_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.config_loader.ConfigLoader.load_profile">
+<span class="sig-name descname"><span class="pre">load_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/config_loader.html#ConfigLoader.load_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.config_loader.ConfigLoader.load_profile" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>category</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>profile_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.config_loader.ConfigLoader.assemble_build_config">
+<span class="sig-name descname"><span class="pre">assemble_build_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_config_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_system</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openrc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desktop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootloader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_profiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_profiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/config_loader.html#ConfigLoader.assemble_build_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.config_loader.ConfigLoader.assemble_build_config" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>global_config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>architecture</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>init_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>desktop</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bootloader</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>package_profiles</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>service_profiles</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>live_profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.stage3_manager">
+<span id="stage3-manager"></span><h2>Stage3 Manager<a class="headerlink" href="#module-core.stage3_manager" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.stage3_manager.Stage3ManagerError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.stage3_manager.</span></span><span class="sig-name descname"><span class="pre">Stage3ManagerError</span></span><a class="reference internal" href="_modules/core/stage3_manager.html#Stage3ManagerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.stage3_manager.Stage3ManagerError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.stage3_manager.Stage3Manager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.stage3_manager.</span></span><span class="sig-name descname"><span class="pre">Stage3Manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage3_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/stage3_manager.html#Stage3Manager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.stage3_manager.Stage3Manager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>stage3_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.stage3_manager.Stage3Manager.fetch_and_extract">
+<span class="sig-name descname"><span class="pre">fetch_and_extract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_root</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/stage3_manager.html#Stage3Manager.fetch_and_extract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.stage3_manager.Stage3Manager.fetch_and_extract" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.chroot_manager">
+<span id="chroot-manager"></span><h2>Chroot Manager<a class="headerlink" href="#module-core.chroot_manager" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.chroot_manager.ChrootManagerError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.chroot_manager.</span></span><span class="sig-name descname"><span class="pre">ChrootManagerError</span></span><a class="reference internal" href="_modules/core/chroot_manager.html#ChrootManagerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_manager.ChrootManagerError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.chroot_manager.ChrootManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.chroot_manager.</span></span><span class="sig-name descname"><span class="pre">ChrootManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_manager.html#ChrootManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_manager.ChrootManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.chroot_manager.ChrootManager.mount_virtual_fs">
+<span class="sig-name descname"><span class="pre">mount_virtual_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_manager.html#ChrootManager.mount_virtual_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_manager.ChrootManager.mount_virtual_fs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.chroot_manager.ChrootManager.umount_virtual_fs">
+<span class="sig-name descname"><span class="pre">umount_virtual_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_manager.html#ChrootManager.umount_virtual_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_manager.ChrootManager.umount_virtual_fs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.chroot_manager.ChrootManager.run_in_chroot">
+<span class="sig-name descname"><span class="pre">run_in_chroot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_manager.html#ChrootManager.run_in_chroot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_manager.ChrootManager.run_in_chroot" title="Link to this definition"></a></dt>
+<dd><p>Executes commands inside chroot with real-time log streaming to console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess" title="(in Python v3.14)"><em>CompletedProcess</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.chroot_setup">
+<span id="chroot-setup"></span><h2>Chroot Setup<a class="headerlink" href="#module-core.chroot_setup" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.chroot_setup.ChrootSetup">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.chroot_setup.</span></span><span class="sig-name descname"><span class="pre">ChrootSetup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_setup.html#ChrootSetup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_setup.ChrootSetup" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>default_profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.chroot_setup.ChrootSetup.prepare_resolv_conf">
+<span class="sig-name descname"><span class="pre">prepare_resolv_conf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_setup.html#ChrootSetup.prepare_resolv_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_setup.ChrootSetup.prepare_resolv_conf" title="Link to this definition"></a></dt>
+<dd><p>Copy host’s /etc/resolv.conf into chroot for network connectivity.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.chroot_setup.ChrootSetup.prepare_default_profile_symlink">
+<span class="sig-name descname"><span class="pre">prepare_default_profile_symlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/chroot_setup.html#ChrootSetup.prepare_default_profile_symlink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.chroot_setup.ChrootSetup.prepare_default_profile_symlink" title="Link to this definition"></a></dt>
+<dd><p>Ensure /etc/portage/make.profile points to a valid profile if missing.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.portage_manager">
+<span id="portage-manager"></span><h2>Portage Manager<a class="headerlink" href="#module-core.portage_manager" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManagerError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.portage_manager.</span></span><span class="sig-name descname"><span class="pre">PortageManagerError</span></span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManagerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManagerError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.portage_manager.</span></span><span class="sig-name descname"><span class="pre">PortageManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chroot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chroot</strong> (<a class="reference internal" href="#core.chroot_manager.ChrootManager" title="core.chroot_manager.ChrootManager"><em>ChrootManager</em></a>)</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager.configure_make_conf">
+<span class="sig-name descname"><span class="pre">configure_make_conf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager.configure_make_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager.configure_make_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager.sync_portage">
+<span class="sig-name descname"><span class="pre">sync_portage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager.sync_portage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager.sync_portage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager.update_world">
+<span class="sig-name descname"><span class="pre">update_world</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager.update_world"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager.update_world" title="Link to this definition"></a></dt>
+<dd><p>Update Gentoo world set non-interactively (–ask=n).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager.setup_custom_overlay">
+<span class="sig-name descname"><span class="pre">setup_custom_overlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_ebuilds_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager.setup_custom_overlay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager.setup_custom_overlay" title="Link to this definition"></a></dt>
+<dd><p>Inject custom overlay and ebuilds into Portage chroot tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>custom_ebuilds_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.portage_manager.PortageManager.install_packages">
+<span class="sig-name descname"><span class="pre">install_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/portage_manager.html#PortageManager.install_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.portage_manager.PortageManager.install_packages" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>packages</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.customizer">
+<span id="system-customizer"></span><h2>System Customizer<a class="headerlink" href="#module-core.customizer" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.customizer.SystemCustomizer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.customizer.</span></span><span class="sig-name descname"><span class="pre">SystemCustomizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chroot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/customizer.html#SystemCustomizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.customizer.SystemCustomizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chroot</strong> (<a class="reference internal" href="#core.chroot_manager.ChrootManager" title="core.chroot_manager.ChrootManager"><em>ChrootManager</em></a>)</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.customizer.SystemCustomizer.setup_live_users">
+<span class="sig-name descname"><span class="pre">setup_live_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/customizer.html#SystemCustomizer.setup_live_users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.customizer.SystemCustomizer.setup_live_users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.customizer.SystemCustomizer.setup_services">
+<span class="sig-name descname"><span class="pre">setup_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/customizer.html#SystemCustomizer.setup_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.customizer.SystemCustomizer.setup_services" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.customizer.SystemCustomizer.copy_custom_files">
+<span class="sig-name descname"><span class="pre">copy_custom_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/customizer.html#SystemCustomizer.copy_custom_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.customizer.SystemCustomizer.copy_custom_files" title="Link to this definition"></a></dt>
+<dd><p>Copies structured files from configs/custom_files/ into the chroot as specified in configs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.customizer.SystemCustomizer.configure_system_defaults">
+<span class="sig-name descname"><span class="pre">configure_system_defaults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/customizer.html#SystemCustomizer.configure_system_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.customizer.SystemCustomizer.configure_system_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.iso_engine">
+<span id="iso-engine"></span><h2>ISO Engine<a class="headerlink" href="#module-core.iso_engine" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngineError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.iso_engine.</span></span><span class="sig-name descname"><span class="pre">ISOEngineError</span></span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngineError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngineError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.iso_engine.</span></span><span class="sig-name descname"><span class="pre">ISOEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>target_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>output_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.prepare_iso_root">
+<span class="sig-name descname"><span class="pre">prepare_iso_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.prepare_iso_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.prepare_iso_root" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.create_squashfs">
+<span class="sig-name descname"><span class="pre">create_squashfs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.create_squashfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.create_squashfs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.generate_grub_config">
+<span class="sig-name descname"><span class="pre">generate_grub_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.generate_grub_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.generate_grub_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.generate_syslinux_config">
+<span class="sig-name descname"><span class="pre">generate_syslinux_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.generate_syslinux_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.generate_syslinux_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.generate_systemd_boot_config">
+<span class="sig-name descname"><span class="pre">generate_systemd_boot_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.generate_systemd_boot_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.generate_systemd_boot_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.generate_bootloader_configs">
+<span class="sig-name descname"><span class="pre">generate_bootloader_configs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.generate_bootloader_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.generate_bootloader_configs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.iso_engine.ISOEngine.build_iso">
+<span class="sig-name descname"><span class="pre">build_iso</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/iso_engine.html#ISOEngine.build_iso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.iso_engine.ISOEngine.build_iso" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.disk_engine">
+<span id="disk-engine"></span><h2>Disk Engine<a class="headerlink" href="#module-core.disk_engine" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.disk_engine.DiskEngineError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.disk_engine.</span></span><span class="sig-name descname"><span class="pre">DiskEngineError</span></span><a class="reference internal" href="_modules/core/disk_engine.html#DiskEngineError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.disk_engine.DiskEngineError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.disk_engine.DiskEngine">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.disk_engine.</span></span><span class="sig-name descname"><span class="pre">DiskEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/disk_engine.html#DiskEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.disk_engine.DiskEngine" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workdir</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>target_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+<li><p><strong>output_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.disk_engine.DiskEngine.build_disk_image">
+<span class="sig-name descname"><span class="pre">build_disk_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/disk_engine.html#DiskEngine.build_disk_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.disk_engine.DiskEngine.build_disk_image" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tutorials.html" class="btn btn-neutral float-left" title="Tutorials &amp; Practical Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

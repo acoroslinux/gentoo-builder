@@ -1,0 +1,15 @@
+{
+  "name": "development",
+  "description": "Software development compilers, toolchains, VCS, and runtimes",
+  "packages": [
+    "dev-vcs/git",
+    "dev-build/cmake",
+    "net-libs/nodejs",
+    "dev-lang/python"
+  ],
+  "use_flags": [
+    "git",
+    "python",
+    "nodejs"
+  ]
+}

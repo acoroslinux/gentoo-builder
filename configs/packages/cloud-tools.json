@@ -1,0 +1,12 @@
+{
+  "name": "cloud-tools",
+  "description": "Cloud administration tools (Terraform, Kubernetes CLI, AWS CLI)",
+  "packages": [
+    "app-admin/terraform",
+    "sys-cluster/kubectl",
+    "app-admin/awscli"
+  ],
+  "use_flags": [
+    "bash-completion"
+  ]
+}

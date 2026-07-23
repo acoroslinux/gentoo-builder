@@ -1,0 +1,13 @@
+{
+  "name": "security",
+  "description": "Firewalls, security tools, password managers, and backup utilities",
+  "packages": [
+    "net-firewall/ufw",
+    "app-admin/keepassxc",
+    "app-backup/timeshift",
+    "app-crypt/gnupg"
+  ],
+  "use_flags": [
+    "gpg"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -m4 -pipe",
+    "ACCEPT_KEYWORDS": "~sh"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/sh/autobuilds/latest-stage3-sh4-{init_system}.txt",
+    "pattern": "stage3-sh4"
+  },
+  "default_profile": "default/linux/sh/23.0"
+}

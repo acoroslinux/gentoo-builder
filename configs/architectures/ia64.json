@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe",
+    "ACCEPT_KEYWORDS": "~ia64"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/ia64/autobuilds/latest-stage3-ia64-{init_system}.txt",
+    "pattern": "stage3-ia64"
+  },
+  "default_profile": "default/linux/ia64/23.0"
+}

@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard",
+    "ACCEPT_KEYWORDS": "~arm"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/arm/autobuilds/latest-stage3-armv7a_hardfp-{init_system}.txt",
+    "pattern": "stage3-armv7a_hardfp"
+  },
+  "default_profile": "default/linux/arm/23.0/armv7a/split-usr"
+}

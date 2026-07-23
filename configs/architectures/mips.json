@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -march=mips3 -mabi=32 -pipe",
+    "ACCEPT_KEYWORDS": "~mips"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/mips/autobuilds/latest-stage3-mips3-{init_system}.txt",
+    "pattern": "stage3-mips3"
+  },
+  "default_profile": "default/linux/mips/23.0"
+}

@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=x86-64",
+    "ACCEPT_KEYWORDS": "~amd64"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-{init_system}.txt",
+    "pattern": "stage3-amd64"
+  },
+  "default_profile": "default/linux/amd64/23.0/split-usr"
+}

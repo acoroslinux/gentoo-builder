@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe",
+    "ACCEPT_KEYWORDS": "~riscv"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/riscv/autobuilds/latest-stage3-rv64_lp64d-{init_system}.txt",
+    "pattern": "stage3-rv64_lp64d"
+  },
+  "default_profile": "default/linux/riscv/23.0/rv64/lp64d/split-usr"
+}

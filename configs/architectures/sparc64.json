@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -mcpu=ultrasparc -pipe",
+    "ACCEPT_KEYWORDS": "~sparc64"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/sparc/autobuilds/latest-stage3-sparc64-{init_system}.txt",
+    "pattern": "stage3-sparc64"
+  },
+  "default_profile": "default/linux/sparc/23.0/sparc64/split-usr"
+}

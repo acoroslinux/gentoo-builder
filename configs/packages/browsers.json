@@ -1,0 +1,10 @@
+{
+  "name": "browsers",
+  "description": "Popular web browsers",
+  "packages": [
+    "www-client/firefox-bin"
+  ],
+  "use_flags": [
+    "hwaccel"
+  ]
+}

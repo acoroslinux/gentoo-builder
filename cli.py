@@ -56,11 +56,20 @@ def main():
         help="Force isolated Gentoo build_host toolchain in real mode, even if host tools are available."
     )
 
+    parser.add_argument(
+        "--target",
+        choices=["livecd-stage1", "livecd-stage2", "diskimage-stage1", "diskimage-stage2", "netboot", "embedded"],
+        default="livecd-stage2",
+        help="Build target/type: 'livecd-stage1', 'livecd-stage2' (default), 'diskimage-stage1', 'diskimage-stage2', 'netboot', 'embedded'."
+    )
+
     parser.add_argument("--init", type=str, default="openrc", help="Init system profile (openrc, systemd, runit, s6). Default: openrc")
     parser.add_argument("--desktop", type=str, help="Desktop environment profile (e.g. xfce, gnome)")
     parser.add_argument("--kernel", type=str, help="Kernel profile (e.g. gentoo-kernel-bin)")
     parser.add_argument("--bootloader", type=str, help="Bootloader profile (e.g. grub-uefi)")
-    parser.add_argument("-o", "--output", type=str, help="Custom output ISO filename")
+    parser.add_argument("--packages", type=str, help="Comma-separated package profiles to include (e.g. printing,network-shares)")
+    parser.add_argument("--services", type=str, help="Comma-separated service profiles to enable (e.g. printing-services,sharing-services)")
+    parser.add_argument("-o", "--output", type=str, help="Custom output filename")
     parser.add_argument("--list-options", action="store_true", help="List all available profiles")
 
     args = parser.parse_args()
@@ -84,8 +93,11 @@ def main():
             desktop=args.desktop,
             kernel=args.kernel,
             bootloader=args.bootloader,
+            package_profiles=args.packages.split(",") if args.packages else [],
+            service_profiles=args.services.split(",") if args.services else [],
             output_name=args.output,
-            force_isolated_toolchain=args.force_isolated_toolchain
+            force_isolated_toolchain=args.force_isolated_toolchain,
+            target=args.target
         )
         orchestrator.build()
     except BuildOrchestratorError as e:

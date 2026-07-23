@@ -1,0 +1,14 @@
+{
+  "name": "graphics",
+  "description": "Image viewers, vector design, and raster graphics editor packages",
+  "packages": [
+    "media-gfx/gimp",
+    "media-gfx/inkscape",
+    "media-gfx/viewnior"
+  ],
+  "use_flags": [
+    "png",
+    "jpeg",
+    "svg"
+  ]
+}

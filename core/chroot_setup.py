@@ -1,14 +1,16 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Optional
 from core.logger_setup import setup_logger
 
 logger = setup_logger("chroot_setup")
 
 class ChrootSetup:
-    def __init__(self, target_root: Path, mode: str = "mock"):
+    def __init__(self, target_root: Path, mode: str = "mock", default_profile: Optional[str] = None):
         self.target_root = Path(target_root).resolve()
         self.mode = mode.lower()
+        self.default_profile = default_profile or "default/linux/amd64/23.0/split-usr"
 
     def prepare_resolv_conf(self):
         """Copy host's /etc/resolv.conf into chroot for network connectivity."""
@@ -33,7 +35,9 @@ class ChrootSetup:
             return
 
         profile_link = self.target_root / "etc" / "portage" / "make.profile"
-        default_profile_target = "../var/db/repos/gentoo/profiles/default/linux/amd64/23.0/split-usr"
+        default_profile_target = self.default_profile
+        if not default_profile_target.startswith(".."):
+            default_profile_target = f"../var/db/repos/gentoo/profiles/{default_profile_target}"
 
         if not profile_link.exists() and not profile_link.is_symlink():
             logger.info("Creating default profile symlink for Gentoo Portage...")

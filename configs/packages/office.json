@@ -1,0 +1,15 @@
+{
+  "name": "office",
+  "description": "Office suites, document viewers, and desktop publishing packages",
+  "packages": [
+    "app-office/libreoffice-bin",
+    "app-text/evince",
+    "app-office/abiword",
+    "app-office/gnumeric",
+    "app-office/scribus"
+  ],
+  "use_flags": [
+    "pdf",
+    "cups"
+  ]
+}

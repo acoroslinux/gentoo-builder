@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorials &amp; Practical Examples &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=87052346" />
+
+  
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Python API Reference" href="api.html" />
+    <link rel="prev" title="Architecture &amp; Design" href="architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials &amp; Practical Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-1-creating-a-custom-xfce-iso-for-x86-64">Tutorial 1: Creating a Custom XFCE ISO for x86_64</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-check-available-options">Step 1: Check available options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-test-the-build-configuration-in-simulation-mock-mode">Step 2: Test the build configuration in simulation (mock) mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-run-the-real-build">Step 3: Run the real build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-2-creating-a-minimal-embedded-rootfs-for-arm64-pine64-raspberry-pi">Tutorial 2: Creating a Minimal Embedded RootFS for ARM64 (Pine64/Raspberry Pi)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-run-the-simulation">Step 1: Run the simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-run-the-real-rootfs-compilation">Step 2: Run the real rootfs compilation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-3-adding-a-new-package-profile-on-demand-software">Tutorial 3: Adding a New Package Profile (On-Demand Software)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Python API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorials &amp; Practical Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorials.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorials-practical-examples">
+<h1>Tutorials &amp; Practical Examples<a class="headerlink" href="#tutorials-practical-examples" title="Link to this heading"></a></h1>
+<p>This page provides practical, step-by-step guides for common Gentoo-Builder tasks.</p>
+<section id="tutorial-1-creating-a-custom-xfce-iso-for-x86-64">
+<h2>Tutorial 1: Creating a Custom XFCE ISO for x86_64<a class="headerlink" href="#tutorial-1-creating-a-custom-xfce-iso-for-x86-64" title="Link to this heading"></a></h2>
+<p>In this tutorial, we will construct a bootable XFCE LiveCD containing office applications and web browsers.</p>
+<section id="step-1-check-available-options">
+<h3>Step 1: Check available options<a class="headerlink" href="#step-1-check-available-options" title="Link to this heading"></a></h3>
+<p>First, list the profiles to make sure <code class="docutils literal notranslate"><span class="pre">xfce</span></code> and package profiles like <code class="docutils literal notranslate"><span class="pre">browsers</span></code> and <code class="docutils literal notranslate"><span class="pre">office</span></code> are available:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>cli.py<span class="w"> </span>--list-options
+</pre></div>
+</div>
+</section>
+<section id="step-2-test-the-build-configuration-in-simulation-mock-mode">
+<h3>Step 2: Test the build configuration in simulation (mock) mode<a class="headerlink" href="#step-2-test-the-build-configuration-in-simulation-mock-mode" title="Link to this heading"></a></h3>
+<p>Always test your build command in simulation mode to ensure configuration loading works perfectly without errors:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>cli.py<span class="w"> </span>x86_64<span class="w"> </span>--mode<span class="w"> </span>mock<span class="w"> </span>--desktop<span class="w"> </span>xfce<span class="w"> </span>--kernel<span class="w"> </span>gentoo-kernel-bin<span class="w"> </span>--packages<span class="w"> </span>browsers,office
+</pre></div>
+</div>
+</section>
+<section id="step-3-run-the-real-build">
+<h3>Step 3: Run the real build<a class="headerlink" href="#step-3-run-the-real-build" title="Link to this heading"></a></h3>
+<p>Run the pipeline with administrator privileges. Ensure you have the required host tools (<code class="docutils literal notranslate"><span class="pre">mksquashfs</span></code>, <code class="docutils literal notranslate"><span class="pre">xorriso</span></code>, <code class="docutils literal notranslate"><span class="pre">grub-mkrescue</span></code>) installed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>python3<span class="w"> </span>cli.py<span class="w"> </span>x86_64<span class="w"> </span>--mode<span class="w"> </span>real<span class="w"> </span>--desktop<span class="w"> </span>xfce<span class="w"> </span>--kernel<span class="w"> </span>gentoo-kernel-bin<span class="w"> </span>--packages<span class="w"> </span>browsers,office
+</pre></div>
+</div>
+<p>The output ISO will be generated in your <code class="docutils literal notranslate"><span class="pre">workdir/x86_64/</span></code> directory with a name like <code class="docutils literal notranslate"><span class="pre">gentoo-builder-openrc-xfce-x86_64.iso</span></code> along with its MD5 and SHA256 checksums.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tutorial-2-creating-a-minimal-embedded-rootfs-for-arm64-pine64-raspberry-pi">
+<h2>Tutorial 2: Creating a Minimal Embedded RootFS for ARM64 (Pine64/Raspberry Pi)<a class="headerlink" href="#tutorial-2-creating-a-minimal-embedded-rootfs-for-arm64-pine64-raspberry-pi" title="Link to this heading"></a></h2>
+<p>In this tutorial, we will build a minimal embedded rootfs tarball for an ARM64 system running OpenRC.</p>
+<section id="step-1-run-the-simulation">
+<h3>Step 1: Run the simulation<a class="headerlink" href="#step-1-run-the-simulation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>cli.py<span class="w"> </span>arm64<span class="w"> </span>--target<span class="w"> </span>embedded<span class="w"> </span>--mode<span class="w"> </span>mock<span class="w"> </span>--init<span class="w"> </span>openrc
+</pre></div>
+</div>
+</section>
+<section id="step-2-run-the-real-rootfs-compilation">
+<h3>Step 2: Run the real rootfs compilation<a class="headerlink" href="#step-2-run-the-real-rootfs-compilation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>python3<span class="w"> </span>cli.py<span class="w"> </span>arm64<span class="w"> </span>--target<span class="w"> </span>embedded<span class="w"> </span>--mode<span class="w"> </span>real<span class="w"> </span>--init<span class="w"> </span>openrc
+</pre></div>
+</div>
+<p>The output will be a compressed tarball file located at:
+<code class="docutils literal notranslate"><span class="pre">workdir/arm64/gentoo-builder-openrc-base-arm64.tar.xz</span></code></p>
+<p>This archive can be extracted directly onto the root partition of an SD card or eMMC storage device.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tutorial-3-adding-a-new-package-profile-on-demand-software">
+<h2>Tutorial 3: Adding a New Package Profile (On-Demand Software)<a class="headerlink" href="#tutorial-3-adding-a-new-package-profile-on-demand-software" title="Link to this heading"></a></h2>
+<p>To add a new software group that users can select using the <code class="docutils literal notranslate"><span class="pre">--packages</span></code> argument:</p>
+<ol class="arabic">
+<li><p>Create a new JSON file inside <code class="docutils literal notranslate"><span class="pre">configs/packages/</span></code>, for example: <code class="docutils literal notranslate"><span class="pre">configs/packages/devops-tools.json</span></code>.</p></li>
+<li><p>Populate the file with package names and USE flags:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;devops-tools&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Container and automation tools&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;app-containers/docker-compose&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;app-admin/ansible&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;net-misc/rsync&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;use_flags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;rsync&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run the generator using your new profile:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>cli.py<span class="w"> </span>x86_64<span class="w"> </span>--packages<span class="w"> </span>devops-tools
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="architecture.html" class="btn btn-neutral float-left" title="Architecture &amp; Design" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="Python API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "desktop-apps",
+  "description": "Common lightweight desktop applications (File Manager, Terminal, Text Editor, Calculator)",
+  "packages": [
+    "x11-misc/pcmanfm",
+    "x11-terms/alacritty",
+    "app-editors/mousepad",
+    "sci-calculators/galculator",
+    "app-arch/file-roller",
+    "media-gfx/scrot"
+  ],
+  "use_flags": [
+    "gtk",
+    "desktop"
+  ]
+}

@@ -40,6 +40,7 @@ class ConfigLoader:
     def assemble_build_config(
         self,
         global_config_path: str | Path,
+        architecture: Optional[str] = "x86_64",
         init_system: Optional[str] = "openrc",
         desktop: Optional[str] = None,
         kernel: Optional[str] = None,
@@ -60,7 +61,8 @@ class ConfigLoader:
             "bootloader": {},
             "live_user": base_cfg.get("live_user", {}),
             "custom_files": base_cfg.get("custom_files", []),
-            "init_system": "openrc"
+            "init_system": "openrc",
+            "default_profile": None
         }
 
         # Apply Init system profile (openrc, systemd, runit, s6)
@@ -71,6 +73,23 @@ class ConfigLoader:
                 merged["stage3"].update(init_cfg["stage3"])
             merged["packages"].extend(init_cfg.get("packages", []))
             merged["use_flags"].extend(init_cfg.get("use_flags", []))
+
+        # Apply Architecture profile
+        if architecture:
+            try:
+                arch_cfg = self.load_profile("architectures", architecture)
+                if "stage3" in arch_cfg:
+                    merged["stage3"].update(arch_cfg["stage3"])
+                if "make_conf" in arch_cfg:
+                    merged["make_conf"].update(arch_cfg["make_conf"])
+                if "packages" in arch_cfg:
+                    merged["packages"].extend(arch_cfg["packages"])
+                if "use_flags" in arch_cfg:
+                    merged["use_flags"].extend(arch_cfg["use_flags"])
+                if "default_profile" in arch_cfg:
+                    merged["default_profile"] = arch_cfg["default_profile"]
+            except ConfigLoaderError:
+                pass
 
         # Apply base customizations if existing
         base_custom_path = self.config_root / "base_customizations.json"
@@ -134,5 +153,13 @@ class ConfigLoader:
         merged["packages"] = sorted(list(set(merged["packages"])))
         merged["use_flags"] = sorted(list(set(merged["use_flags"])))
         merged["services"] = sorted(list(set(merged["services"])))
+
+        # Interpolate variables in stage3 URL if present
+        if "stage3" in merged and "url" in merged["stage3"]:
+            url_str = merged["stage3"]["url"]
+            merged["stage3"]["url"] = url_str.format(
+                init_system=init_system or "openrc",
+                arch=architecture or "x86_64"
+            )
 
         return merged

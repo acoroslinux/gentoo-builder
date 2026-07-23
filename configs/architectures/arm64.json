@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=armv8-a",
+    "ACCEPT_KEYWORDS": "~arm64"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/arm64/autobuilds/latest-stage3-arm64-{init_system}.txt",
+    "pattern": "stage3-arm64"
+  },
+  "default_profile": "default/linux/arm64/23.0/split-usr"
+}

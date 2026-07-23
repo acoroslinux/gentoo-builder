@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe",
+    "ACCEPT_KEYWORDS": "~ppc"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/ppc/autobuilds/latest-stage3-ppc-{init_system}.txt",
+    "pattern": "stage3-ppc"
+  },
+  "default_profile": "default/linux/powerpc/ppc32/23.0/split-usr"
+}

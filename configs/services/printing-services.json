@@ -1,0 +1,7 @@
+{
+  "name": "printing-services",
+  "description": "CUPS printing daemon services",
+  "services": [
+    "cupsd"
+  ]
+}

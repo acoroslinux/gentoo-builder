@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comprehensive Usage &amp; Configuration Guide &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=87052346" />
+
+  
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architecture &amp; Design" href="architecture.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Comprehensive Usage &amp; Configuration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-arguments-reference">1. Command-Line Arguments Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-profiles-structure">2. Configuration Profiles Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#global-build-configuration-configs-global-build-json">Global Build Configuration (<code class="docutils literal notranslate"><span class="pre">configs/global_build.json</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture-configuration-configs-architectures-json">Architecture Configuration (<code class="docutils literal notranslate"><span class="pre">configs/architectures/*.json</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#desktop-configuration-configs-desktops-json">Desktop Configuration (<code class="docutils literal notranslate"><span class="pre">configs/desktops/*.json</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#real-mode-step-by-step">3. Real Mode Step-by-Step</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Customization &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Practical Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Python API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Comprehensive Usage &amp; Configuration Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="comprehensive-usage-configuration-guide">
+<h1>Comprehensive Usage &amp; Configuration Guide<a class="headerlink" href="#comprehensive-usage-configuration-guide" title="Link to this heading"></a></h1>
+<p>This page provides an in-depth reference for configuring, extending, and executing Gentoo-Builder.</p>
+<hr class="docutils" />
+<section id="command-line-arguments-reference">
+<h2>1. Command-Line Arguments Reference<a class="headerlink" href="#command-line-arguments-reference" title="Link to this heading"></a></h2>
+<p>Gentoo-Builder is controlled via the <code class="docutils literal notranslate"><span class="pre">cli.py</span></code> script. The available arguments are:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Default / Options</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">architecture</span></code></p></td>
+<td><p>Target architecture profile to load.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x86_64</span></code> (options: <code class="docutils literal notranslate"><span class="pre">arm64</span></code>, <code class="docutils literal notranslate"><span class="pre">x86</span></code>, <code class="docutils literal notranslate"><span class="pre">riscv</span></code>, <code class="docutils literal notranslate"><span class="pre">ppc</span></code>, etc.)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-c</span></code>, <code class="docutils literal notranslate"><span class="pre">--config</span></code></p></td>
+<td><p>Path to the global build configuration file.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">configs/global_build.json</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--mode</span></code></p></td>
+<td><p>Execution mode. Simulation (<code class="docutils literal notranslate"><span class="pre">mock</span></code>) or real compilation (<code class="docutils literal notranslate"><span class="pre">real</span></code>).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mock</span></code> / <code class="docutils literal notranslate"><span class="pre">real</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--clean</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
+<td><p>Clean previous build trees before running. Preserves download caches.</p></td>
+<td><p>Default: <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--force-isolated-toolchain</span></code></p></td>
+<td><p>Force compilation inside an isolated build-host chroot.</p></td>
+<td><p>Flag (false by default)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--target</span></code></p></td>
+<td><p>Build compilation type or target stage.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">livecd-stage2</span></code> (options below)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--init</span></code></p></td>
+<td><p>Init system profile to apply.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">openrc</span></code> (options: <code class="docutils literal notranslate"><span class="pre">systemd</span></code>, <code class="docutils literal notranslate"><span class="pre">runit</span></code>, <code class="docutils literal notranslate"><span class="pre">s6</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--desktop</span></code></p></td>
+<td><p>Desktop environment profile to load.</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">xfce</span></code>, <code class="docutils literal notranslate"><span class="pre">gnome</span></code>, <code class="docutils literal notranslate"><span class="pre">kde</span></code>, <code class="docutils literal notranslate"><span class="pre">awesome</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--kernel</span></code></p></td>
+<td><p>Kernel profile to apply.</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">gentoo-kernel-bin</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--bootloader</span></code></p></td>
+<td><p>Bootloader profile to apply.</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">grub-uefi</span></code>, <code class="docutils literal notranslate"><span class="pre">syslinux</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--packages</span></code></p></td>
+<td><p>Comma-separated list of on-demand package profiles.</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">browsers,office,printing</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--services</span></code></p></td>
+<td><p>Comma-separated list of on-demand service profiles to start.</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">printing-services,sharing-services</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code>, <code class="docutils literal notranslate"><span class="pre">--output</span></code></p></td>
+<td><p>Customize the final package output filename.</p></td>
+<td><p>Generates name based on init, desktop, and arch.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--list-options</span></code></p></td>
+<td><p>Prints all available JSON config profiles and exits.</p></td>
+<td><p>Flag</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="configuration-profiles-structure">
+<h2>2. Configuration Profiles Structure<a class="headerlink" href="#configuration-profiles-structure" title="Link to this heading"></a></h2>
+<p>Every aspect of the build is modular and defined inside structured JSON files within the <code class="docutils literal notranslate"><span class="pre">configs/</span></code> directory.</p>
+<section id="global-build-configuration-configs-global-build-json">
+<h3>Global Build Configuration (<code class="docutils literal notranslate"><span class="pre">configs/global_build.json</span></code>)<a class="headerlink" href="#global-build-configuration-configs-global-build-json" title="Link to this heading"></a></h3>
+<p>Defines the base distribution details, default user accounts, groups, and packages that apply to all targets:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;global&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;distro&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Gentoo Linux&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rolling&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;maintainer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AçorOS Linux Team&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;stage3&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;make_conf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;CFLAGS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-O2 -pipe -march=x86-64&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ACCEPT_KEYWORDS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~amd64&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ACCEPT_LICENSE&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;use_flags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;unicode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;nls&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;udev&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;dbus&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;app-admin/sudo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;net-misc/dhcpcd&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;services&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;dbus&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;live_user&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;live&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;live&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;groups&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;wheel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;audio&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;video&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="architecture-configuration-configs-architectures-json">
+<h3>Architecture Configuration (<code class="docutils literal notranslate"><span class="pre">configs/architectures/*.json</span></code>)<a class="headerlink" href="#architecture-configuration-configs-architectures-json" title="Link to this heading"></a></h3>
+<p>Overrides variables like flags, keywords, stage3 URLs, and targets specific to the architecture (e.g., <code class="docutils literal notranslate"><span class="pre">configs/architectures/arm64.json</span></code>):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;make_conf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;CFLAGS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-O2 -pipe -march=armv8-a&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ACCEPT_KEYWORDS&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~arm64&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;stage3&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://distfiles.gentoo.org/releases/arm64/autobuilds/latest-stage3-arm64-{init_system}.txt&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stage3-arm64&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;default_profile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default/linux/arm64/23.0/split-usr&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="desktop-configuration-configs-desktops-json">
+<h3>Desktop Configuration (<code class="docutils literal notranslate"><span class="pre">configs/desktops/*.json</span></code>)<a class="headerlink" href="#desktop-configuration-configs-desktops-json" title="Link to this heading"></a></h3>
+<p>Defines graphical desktop environment configurations (e.g., packages, mouse settings, default configs):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;xfce-base/xfce4-meta&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;x11-themes/adwaita-icon-theme&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;use_flags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;gtk3&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;xfce&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="real-mode-step-by-step">
+<h2>3. Real Mode Step-by-Step<a class="headerlink" href="#real-mode-step-by-step" title="Link to this heading"></a></h2>
+<p>To run a real Gentoo build:</p>
+<ol class="arabic">
+<li><p>Verify the configuration matches your expectations.</p></li>
+<li><p>Run the script with root permissions:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>python3<span class="w"> </span>cli.py<span class="w"> </span>x86_64<span class="w"> </span>--mode<span class="w"> </span>real<span class="w"> </span>--target<span class="w"> </span>livecd-stage2<span class="w"> </span>--init<span class="w"> </span>openrc<span class="w"> </span>--desktop<span class="w"> </span>xfce<span class="w"> </span>--kernel<span class="w"> </span>gentoo-kernel-bin
+</pre></div>
+</div>
+</li>
+<li><p>Gentoo-Builder will execute:</p>
+<ul class="simple">
+<li><p><strong>Stage3 Download</strong>: Fetches the newest matching Gentoo stage3 from official mirrors.</p></li>
+<li><p><strong>Chroot Setup</strong>: Mounts <code class="docutils literal notranslate"><span class="pre">/proc</span></code>, <code class="docutils literal notranslate"><span class="pre">/sys</span></code>, <code class="docutils literal notranslate"><span class="pre">/dev</span></code> and copies resolv.conf.</p></li>
+<li><p><strong>Emerge Synchronize</strong>: Runs <code class="docutils literal notranslate"><span class="pre">emerge-webrsync</span></code> to update the ebuild tree.</p></li>
+<li><p><strong>Compilation</strong>: Runs <code class="docutils literal notranslate"><span class="pre">emerge</span></code> to compile and install all packages in parallel.</p></li>
+<li><p><strong>Customization</strong>: Creates the live user, enables services (e.g. <code class="docutils literal notranslate"><span class="pre">NetworkManager</span></code>, <code class="docutils literal notranslate"><span class="pre">cupsd</span></code>), and sets up keymaps.</p></li>
+<li><p><strong>SquashFS Creation</strong>: Compresses the chroot filesystem into a <code class="docutils literal notranslate"><span class="pre">filesystem.squashfs</span></code> file.</p></li>
+<li><p><strong>Bootloader Config</strong>: Generates GRUB, Systemd-boot, or Syslinux config.</p></li>
+<li><p><strong>ISO Generation</strong>: Packages everything into a bootable ISO with checksum files.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture &amp; Design" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

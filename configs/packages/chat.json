@@ -1,0 +1,12 @@
+{
+  "name": "chat",
+  "description": "Communication clients (Telegram, HexChat)",
+  "packages": [
+    "net-im/telegram-desktop",
+    "net-irc/hexchat"
+  ],
+  "use_flags": [
+    "dbus",
+    "libnotify"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=z10",
+    "ACCEPT_KEYWORDS": "~s390x"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/s390/autobuilds/latest-stage3-s390x-{init_system}.txt",
+    "pattern": "stage3-s390x"
+  },
+  "default_profile": "default/linux/s390/23.0/s390x"
+}

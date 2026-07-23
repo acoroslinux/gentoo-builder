@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.iso_engine &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=87052346" />
+
+  
+      <script src="../../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials &amp; Practical Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Python API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.iso_engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.iso_engine</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">core.logger_setup</span> <span class="kn">import</span> <span class="n">setup_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="s2">&quot;iso_engine&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ISOEngineError">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngineError">[docs]</a>
+<span class="k">class</span> <span class="nc">ISOEngineError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine">[docs]</a>
+<span class="k">class</span> <span class="nc">ISOEngine</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">target_root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mock&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">target_root</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span> <span class="o">=</span> <span class="n">output_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="s2">&quot;iso_root&quot;</span>
+
+<div class="viewcode-block" id="ISOEngine.prepare_iso_root">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.prepare_iso_root">[docs]</a>
+    <span class="k">def</span> <span class="nf">prepare_iso_root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing ISO root structure at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK ISO ENGINE] Permission denied creating </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="si">}</span><span class="s2">. Using existing root.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+        <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;live&quot;</span><span class="p">,</span> <span class="s2">&quot;boot/grub&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux&quot;</span><span class="p">,</span> <span class="s2">&quot;loader/entries&quot;</span><span class="p">]:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="n">sub</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span>
+
+        <span class="c1"># Copy kernel and initramfs from chroot if available</span>
+        <span class="n">chroot_boot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;boot&quot;</span>
+        <span class="n">iso_boot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;boot&quot;</span>
+        <span class="k">if</span> <span class="n">chroot_boot</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">kfile</span> <span class="ow">in</span> <span class="n">chroot_boot</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;vmlinuz*&quot;</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">kfile</span><span class="p">,</span> <span class="n">iso_boot</span> <span class="o">/</span> <span class="s2">&quot;vmlinuz&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied kernel </span><span class="si">{</span><span class="n">kfile</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">iso_boot</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">&#39;vmlinuz&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">for</span> <span class="n">ifile</span> <span class="ow">in</span> <span class="n">chroot_boot</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;initramfs*&quot;</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">ifile</span><span class="p">,</span> <span class="n">iso_boot</span> <span class="o">/</span> <span class="s2">&quot;initramfs&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied initramfs </span><span class="si">{</span><span class="n">ifile</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">iso_boot</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">&#39;initramfs&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+
+        <span class="c1"># For syslinux/isolinux targets, we must copy syslinux boot files if they exist in the chroot or host</span>
+        <span class="n">btype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;grub-uefi&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;syslinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">or</span> <span class="s2">&quot;isolinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span><span class="p">:</span>
+            <span class="n">syslinux_paths</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;usr&quot;</span> <span class="o">/</span> <span class="s2">&quot;share&quot;</span> <span class="o">/</span> <span class="s2">&quot;syslinux&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;usr&quot;</span> <span class="o">/</span> <span class="s2">&quot;lib&quot;</span> <span class="o">/</span> <span class="s2">&quot;syslinux&quot;</span> <span class="o">/</span> <span class="s2">&quot;bios&quot;</span><span class="p">,</span>
+                <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/usr/share/syslinux&quot;</span><span class="p">),</span>
+                <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/usr/lib/syslinux/bios&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+            
+            <span class="n">isolinux_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;isolinux&quot;</span>
+            <span class="n">isolinux_target</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+            <span class="n">copied</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">syslinux_paths</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;isolinux.bin&quot;</span><span class="p">,</span> <span class="s2">&quot;vesamenu.c32&quot;</span><span class="p">,</span> <span class="s2">&quot;menu.c32&quot;</span><span class="p">,</span> <span class="s2">&quot;ldlinux.c32&quot;</span><span class="p">,</span> <span class="s2">&quot;libcom32.c32&quot;</span><span class="p">,</span> <span class="s2">&quot;libutil.c32&quot;</span><span class="p">]:</span>
+                        <span class="n">src_file</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">filename</span>
+                        <span class="k">if</span> <span class="n">src_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">isolinux_target</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span>
+                                <span class="n">copied</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not copy </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">copied</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied syslinux boot binaries from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> into isolinux target&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">copied</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not find syslinux boot files inside chroot or host distribution!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.create_squashfs">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.create_squashfs">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_squashfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">squash_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;live&quot;</span> <span class="o">/</span> <span class="s2">&quot;filesystem.squashfs&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating SquashFS image at </span><span class="si">{</span><span class="n">squash_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[MOCK ISO ENGINE] Creating dummy filesystem.squashfs&quot;</span><span class="p">)</span>
+            <span class="n">squash_path</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mksquashfs&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_root</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">squash_path</span><span class="p">),</span> <span class="s2">&quot;-comp&quot;</span><span class="p">,</span> <span class="s2">&quot;xz&quot;</span><span class="p">,</span> <span class="s2">&quot;-wildcards&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;boot/*&quot;</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ISOEngineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mksquashfs failed: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.generate_grub_config">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.generate_grub_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_grub_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">grub_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;boot&quot;</span> <span class="o">/</span> <span class="s2">&quot;grub&quot;</span> <span class="o">/</span> <span class="s2">&quot;grub.cfg&quot;</span>
+        <span class="n">vol_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vol_id&quot;</span><span class="p">,</span> <span class="s2">&quot;GENTOO_LIVE&quot;</span><span class="p">)</span>
+        <span class="n">bootargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bootargs&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;root=live:CDLABEL=</span><span class="si">{</span><span class="n">vol_id</span><span class="si">}</span><span class="s2"> rd.live.dir=/ rd.live.squashimg=filesystem.squashfs cdroot&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;set default=0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;set timeout=10&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;menuentry &#39;Boot Gentoo Modern (Default)&#39; --class gnu-linux --class os {&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    search --no-floppy --set=root -l </span><span class="si">{</span><span class="n">vol_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    linux /boot/vmlinuz </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    initrd /boot/initramfs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;}&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;menuentry &#39;Boot Gentoo Modern (Copy to RAM)&#39; --class gnu-linux --class os {&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    search --no-floppy --set=root -l </span><span class="si">{</span><span class="n">vol_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    linux /boot/vmlinuz </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2"> docache rd.live.ram=1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    initrd /boot/initramfs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;}&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;menuentry &#39;Boot Gentoo Modern (Safe Graphics)&#39; --class gnu-linux --class os {&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    search --no-floppy --set=root -l </span><span class="si">{</span><span class="n">vol_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    linux /boot/vmlinuz </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2"> nomodeset&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    initrd /boot/initramfs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;}&quot;</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK ISO ENGINE] Writing GRUB config to </span><span class="si">{</span><span class="n">grub_cfg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">grub_cfg</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.generate_syslinux_config">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.generate_syslinux_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_syslinux_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">syslinux_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;isolinux&quot;</span> <span class="o">/</span> <span class="s2">&quot;isolinux.cfg&quot;</span>
+        <span class="n">bootargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bootargs&quot;</span><span class="p">,</span> <span class="s2">&quot;root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;UI vesamenu.c32&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;DEFAULT gentoo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TIMEOUT 100&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PROMPT 0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LABEL gentoo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  MENU LABEL Boot Gentoo Modern (Default)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  KERNEL /boot/vmlinuz&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;  APPEND initrd=/boot/initramfs </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LABEL gentoo-ram&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  MENU LABEL Boot Gentoo Modern (Copy to RAM)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  KERNEL /boot/vmlinuz&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;  APPEND initrd=/boot/initramfs </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2"> docache&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LABEL gentoo-safe&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  MENU LABEL Boot Gentoo Modern (Safe Graphics)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;  KERNEL /boot/vmlinuz&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;  APPEND initrd=/boot/initramfs </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="s2"> nomodeset&quot;</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK ISO ENGINE] Writing ISOLINUX config to </span><span class="si">{</span><span class="n">syslinux_cfg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">syslinux_cfg</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.generate_systemd_boot_config">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.generate_systemd_boot_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_systemd_boot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">loader_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;loader&quot;</span> <span class="o">/</span> <span class="s2">&quot;loader.conf&quot;</span>
+        <span class="n">entry_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;loader&quot;</span> <span class="o">/</span> <span class="s2">&quot;entries&quot;</span> <span class="o">/</span> <span class="s2">&quot;gentoo.conf&quot;</span>
+        <span class="n">bootargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bootargs&quot;</span><span class="p">,</span> <span class="s2">&quot;root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs&quot;</span><span class="p">)</span>
+
+        <span class="n">loader_conf</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;default gentoo.conf</span><span class="se">\n</span><span class="s2">timeout 10</span><span class="se">\n</span><span class="s2">console-mode max</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">entry_conf</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+            <span class="s2">&quot;title Gentoo Modern</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;linux /boot/vmlinuz</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;initrd /boot/initramfs</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;options </span><span class="si">{</span><span class="n">bootargs</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK ISO ENGINE] Writing Systemd-boot config to </span><span class="si">{</span><span class="n">loader_conf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.generate_bootloader_configs">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.generate_bootloader_configs">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_bootloader_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">btype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;grub-uefi&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating bootloader configurations for type: </span><span class="si">{</span><span class="n">btype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;syslinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">or</span> <span class="s2">&quot;isolinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_syslinux_config</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s2">&quot;systemd-boot&quot;</span> <span class="ow">in</span> <span class="n">btype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_systemd_boot_config</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_grub_config</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_grub_config</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.build_iso">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.build_iso">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_iso</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_iso_root</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_squashfs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_bootloader_configs</span><span class="p">()</span>
+
+        <span class="n">output_iso</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building ISO file: </span><span class="si">{</span><span class="n">output_iso</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MOCK ISO ENGINE] Creating dummy ISO image: </span><span class="si">{</span><span class="n">output_iso</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output_iso</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;MOCK GENTOO ISO IMAGE CONTENT&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vol_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vol_id&quot;</span><span class="p">,</span> <span class="s2">&quot;gentoo_modern&quot;</span><span class="p">)</span>
+            <span class="n">btype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;grub-uefi&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;syslinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">or</span> <span class="s2">&quot;isolinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;xorriso&quot;</span><span class="p">,</span> <span class="s2">&quot;-as&quot;</span><span class="p">,</span> <span class="s2">&quot;mkisofs&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-iso-level&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-full-iso9660-filenames&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-volid&quot;</span><span class="p">,</span> <span class="n">vol_id</span><span class="p">,</span>
+                    <span class="s2">&quot;-eltorito-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/isolinux.bin&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-eltorito-catalog&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/boot.cat&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-no-emul-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-load-size&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-info-table&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-output&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_iso</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;grub-mkrescue&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-volid&quot;</span><span class="p">,</span> <span class="n">vol_id</span><span class="p">,</span>
+                    <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_iso</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="p">)</span>
+                <span class="p">]</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ISOEngineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ISO creation failed: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_checksums</span><span class="p">(</span><span class="n">output_iso</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output_iso</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_generate_checksums</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iso_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating checksums for </span><span class="si">{</span><span class="n">iso_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">iso_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+
+        <span class="n">md5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">sha256</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+        <span class="p">(</span><span class="n">iso_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iso_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.md5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">md5</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">iso_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">iso_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iso_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.sha256&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">iso_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

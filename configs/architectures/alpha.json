@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-mieee -pipe -O2",
+    "ACCEPT_KEYWORDS": "~alpha"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/alpha/autobuilds/latest-stage3-alpha-{init_system}.txt",
+    "pattern": "stage3-alpha"
+  },
+  "default_profile": "default/linux/alpha/23.0"
+}

@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe",
+    "ACCEPT_KEYWORDS": "~m68k"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/m68k/autobuilds/latest-stage3-m68k-{init_system}.txt",
+    "pattern": "stage3-m68k"
+  },
+  "default_profile": "default/linux/m68k/23.0"
+}

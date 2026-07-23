@@ -50,6 +50,36 @@ class ISOEngine:
                 logger.info(f"Copied initramfs {ifile.name} -> {iso_boot / 'initramfs'}")
                 break
 
+        # For syslinux/isolinux targets, we must copy syslinux boot files if they exist in the chroot or host
+        btype = self.config.get("type", "grub-uefi")
+        if "syslinux" in btype or "isolinux" in btype:
+            syslinux_paths = [
+                self.target_root / "usr" / "share" / "syslinux",
+                self.target_root / "usr" / "lib" / "syslinux" / "bios",
+                Path("/usr/share/syslinux"),
+                Path("/usr/lib/syslinux/bios")
+            ]
+            
+            isolinux_target = self.iso_dir / "isolinux"
+            isolinux_target.mkdir(parents=True, exist_ok=True)
+            
+            copied = False
+            for path in syslinux_paths:
+                if path.exists():
+                    for filename in ["isolinux.bin", "vesamenu.c32", "menu.c32", "ldlinux.c32", "libcom32.c32", "libutil.c32"]:
+                        src_file = path / filename
+                        if src_file.exists():
+                            try:
+                                shutil.copy2(src_file, isolinux_target / filename)
+                                copied = True
+                            except Exception as e:
+                                logger.warning(f"Could not copy {filename} from {path}: {e}")
+                    if copied:
+                        logger.info(f"Copied syslinux boot binaries from {path} into isolinux target")
+                        break
+            if not copied and self.mode != "mock":
+                logger.warning("Could not find syslinux boot files inside chroot or host distribution!")
+
     def create_squashfs(self):
         squash_path = self.iso_dir / "live" / "filesystem.squashfs"
         logger.info(f"Creating SquashFS image at {squash_path}")

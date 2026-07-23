@@ -1,0 +1,14 @@
+{
+  "name": "multimedia-editing",
+  "description": "Audio, video, and streaming production packages (OBS, Audacity, Kdenlive)",
+  "packages": [
+    "media-video/obs-studio",
+    "media-sound/audacity",
+    "media-video/kdenlive"
+  ],
+  "use_flags": [
+    "ffmpeg",
+    "alsa",
+    "pulseaudio"
+  ]
+}

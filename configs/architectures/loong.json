@@ -1,0 +1,11 @@
+{
+  "make_conf": {
+    "CFLAGS": "-O2 -pipe -march=loongarch64",
+    "ACCEPT_KEYWORDS": "~loong"
+  },
+  "stage3": {
+    "url": "https://distfiles.gentoo.org/releases/loong/autobuilds/latest-stage3-loongarch64-{init_system}.txt",
+    "pattern": "stage3-loongarch64"
+  },
+  "default_profile": "default/linux/loong/23.0/la64v100/lp64d/split-usr"
+}

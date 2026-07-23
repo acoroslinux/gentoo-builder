@@ -1,0 +1,16 @@
+{
+  "name": "network-shares",
+  "description": "Network sharing protocol clients and servers (Samba, NFS, SSHFS)",
+  "packages": [
+    "net-fs/samba",
+    "net-fs/cifs-utils",
+    "net-fs/nfs-utils",
+    "net-fs/sshfs"
+  ],
+  "use_flags": [
+    "samba",
+    "client",
+    "server",
+    "nfs"
+  ]
+}

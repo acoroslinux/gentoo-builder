@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Customization &amp; Troubleshooting &mdash; Gentoo-Builder</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=87052346" />
+
+  
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials &amp; Practical Examples" href="tutorials.html" />
+    <link rel="prev" title="Architecture &amp; Design" href="architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7A5B95" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Gentoo-Builder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Comprehensive Usage &amp; Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Customization &amp; Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#custom-portage-overlays-local-ebuilds">1. Custom Portage Overlays &amp; Local Ebuilds</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#steps-to-include-custom-ebuilds">Steps to include custom ebuilds</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#portage-cache-persistence-performance-otimization">2. Portage Cache Persistence &amp; Performance Otimization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#active-caches">Active Caches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-optimization">Hardware Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#customizing-the-kernel-configuration">3. Customizing the Kernel Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting-recovery">4. Troubleshooting &amp; Recovery</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#issue-1-emerge-or-package-compilation-fails">Issue 1: Emerge or Package Compilation Fails</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#issue-2-clean-builds-do-not-clean-the-download-cache">Issue 2: Clean builds do not clean the download cache</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Practical Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Python API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7A5B95" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Gentoo-Builder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Advanced Customization &amp; Troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/advanced.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-customization-troubleshooting">
+<h1>Advanced Customization &amp; Troubleshooting<a class="headerlink" href="#advanced-customization-troubleshooting" title="Link to this heading"></a></h1>
+<p>This page details advanced usage, customization techniques, and troubleshooting steps for Gentoo-Builder.</p>
+<hr class="docutils" />
+<section id="custom-portage-overlays-local-ebuilds">
+<h2>1. Custom Portage Overlays &amp; Local Ebuilds<a class="headerlink" href="#custom-portage-overlays-local-ebuilds" title="Link to this heading"></a></h2>
+<p>Gentoo-Builder has native support for inject-compiling custom, third-party, or local ebuilds during the Portage package installation step.</p>
+<section id="how-it-works">
+<h3>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading"></a></h3>
+<p>During the build, <code class="docutils literal notranslate"><span class="pre">PortageManager</span></code> sets up a local repository named <code class="docutils literal notranslate"><span class="pre">local_repo</span></code> inside the chroot under <code class="docutils literal notranslate"><span class="pre">/var/db/repos/local_repo</span></code> and registers it in <code class="docutils literal notranslate"><span class="pre">/etc/portage/repos.conf/local_repo.conf</span></code>.</p>
+</section>
+<section id="steps-to-include-custom-ebuilds">
+<h3>Steps to include custom ebuilds<a class="headerlink" href="#steps-to-include-custom-ebuilds" title="Link to this heading"></a></h3>
+<p>If you have a local directory containing your custom ebuilds (structured like a standard Portage overlay, e.g., <code class="docutils literal notranslate"><span class="pre">category/package/package-version.ebuild</span></code>), you can inject them:</p>
+<ol class="arabic simple">
+<li><p>Put your custom overlay directory structure in a local path, e.g., <code class="docutils literal notranslate"><span class="pre">./my_custom_overlay/</span></code>.</p></li>
+<li><p>Ensure you have the corresponding package defined in your config JSON file (e.g. under <code class="docutils literal notranslate"><span class="pre">packages/my-custom-package</span></code>).</p></li>
+<li><p>During runtime, <code class="docutils literal notranslate"><span class="pre">PortageManager</span></code> automatically merges files from the specified <code class="docutils literal notranslate"><span class="pre">custom_ebuilds_dir</span></code> and runs <code class="docutils literal notranslate"><span class="pre">ebuild</span> <span class="pre">digest</span></code> inside the chroot to generate Manifest files before calling <code class="docutils literal notranslate"><span class="pre">emerge</span></code>.</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="portage-cache-persistence-performance-otimization">
+<h2>2. Portage Cache Persistence &amp; Performance Otimization<a class="headerlink" href="#portage-cache-persistence-performance-otimization" title="Link to this heading"></a></h2>
+<p>Portage compilation is highly resource-intensive. To prevent downloading source tarballs multiple times and to reuse compiled binary packages across clean builds, Gentoo-Builder implements <strong>Portage Cache Binding</strong>.</p>
+<section id="active-caches">
+<h3>Active Caches<a class="headerlink" href="#active-caches" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Distfiles Cache</strong>: Bind-mounted from the host directory <code class="docutils literal notranslate"><span class="pre">workdir/&lt;arch&gt;/cache/distfiles</span></code> to <code class="docutils literal notranslate"><span class="pre">/var/cache/distfiles</span></code> inside the chroot. This preserves downloaded source tarballs.</p></li>
+<li><p><strong>Binpkgs Cache</strong>: Bind-mounted from the host directory <code class="docutils literal notranslate"><span class="pre">workdir/&lt;arch&gt;/cache/binpkgs</span></code> to <code class="docutils literal notranslate"><span class="pre">/var/cache/binpkgs</span></code> inside the chroot. This caches compiled packages, allowing subsequent builds to install them instantly via <code class="docutils literal notranslate"><span class="pre">getbinpkg</span></code> features without compiling them again.</p></li>
+</ul>
+</section>
+<section id="hardware-optimization">
+<h3>Hardware Optimization<a class="headerlink" href="#hardware-optimization" title="Link to this heading"></a></h3>
+<p>The builder dynamically detects the CPU core count on the host:</p>
+<ul class="simple">
+<li><p>Sets <code class="docutils literal notranslate"><span class="pre">MAKEOPTS=&quot;-jN&quot;</span></code> where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of CPU cores.</p></li>
+<li><p>Sets <code class="docutils literal notranslate"><span class="pre">--jobs</span></code> and <code class="docutils literal notranslate"><span class="pre">--load-average</span></code> inside <code class="docutils literal notranslate"><span class="pre">EMERGE_DEFAULT_OPTS</span></code> to prevent overloading the host system while maximizing parallel compilation.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="customizing-the-kernel-configuration">
+<h2>3. Customizing the Kernel Configuration<a class="headerlink" href="#customizing-the-kernel-configuration" title="Link to this heading"></a></h2>
+<p>If you do not want to use the default binary kernel (<code class="docutils literal notranslate"><span class="pre">sys-kernel/gentoo-kernel-bin</span></code>), you can build a custom kernel:</p>
+<ol class="arabic simple">
+<li><p>Edit the kernel configuration profile in <code class="docutils literal notranslate"><span class="pre">configs/kernels/</span></code>.</p></li>
+<li><p>Point it to a custom package name or provide kernel sources like <code class="docutils literal notranslate"><span class="pre">sys-kernel/gentoo-sources</span></code>.</p></li>
+<li><p>Provide custom kernel config files by copying them via <code class="docutils literal notranslate"><span class="pre">custom_files</span></code> list or placing them inside target chroot paths like <code class="docutils literal notranslate"><span class="pre">/usr/src/linux/.config</span></code> during customizer execution.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="troubleshooting-recovery">
+<h2>4. Troubleshooting &amp; Recovery<a class="headerlink" href="#troubleshooting-recovery" title="Link to this heading"></a></h2>
+<section id="issue-1-emerge-or-package-compilation-fails">
+<h3>Issue 1: Emerge or Package Compilation Fails<a class="headerlink" href="#issue-1-emerge-or-package-compilation-fails" title="Link to this heading"></a></h3>
+<p>If <code class="docutils literal notranslate"><span class="pre">emerge</span></code> fails during the real mode execution, virtual filesystems may remain mounted.</p>
+<ul>
+<li><p><strong>Solution</strong>: Before attempting to modify files manually or delete the directory, run the cleanup script or manually unmount virtual filesystems:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/dev/pts
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/dev/shm
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/dev
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/proc
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/sys
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/var/cache/distfiles
+sudo<span class="w"> </span>umount<span class="w"> </span>-l<span class="w"> </span>workdir/x86_64/chroot/var/cache/binpkgs
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="issue-2-clean-builds-do-not-clean-the-download-cache">
+<h3>Issue 2: Clean builds do not clean the download cache<a class="headerlink" href="#issue-2-clean-builds-do-not-clean-the-download-cache" title="Link to this heading"></a></h3>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">--clean</span></code> argument removes compile chroots (<code class="docutils literal notranslate"><span class="pre">workdir/&lt;arch&gt;/chroot/</span></code> and <code class="docutils literal notranslate"><span class="pre">workdir/&lt;arch&gt;/iso_root/</span></code>) to ensure a fresh, unpolluted environment. However, it <strong>preserves</strong> the cache folder (<code class="docutils literal notranslate"><span class="pre">workdir/&lt;arch&gt;/cache/</span></code>) to avoid redownloading the large Stage3 tarball or Portage distfiles.</p>
+<ul>
+<li><p><strong>How to force full clean</strong>: If you want to delete everything (including downloads and cache) to start completely from scratch, delete the workdir manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>workdir/x86_64/
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="architecture.html" class="btn btn-neutral float-left" title="Architecture &amp; Design" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials.html" class="btn btn-neutral float-right" title="Tutorials &amp; Practical Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026-2026, AçorOS Linux Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

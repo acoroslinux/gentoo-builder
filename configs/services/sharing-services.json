@@ -1,0 +1,8 @@
+{
+  "name": "sharing-services",
+  "description": "Network sharing daemons (Samba, NFS)",
+  "services": [
+    "samba",
+    "nfs"
+  ]
+}

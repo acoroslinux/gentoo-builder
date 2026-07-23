@@ -1,0 +1,14 @@
+{
+  "name": "productivity",
+  "description": "Productivity, note-taking, document conversion, and scheduling packages",
+  "packages": [
+    "app-text/cherrytree",
+    "app-text/pandoc",
+    "app-office/gnucash"
+  ],
+  "use_flags": [
+    "sqlite",
+    "xml",
+    "finance"
+  ]
+}

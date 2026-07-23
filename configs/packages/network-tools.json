@@ -1,0 +1,15 @@
+{
+  "name": "network-tools",
+  "description": "Network utilities, diagnostics, and VPN support packages",
+  "packages": [
+    "net-analyzer/nmap",
+    "net-dns/bind-tools",
+    "net-misc/traceroute",
+    "net-vpn/openvpn",
+    "net-vpn/wireguard-tools"
+  ],
+  "use_flags": [
+    "iproute2",
+    "openssl"
+  ]
+}

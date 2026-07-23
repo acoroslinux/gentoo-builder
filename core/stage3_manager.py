@@ -26,21 +26,25 @@ class Stage3Manager:
         else:
             return base_url
 
+        pattern = self.config.get("pattern", "stage3-amd64")
         try:
             req = urllib.request.Request(txt_url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req) as resp:
                 content = resp.read().decode("utf-8")
+                base_path_url = txt_url.rsplit("/", 1)[0] + "/"
                 for line in content.splitlines():
                     line = line.strip()
-                    if line and not line.startswith("#") and not line.startswith("-----") and "stage3-amd64" in line:
+                    if line and not line.startswith("#") and not line.startswith("-----") and pattern in line:
                         rel_path = line.split()[0]
-                        full_url = f"https://distfiles.gentoo.org/releases/amd64/autobuilds/{rel_path}"
+                        full_url = f"{base_path_url}{rel_path}"
                         logger.info(f"Resolved latest Gentoo Stage3 URL: {full_url}")
                         return full_url
         except Exception as e:
             logger.warning(f"Could not resolve dynamic stage3 URL from {txt_url}: {e}")
 
-        return "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64-openrc/stage3-amd64-openrc-latest.tar.xz"
+        # Construct a sensible fallback based on the txt_url or pattern
+        base_path_url = txt_url.rsplit("/", 1)[0] + "/" if "/" in txt_url else "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
+        return f"{base_path_url}current-{pattern}-openrc/{pattern}-openrc-latest.tar.xz"
 
     def fetch_and_extract(self, target_root: Path):
         configured_url = self.config.get("url", "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt")
