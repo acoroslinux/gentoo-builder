@@ -1,7 +1,8 @@
 {
+  "name": "calamares",
+  "description": "Calamares graphical system installer profile",
   "packages": [
-    "sys-boot/calamares",
-    "sys-boot/calamares-gentoo-configs"
+    "app-admin/calamares"
   ],
   "services": [],
   "use_flags": [
@@ -9,5 +10,19 @@
     "qt6",
     "kpmcore",
     "networkmanager"
+  ],
+  "custom_files": [
+    {
+      "source": "calamares",
+      "destination": "/etc/calamares"
+    },
+    {
+      "source": "autostart/create-install-icon.desktop",
+      "destination": "/etc/xdg/autostart/create-install-icon.desktop"
+    },
+    {
+      "source": "scripts/create-install-icon.sh",
+      "destination": "/usr/local/bin/create-install-icon.sh"
+    }
   ]
 }

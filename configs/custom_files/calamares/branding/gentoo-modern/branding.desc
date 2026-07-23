@@ -1,20 +1,20 @@
 # SPDX-FileCopyrightText: no
 # SPDX-License-Identifier: CC0-1.0
 ---
-componentName:   void-modern
+componentName:   gentoo-modern
 
 strings:
-    productName:         "Void Modern"
-    shortProductName:    "VoidModern"
+    productName:         "Gentoo Modern"
+    shortProductName:    "GentooModern"
     version:             "2026.07"
     shortVersion:        "2026.07"
-    versionedName:       "Void Modern 2026.07"
-    shortVersionedName:  "VoidModern 2026.07"
-    installLabel:        "Install Void Modern"
-    productUrl:          "https://github.com/acoroslinux/void-builder"
-    supportUrl:          "https://github.com/acoroslinux/void-builder"
-    knownIssuesUrl:      "https://github.com/acoroslinux/void-builder"
-    releaseNotesUrl:     "https://github.com/acoroslinux/void-builder"
+    versionedName:       "Gentoo Modern 2026.07"
+    shortVersionedName:  "GentooModern 2026.07"
+    installLabel:        "Install Gentoo Modern"
+    productUrl:          "https://github.com/acoroslinux/gentoo-builder"
+    supportUrl:          "https://github.com/acoroslinux/gentoo-builder"
+    knownIssuesUrl:      "https://github.com/acoroslinux/gentoo-builder"
+    releaseNotesUrl:     "https://github.com/acoroslinux/gentoo-builder"
 
 images:
     productLogo:         "logo.png"

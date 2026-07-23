@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "sys-kernel/gentoo-kernel"
+  ],
+  "use_flags": [
+    "dracut",
+    "initramfs",
+    "savedconfig"
+  ]
+}

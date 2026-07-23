@@ -135,9 +135,16 @@ class ConfigLoader:
             merged["bootloader"] = b_cfg
 
         # Package profiles
-        for pkg_p in (package_profiles or []):
+        resolved_pkg_profiles = list(package_profiles) if package_profiles is not None else []
+        for default_profile in ["xorg", "wayland"]:
+            if default_profile not in resolved_pkg_profiles:
+                resolved_pkg_profiles.append(default_profile)
+
+        for pkg_p in resolved_pkg_profiles:
             p_cfg = self.load_profile("packages", pkg_p)
             merged["packages"].extend(p_cfg.get("packages", []))
+            merged["use_flags"].extend(p_cfg.get("use_flags", []))
+            merged["custom_files"].extend(p_cfg.get("custom_files", []))
 
         # Service profiles
         for srv_p in (service_profiles or []):

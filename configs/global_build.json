@@ -10,13 +10,19 @@
   "make_conf": {
     "CFLAGS": "-O2 -pipe -march=x86-64",
     "ACCEPT_KEYWORDS": "~amd64",
-    "ACCEPT_LICENSE": "*"
+    "ACCEPT_LICENSE": "*",
+    "VIDEO_CARDS": "amdgpu radeon radeonsi nouveau intel fbdev vesa",
+    "INPUT_DEVICES": "libinput synaptics evdev"
   },
   "use_flags": [
     "unicode",
     "nls",
     "udev",
-    "dbus"
+    "dbus",
+    "opengl",
+    "egl",
+    "text",
+    "dist-kernel"
   ],
   "packages": [
     "app-admin/sudo",

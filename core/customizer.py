@@ -1,9 +1,11 @@
 import os
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Dict, Any, List
 from core.chroot_manager import ChrootManager
 from core.logger_setup import setup_logger
+from core.path_utils import resolve_from_project
 
 logger = setup_logger("customizer")
 

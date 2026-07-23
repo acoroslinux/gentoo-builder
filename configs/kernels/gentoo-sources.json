@@ -1,0 +1,9 @@
+{
+  "packages": [
+    "sys-kernel/gentoo-sources",
+    "sys-kernel/genkernel"
+  ],
+  "use_flags": [
+    "symlink"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "wayland",
+  "description": "Wayland display server packages, protocols and libraries",
+  "packages": [
+    "dev-libs/wayland",
+    "dev-libs/wayland-protocols",
+    "gui-libs/wlroots",
+    "x11-libs/libxkbcommon",
+    "x11-base/xwayland",
+    "app-misc/wayland-utils"
+  ],
+  "use_flags": [
+    "wayland",
+    "egl",
+    "gles2"
+  ]
+}

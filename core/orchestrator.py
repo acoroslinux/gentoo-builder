@@ -47,10 +47,14 @@ class BuildOrchestrator:
         self.desktop = desktop
         self.kernel = kernel
         self.bootloader = bootloader
-        self.package_profiles = package_profiles or []
-        self.service_profiles = service_profiles or []
+        self.package_profiles = list(package_profiles) if package_profiles else []
+        self.service_profiles = list(service_profiles) if service_profiles else []
         self.live_profile = live_profile
         self.target = target or "livecd-stage2"
+
+        # Automatically include calamares installer profile ONLY for LiveCD target ISO builds
+        if self.target.startswith("livecd") and "calamares" not in self.package_profiles:
+            self.package_profiles.append("calamares")
 
         # Determine extension based on target
         if self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:

@@ -46,6 +46,7 @@ def test_mock_build_diskimage_stage2():
             clean=True,
             target="diskimage-stage2"
         )
+        assert "calamares" not in orchestration.package_profiles
         orchestration.workdir = Path(tmpdir) / "workdir"
         orchestration.target_root = orchestration.workdir / "chroot"
         

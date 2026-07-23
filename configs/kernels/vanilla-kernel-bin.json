@@ -1,0 +1,9 @@
+{
+  "packages": [
+    "sys-kernel/vanilla-kernel-bin"
+  ],
+  "use_flags": [
+    "dracut",
+    "initramfs"
+  ]
+}

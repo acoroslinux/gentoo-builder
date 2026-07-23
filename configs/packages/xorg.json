@@ -1,0 +1,18 @@
+{
+  "name": "xorg",
+  "description": "Xorg display server packages and dependencies",
+  "packages": [
+    "x11-base/xorg-server",
+    "x11-base/xorg-drivers",
+    "x11-apps/xinit",
+    "x11-apps/xrandr",
+    "x11-apps/xprop",
+    "x11-apps/xset",
+    "x11-apps/xrdb"
+  ],
+  "use_flags": [
+    "X",
+    "xorg",
+    "elogind"
+  ]
+}

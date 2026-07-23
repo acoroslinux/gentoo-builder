@@ -27,7 +27,7 @@ class PortageManager:
         cpu_count = os.cpu_count() or 2
         makeopts = f"-j{cpu_count}"
         load_avg = str(cpu_count)
-        emerge_opts = f"--jobs={max(1, cpu_count // 2)} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --getbinpkg=y --usepkg=y"
+        emerge_opts = f"--jobs={max(1, cpu_count // 2)} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y"
 
         # Allow explicit override from config if provided
         cflags = make_conf_data.get("CFLAGS", "-O2 -pipe -march=x86-64")
@@ -45,11 +45,16 @@ class PortageManager:
             'ACCEPT_LICENSE="' + make_conf_data.get("ACCEPT_LICENSE", "*") + '"',
             'USE="' + " ".join(use_flags) + '"',
             f'EMERGE_DEFAULT_OPTS="{emerge_opts}"',
-            'FEATURES="binpkg-logs parallel-install parallel-fetch buildpkg getbinpkg"',
+            'FEATURES="binpkg-logs parallel-install parallel-fetch buildpkg"',
             'PORTAGE_NICENESS="10"',
             'DISTDIR="/var/cache/distfiles"',
             'PKGDIR="/var/cache/binpkgs"'
         ]
+        
+        # Append any custom variables (like VIDEO_CARDS, INPUT_DEVICES, etc.)
+        for key, val in make_conf_data.items():
+            if key not in ["CFLAGS", "CXXFLAGS", "FCFLAGS", "FFLAGS", "COMMON_FLAGS", "MAKEOPTS", "ACCEPT_KEYWORDS", "ACCEPT_LICENSE", "USE", "EMERGE_DEFAULT_OPTS", "FEATURES", "PORTAGE_NICENESS", "DISTDIR", "PKGDIR"]:
+                lines.append(f'{key}="{val}"')
 
         if self.chroot.mode == "mock":
             logger.info(f"[MOCK PORTAGE] Writing hardware-optimized make.conf to {make_conf_path} (MAKEOPTS={makeopts_val})")
@@ -67,7 +72,8 @@ class PortageManager:
     def update_world(self):
         """Update Gentoo world set non-interactively (--ask=n)."""
         logger.info("Updating base packages and slot dependencies (emerge --ask=n --update --deep --newuse @world)...")
-        res = self.chroot.run_in_chroot(["emerge", "--ask=n", "--update", "--deep", "--newuse", "--with-bdeps=y", "@world"])
+        self.chroot.run_in_chroot("env-update")
+        res = self.chroot.run_in_chroot(["emerge", "--ask=n", "--update", "--deep", "--newuse", "--with-bdeps=y", "--autounmask-write=y", "--autounmask-continue=y", "@world"])
         if res.returncode != 0 and self.chroot.mode == "real":
             logger.warning(f"emerge @world returned warnings: {res.stderr}")
 
@@ -113,9 +119,11 @@ class PortageManager:
             return
 
         self.setup_custom_overlay()
+        self.chroot.run_in_chroot("env-update")
         self.update_world()
 
         logger.info(f"Installing packages via emerge: {' '.join(packages)}")
+        self.chroot.run_in_chroot("env-update")
         cmd = ["emerge", "--ask=n", "--noreplace", "--verbose", "--autounmask-write=y", "--autounmask-continue=y"] + packages
         res = self.chroot.run_in_chroot(cmd)
         if res.returncode != 0 and self.chroot.mode == "real":

@@ -4,6 +4,7 @@ import hashlib
 from pathlib import Path
 from typing import Dict, Any
 from core.logger_setup import setup_logger
+from core.path_utils import resolve_from_project
 
 logger = setup_logger("iso_engine")
 
@@ -50,6 +51,27 @@ class ISOEngine:
                 logger.info(f"Copied initramfs {ifile.name} -> {iso_boot / 'initramfs'}")
                 break
 
+        # Copy GRUB theme and ISOLINUX splash image into iso_root
+        grub_theme_src = resolve_from_project("configs/custom_files/grub/modern")
+        if grub_theme_src.exists():
+            iso_grub_theme = self.iso_dir / "boot" / "grub" / "themes" / "modern"
+            try:
+                iso_grub_theme.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(grub_theme_src, iso_grub_theme, dirs_exist_ok=True)
+                logger.info(f"Copied GRUB theme -> {iso_grub_theme}")
+            except OSError as e:
+                logger.warning(f"Could not copy GRUB theme to ISO root: {e}")
+
+        splash_src = resolve_from_project("configs/custom_files/grub/modern/background.png")
+        if splash_src.exists():
+            isolinux_target = self.iso_dir / "isolinux"
+            try:
+                isolinux_target.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(splash_src, isolinux_target / "splash.png")
+                logger.info(f"Copied ISOLINUX splash image -> {isolinux_target / 'splash.png'}")
+            except OSError as e:
+                logger.warning(f"Could not copy ISOLINUX splash image: {e}")
+
         # For syslinux/isolinux targets, we must copy syslinux boot files if they exist in the chroot or host
         btype = self.config.get("type", "grub-uefi")
         if "syslinux" in btype or "isolinux" in btype:
@@ -85,7 +107,11 @@ class ISOEngine:
         logger.info(f"Creating SquashFS image at {squash_path}")
         if self.mode == "mock":
             logger.info("[MOCK ISO ENGINE] Creating dummy filesystem.squashfs")
-            squash_path.touch()
+            try:
+                squash_path.parent.mkdir(parents=True, exist_ok=True)
+                squash_path.touch()
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped creating dummy squashfs due to: {e}")
             return
 
         cmd = ["mksquashfs", str(self.target_root), str(squash_path), "-comp", "xz", "-wildcards", "-e", "boot/*"]
@@ -101,16 +127,22 @@ class ISOEngine:
         lines = [
             "set default=0",
             "set timeout=10",
+            "set gfxmode=auto",
+            "insmod all_video",
+            "insmod gfxterm",
+            "insmod png",
+            "set theme=/boot/grub/themes/modern/theme.txt",
+            "terminal_output gfxterm",
             "",
             "menuentry 'Boot Gentoo Modern (Default)' --class gnu-linux --class os {",
             f"    search --no-floppy --set=root -l {vol_id}",
-            f"    linux /boot/vmlinuz {bootargs}",
+            f"    linux /boot/vmlinuz {bootargs} quiet splash plymouth.theme=gentoo-modern",
             "    initrd /boot/initramfs",
             "}",
             "",
             "menuentry 'Boot Gentoo Modern (Copy to RAM)' --class gnu-linux --class os {",
             f"    search --no-floppy --set=root -l {vol_id}",
-            f"    linux /boot/vmlinuz {bootargs} docache rd.live.ram=1",
+            f"    linux /boot/vmlinuz {bootargs} docache rd.live.ram=1 quiet splash plymouth.theme=gentoo-modern",
             "    initrd /boot/initramfs",
             "}",
             "",
@@ -123,7 +155,13 @@ class ISOEngine:
 
         if self.mode == "mock":
             logger.info(f"[MOCK ISO ENGINE] Writing GRUB config to {grub_cfg}")
-        grub_cfg.write_text("\n".join(lines) + "\n")
+            try:
+                grub_cfg.parent.mkdir(parents=True, exist_ok=True)
+                grub_cfg.write_text("\n".join(lines) + "\n")
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped writing GRUB config due to: {e}")
+        else:
+            grub_cfg.write_text("\n".join(lines) + "\n")
 
     def generate_syslinux_config(self):
         syslinux_cfg = self.iso_dir / "isolinux" / "isolinux.cfg"
@@ -131,6 +169,8 @@ class ISOEngine:
 
         lines = [
             "UI vesamenu.c32",
+            "MENU TITLE Gentoo Modern Live ISO",
+            "MENU BACKGROUND /isolinux/splash.png",
             "DEFAULT gentoo",
             "TIMEOUT 100",
             "PROMPT 0",
@@ -138,12 +178,12 @@ class ISOEngine:
             "LABEL gentoo",
             "  MENU LABEL Boot Gentoo Modern (Default)",
             "  KERNEL /boot/vmlinuz",
-            f"  APPEND initrd=/boot/initramfs {bootargs}",
+            f"  APPEND initrd=/boot/initramfs {bootargs} quiet splash plymouth.theme=gentoo-modern",
             "",
             "LABEL gentoo-ram",
             "  MENU LABEL Boot Gentoo Modern (Copy to RAM)",
             "  KERNEL /boot/vmlinuz",
-            f"  APPEND initrd=/boot/initramfs {bootargs} docache",
+            f"  APPEND initrd=/boot/initramfs {bootargs} docache quiet splash plymouth.theme=gentoo-modern",
             "",
             "LABEL gentoo-safe",
             "  MENU LABEL Boot Gentoo Modern (Safe Graphics)",
@@ -153,22 +193,43 @@ class ISOEngine:
 
         if self.mode == "mock":
             logger.info(f"[MOCK ISO ENGINE] Writing ISOLINUX config to {syslinux_cfg}")
-        syslinux_cfg.write_text("\n".join(lines) + "\n")
+            try:
+                syslinux_cfg.parent.mkdir(parents=True, exist_ok=True)
+                syslinux_cfg.write_text("\n".join(lines) + "\n")
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped writing ISOLINUX config due to: {e}")
+        else:
+            syslinux_cfg.write_text("\n".join(lines) + "\n")
 
     def generate_systemd_boot_config(self):
         loader_conf = self.iso_dir / "loader" / "loader.conf"
         entry_conf = self.iso_dir / "loader" / "entries" / "gentoo.conf"
         bootargs = self.config.get("bootargs", "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs")
 
-        loader_conf.write_text("default gentoo.conf\ntimeout 10\nconsole-mode max\n")
-        entry_conf.write_text(
-            "title Gentoo Modern\n"
-            "linux /boot/vmlinuz\n"
-            "initrd /boot/initramfs\n"
-            f"options {bootargs}\n"
-        )
         if self.mode == "mock":
             logger.info(f"[MOCK ISO ENGINE] Writing Systemd-boot config to {loader_conf}")
+            try:
+                loader_conf.parent.mkdir(parents=True, exist_ok=True)
+                loader_conf.write_text("default gentoo.conf\ntimeout 10\nconsole-mode max\n")
+                entry_conf.parent.mkdir(parents=True, exist_ok=True)
+                entry_conf.write_text(
+                    "title Gentoo Modern\n"
+                    "linux /boot/vmlinuz\n"
+                    "initrd /boot/initramfs\n"
+                    f"options {bootargs} quiet splash plymouth.theme=gentoo-modern\n"
+                )
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped writing Systemd-boot config due to: {e}")
+        else:
+            loader_conf.parent.mkdir(parents=True, exist_ok=True)
+            loader_conf.write_text("default gentoo.conf\ntimeout 10\nconsole-mode max\n")
+            entry_conf.parent.mkdir(parents=True, exist_ok=True)
+            entry_conf.write_text(
+                "title Gentoo Modern\n"
+                "linux /boot/vmlinuz\n"
+                "initrd /boot/initramfs\n"
+                f"options {bootargs} quiet splash plymouth.theme=gentoo-modern\n"
+            )
 
     def generate_bootloader_configs(self):
         btype = self.config.get("type", "grub-uefi")
@@ -192,7 +253,10 @@ class ISOEngine:
 
         if self.mode == "mock":
             logger.info(f"[MOCK ISO ENGINE] Creating dummy ISO image: {output_iso}")
-            output_iso.write_text("MOCK GENTOO ISO IMAGE CONTENT")
+            try:
+                output_iso.write_text("MOCK GENTOO ISO IMAGE CONTENT")
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped creating dummy ISO due to: {e}")
         else:
             vol_id = self.config.get("vol_id", "gentoo_modern")
             btype = self.config.get("type", "grub-uefi")
@@ -226,10 +290,20 @@ class ISOEngine:
 
     def _generate_checksums(self, iso_path: Path):
         logger.info(f"Generating checksums for {iso_path.name}")
-        content = iso_path.read_bytes()
+        if self.mode == "mock":
+            try:
+                (iso_path.parent / f"{iso_path.name}.md5").write_text("MOCK_MD5")
+                (iso_path.parent / f"{iso_path.name}.sha256").write_text("MOCK_SHA256")
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped generating checksums due to: {e}")
+            return
 
-        md5 = hashlib.md5(content).hexdigest()
-        sha256 = hashlib.sha256(content).hexdigest()
+        try:
+            content = iso_path.read_bytes()
+            md5 = hashlib.md5(content).hexdigest()
+            sha256 = hashlib.sha256(content).hexdigest()
 
-        (iso_path.parent / f"{iso_path.name}.md5").write_text(f"{md5}  {iso_path.name}\n")
-        (iso_path.parent / f"{iso_path.name}.sha256").write_text(f"{sha256}  {iso_path.name}\n")
+            (iso_path.parent / f"{iso_path.name}.md5").write_text(f"{md5}  {iso_path.name}\n")
+            (iso_path.parent / f"{iso_path.name}.sha256").write_text(f"{sha256}  {iso_path.name}\n")
+        except OSError as e:
+            raise ISOEngineError(f"Checksum generation failed: {e}")

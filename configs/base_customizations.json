@@ -5,10 +5,6 @@
       "destination": "/etc/skel"
     },
     {
-      "source": "autostart",
-      "destination": "/etc/xdg/autostart"
-    },
-    {
       "source": "applications",
       "destination": "/usr/share/applications"
     },
@@ -21,8 +17,24 @@
       "destination": "/usr/share/backgrounds"
     },
     {
-      "source": "scripts",
-      "destination": "/usr/local/bin"
+      "source": "plymouth/themes/gentoo-modern",
+      "destination": "/usr/share/plymouth/themes/gentoo-modern"
+    },
+    {
+      "source": "plymouth/plymouthd.conf",
+      "destination": "/etc/plymouth/plymouthd.conf"
+    },
+    {
+      "source": "grub/modern",
+      "destination": "/boot/grub/themes/modern"
+    },
+    {
+      "source": "lightdm/lightdm-gtk-greeter.conf",
+      "destination": "/etc/lightdm/lightdm-gtk-greeter.conf"
+    },
+    {
+      "source": "sddm/sddm.conf.d",
+      "destination": "/etc/sddm.conf.d"
     }
   ]
 }

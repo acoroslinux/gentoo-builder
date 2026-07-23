@@ -3,3 +3,4 @@ __pycache__/
 .pytest_cache/
 workdir/
 gentoo-catalyst-ref/
+docs/_build/
