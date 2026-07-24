@@ -1,7 +1,11 @@
 {
   "name": "filesystems",
-  "description": "Filesystem management tools (Btrfs, ZFS, Ext4, XFS, NTFS, FAT)",
+  "description": "Filesystem, disk partition, encryption, and volume management tools",
   "packages": [
+    "sys-block/parted",
+    "sys-apps/gptfdisk",
+    "sys-fs/cryptsetup",
+    "sys-fs/lvm2",
     "sys-fs/btrfs-progs",
     "sys-fs/e2fsprogs",
     "sys-fs/xfsprogs",

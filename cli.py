@@ -12,6 +12,17 @@ def _available_profiles(config_root: Path, category: str):
         return []
     return sorted([p.stem for p in category_dir.glob("*.json")])
 
+def _parse_list_arg(arg_value):
+    if not arg_value:
+        return []
+    items = []
+    if isinstance(arg_value, list):
+        for val in arg_value:
+            items.extend([x.strip() for x in val.split(",") if x.strip()])
+    elif isinstance(arg_value, str):
+        items.extend([x.strip() for x in arg_value.split(",") if x.strip()])
+    return items
+
 def main():
     default_config_path = resolve_from_project("configs/global_build.json")
 
@@ -67,8 +78,8 @@ def main():
     parser.add_argument("--desktop", type=str, help="Desktop environment profile (e.g. xfce, gnome)")
     parser.add_argument("--kernel", type=str, help="Kernel profile (e.g. gentoo-kernel-bin)")
     parser.add_argument("--bootloader", type=str, help="Bootloader profile (e.g. grub-uefi)")
-    parser.add_argument("--packages", type=str, help="Comma-separated package profiles to include (e.g. printing,network-shares)")
-    parser.add_argument("--services", type=str, help="Comma-separated service profiles to enable (e.g. printing-services,sharing-services)")
+    parser.add_argument("--packages", "--package", nargs="+", action="append", help="Package profiles to include (comma or space separated, or repeated)")
+    parser.add_argument("--services", "--service", nargs="+", action="append", help="Service profiles to enable (comma or space separated, or repeated)")
     parser.add_argument("-o", "--output", type=str, help="Custom output filename")
     parser.add_argument("--list-options", action="store_true", help="List all available profiles")
 
@@ -83,6 +94,10 @@ def main():
             print(f"  {category:<15}: {', '.join(profs) if profs else 'None'}")
         sys.exit(0)
 
+    # Flatten nested list from action="append" + nargs="+"
+    raw_pkgs = [item for sublist in args.packages for item in sublist] if args.packages else []
+    raw_srvs = [item for sublist in args.services for item in sublist] if args.services else []
+
     try:
         orchestrator = BuildOrchestrator(
             arch=args.architecture,
@@ -93,15 +108,15 @@ def main():
             desktop=args.desktop,
             kernel=args.kernel,
             bootloader=args.bootloader,
-            package_profiles=args.packages.split(",") if args.packages else [],
-            service_profiles=args.services.split(",") if args.services else [],
+            package_profiles=_parse_list_arg(raw_pkgs),
+            service_profiles=_parse_list_arg(raw_srvs),
             output_name=args.output,
             force_isolated_toolchain=args.force_isolated_toolchain,
             target=args.target
         )
         orchestrator.build()
     except BuildOrchestratorError as e:
-        print(f"Build Failed: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":
