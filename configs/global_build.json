@@ -22,6 +22,8 @@
     "egl",
     "text",
     "python",
+    "mount",
+    "alsa",
     "dist-kernel"
   ],
   "packages": [

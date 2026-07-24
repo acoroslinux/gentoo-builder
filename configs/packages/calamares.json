@@ -10,7 +10,8 @@
     "qt6",
     "kpmcore",
     "networkmanager",
-    "python"
+    "python",
+    "mount"
   ],
   "custom_files": [
     {
