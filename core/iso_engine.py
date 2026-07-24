@@ -288,6 +288,28 @@ class ISOEngine:
         self._generate_checksums(output_iso)
         return output_iso
 
+    def build_tarball(self) -> Path:
+        output_tarball = self.workdir / self.output_name
+        if not output_tarball.name.endswith((".tar.xz", ".tar.gz", ".tar.bz2", ".tar")):
+            output_tarball = self.workdir / f"{Path(self.output_name).stem}.tar.xz"
+
+        logger.info(f"Building compressed rootfs tarball: {output_tarball}")
+
+        if self.mode == "mock":
+            logger.info(f"[MOCK ISO ENGINE] Creating dummy tarball: {output_tarball}")
+            try:
+                output_tarball.write_text("MOCK GENTOO ROOTFS TARBALL CONTENT")
+            except OSError as e:
+                logger.warning(f"[MOCK ISO ENGINE] Skipped creating dummy tarball due to: {e}")
+        else:
+            cmd = ["tar", "-cJf", str(output_tarball), "-C", str(self.target_root), "."]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode != 0:
+                raise ISOEngineError(f"Tarball creation failed: {res.stderr}")
+
+        self._generate_checksums(output_tarball)
+        return output_tarball
+
     def _generate_checksums(self, iso_path: Path):
         logger.info(f"Generating checksums for {iso_path.name}")
         if self.mode == "mock":

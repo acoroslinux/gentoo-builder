@@ -83,6 +83,13 @@ def main():
     parser.add_argument("-o", "--output", type=str, help="Custom output filename")
     parser.add_argument("--list-options", action="store_true", help="List all available profiles")
 
+    parser.add_argument(
+        "--format",
+        choices=["iso", "img", "tarball"],
+        default="iso",
+        help="Target build artifact format: 'iso' (bootable ISO), 'img' (disk image), or 'tarball' (rootfs tar.xz). Default: iso"
+    )
+
     args = parser.parse_args()
 
     config_root = resolve_from_project("configs")
@@ -112,7 +119,8 @@ def main():
             service_profiles=_parse_list_arg(raw_srvs),
             output_name=args.output,
             force_isolated_toolchain=args.force_isolated_toolchain,
-            target=args.target
+            target=args.target,
+            output_format=args.format
         )
         orchestrator.build()
     except BuildOrchestratorError as e:

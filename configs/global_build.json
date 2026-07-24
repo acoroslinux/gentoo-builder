@@ -25,6 +25,7 @@
     "mount",
     "alsa",
     "libproxy",
+    "icu",
     "dist-kernel"
   ],
   "packages": [

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gentoo-Builder Documentation &mdash; Gentoo-Builder</title>
+  <title>Gentoo Modern Documentation &mdash; Gentoo-Builder</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=87052346" />
@@ -46,7 +46,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Comprehensive Usage &amp; Configuration Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; System Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Customization &amp; Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Practical Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API Reference</a></li>
@@ -66,7 +66,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Gentoo-Builder Documentation</li>
+      <li class="breadcrumb-item active">Gentoo Modern Documentation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -76,10 +76,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="gentoo-builder-documentation">
-<h1>Gentoo-Builder Documentation<a class="headerlink" href="#gentoo-builder-documentation" title="Link to this heading"></a></h1>
-<p>Welcome to the official documentation for <strong>Gentoo-Builder</strong>, a modular and automated pipeline tool designed to build customized Gentoo Linux images, ISOs, netboot tarballs, and minimal rootfs archives.</p>
-<p>Gentoo-Builder is designed to be highly configurable, host-agnostic, and fully compatible with Gentoo’s official Catalyst architecture and target patterns.</p>
+  <section id="gentoo-modern-documentation">
+<h1>Gentoo Modern Documentation<a class="headerlink" href="#gentoo-modern-documentation" title="Link to this heading"></a></h1>
+<p>Welcome to the official documentation for <strong>Gentoo Modern</strong> (<code class="docutils literal notranslate"><span class="pre">gentoo-builder</span></code>), a modular, automated, and dynamic pipeline tool designed to build customized Gentoo Linux LiveCD ISOs, Disk Images, RootFS Tarballs, and Minimal archives.</p>
+<p>Gentoo Modern is designed to be highly configurable, host-agnostic, and fully compatible with Gentoo’s official Catalyst architecture and target patterns.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
 <ul>
@@ -91,13 +91,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Comprehensive Usage &amp; Configuration Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#command-line-arguments-reference">1. Command-Line Arguments Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#configuration-profiles-structure">2. Configuration Profiles Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#real-mode-step-by-step">3. Real Mode Step-by-Step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#flexible-argument-syntax-examples">2. Flexible Argument Syntax Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#configuration-profiles-structure">3. Configuration Profiles Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#real-mode-execution-pipeline">4. Real Mode Execution Pipeline</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; Design</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#directory-structure">Directory Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#compilation-pipeline-flow">Compilation Pipeline Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture &amp; System Design</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#directory-structure">🏗️ Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#compilation-pipeline-flow">🔄 Compilation Pipeline Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#key-architectural-principles">🔑 Key Architectural Principles</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Customization &amp; Troubleshooting</a><ul>
@@ -130,11 +132,13 @@
 <section id="core-features">
 <h2>Core Features<a class="headerlink" href="#core-features" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Cross-Architecture Support</strong>: Built-in configuration profiles for 15+ CPU architectures, including <code class="docutils literal notranslate"><span class="pre">x86_64</span></code>, <code class="docutils literal notranslate"><span class="pre">x86</span></code>, <code class="docutils literal notranslate"><span class="pre">arm64</span></code>, <code class="docutils literal notranslate"><span class="pre">riscv</span></code>, <code class="docutils literal notranslate"><span class="pre">ppc</span></code>, and <code class="docutils literal notranslate"><span class="pre">sparc</span></code>.</p></li>
-<li><p><strong>Flexible Init Systems</strong>: Seamless support for <code class="docutils literal notranslate"><span class="pre">openrc</span></code>, <code class="docutils literal notranslate"><span class="pre">systemd</span></code>, <code class="docutils literal notranslate"><span class="pre">runit</span></code>, and <code class="docutils literal notranslate"><span class="pre">s6</span></code> system initialization profiles.</p></li>
-<li><p><strong>Modular Software Selection</strong>: Select packages dynamically via structured JSON profiles (<code class="docutils literal notranslate"><span class="pre">office</span></code>, <code class="docutils literal notranslate"><span class="pre">browsers</span></code>, <code class="docutils literal notranslate"><span class="pre">chat</span></code>, <code class="docutils literal notranslate"><span class="pre">development</span></code>, <code class="docutils literal notranslate"><span class="pre">multimedia</span></code>, <code class="docutils literal notranslate"><span class="pre">gaming</span></code>, etc.).</p></li>
-<li><p><strong>Multiple Output Targets</strong>: Support for <code class="docutils literal notranslate"><span class="pre">livecd-stage1</span></code>, <code class="docutils literal notranslate"><span class="pre">livecd-stage2</span></code> (ISO), <code class="docutils literal notranslate"><span class="pre">diskimage-stage1</span></code>, <code class="docutils literal notranslate"><span class="pre">diskimage-stage2</span></code> (raw <code class="docutils literal notranslate"><span class="pre">.img</span></code>), <code class="docutils literal notranslate"><span class="pre">netboot</span></code>, and <code class="docutils literal notranslate"><span class="pre">embedded</span></code>.</p></li>
-<li><p><strong>Host Agnostic Toolchain</strong>: Uses an isolated chroot system toolchain for compilation, preventing pollution of the host operating system.</p></li>
+<li><p><strong>Multi-Architecture Support</strong>: Built-in configuration profiles for 20 CPU architectures, including <code class="docutils literal notranslate"><span class="pre">x86_64</span></code>, <code class="docutils literal notranslate"><span class="pre">x86</span></code>, <code class="docutils literal notranslate"><span class="pre">arm64</span></code>, <code class="docutils literal notranslate"><span class="pre">riscv64</span></code>, <code class="docutils literal notranslate"><span class="pre">ppc64le</span></code>, <code class="docutils literal notranslate"><span class="pre">loong</span></code>, <code class="docutils literal notranslate"><span class="pre">s390x</span></code>, and <code class="docutils literal notranslate"><span class="pre">sparc64</span></code>.</p></li>
+<li><p><strong>Multi-Init System Support</strong>: Native support for <code class="docutils literal notranslate"><span class="pre">OpenRC</span></code>, <code class="docutils literal notranslate"><span class="pre">Systemd</span></code>, <code class="docutils literal notranslate"><span class="pre">Runit</span></code>, and <code class="docutils literal notranslate"><span class="pre">S6</span></code> init system profiles with multi-init <code class="docutils literal notranslate"><span class="pre">/etc/machine-id</span></code> compatibility.</p></li>
+<li><p><strong>Calamares Graphical Installer</strong>: Pre-configured Calamares installer with offline SquashFS extraction and automatic GRUB EFI configuration.</p></li>
+<li><p><strong>Flexible CLI Argument Syntax</strong>: Pass package and service profiles via comma-separated strings, space-separated lists, or repeated arguments (<code class="docutils literal notranslate"><span class="pre">--packages</span> <span class="pre">filesystems,network-tools</span></code> or <code class="docutils literal notranslate"><span class="pre">--package</span> <span class="pre">audio</span></code>).</p></li>
+<li><p><strong>Multiple Output Artifact Formats</strong>: Generate bootable LiveCD ISOs (<code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">iso</span></code>), raw disk images (<code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">img</span></code>), or compressed rootfs tarballs (<code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">tarball</span></code>).</p></li>
+<li><p><strong>Modular Software Selection</strong>: Select packages dynamically via structured JSON profiles (<code class="docutils literal notranslate"><span class="pre">filesystems</span></code>, <code class="docutils literal notranslate"><span class="pre">network-tools</span></code>, <code class="docutils literal notranslate"><span class="pre">system-utils</span></code>, <code class="docutils literal notranslate"><span class="pre">browsers</span></code>, <code class="docutils literal notranslate"><span class="pre">office</span></code>, <code class="docutils literal notranslate"><span class="pre">multimedia</span></code>, <code class="docutils literal notranslate"><span class="pre">gaming</span></code>, etc.).</p></li>
+<li><p><strong>Host-Agnostic Isolated Toolchain</strong>: Option to use an isolated build-host chroot system toolchain for compilation, preventing pollution of the host system.</p></li>
 </ul>
 </section>
 </section>

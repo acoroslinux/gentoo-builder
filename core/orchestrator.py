@@ -37,7 +37,8 @@ class BuildOrchestrator:
         live_profile: Optional[str] = None,
         output_name: Optional[str] = None,
         force_isolated_toolchain: bool = False,
-        target: str = "livecd-stage2"
+        target: str = "livecd-stage2",
+        output_format: str = "iso"
     ):
         self.arch = arch
         self.config_path = resolve_from_project(config_path)
@@ -51,18 +52,19 @@ class BuildOrchestrator:
         self.service_profiles = list(service_profiles) if service_profiles else []
         self.live_profile = live_profile
         self.target = target or "livecd-stage2"
+        self.output_format = output_format
 
         # Automatically include calamares installer profile ONLY for LiveCD target ISO builds
-        if self.target.startswith("livecd") and "calamares" not in self.package_profiles:
+        if self.target.startswith("livecd") and self.output_format == "iso" and "calamares" not in self.package_profiles:
             self.package_profiles.append("calamares")
 
-        # Determine extension based on target
-        if self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:
+        # Determine extension based on format or target
+        if self.output_format == "tarball" or self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:
             ext = "tar.xz"
+        elif self.output_format == "img" or self.target == "diskimage-stage2":
+            ext = "img"
         elif self.target == "netboot":
             ext = "tar.gz"
-        elif self.target == "diskimage-stage2":
-            ext = "img"
         else:
             ext = "iso"
 
@@ -201,16 +203,22 @@ class BuildOrchestrator:
                 customizer.configure_system_defaults()
                 customizer.setup_services()
 
-                if self.target == "diskimage-stage2":
+                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
+
+                if self.output_format == "tarball":
+                    tarball_file = iso_engine.build_tarball()
+                    logger.info(f"Tarball build completed successfully! Output: {tarball_file}")
+                    return tarball_file
+
+                if self.output_format == "img" or self.target == "diskimage-stage2":
                     # 8. Build disk image via DiskEngine
                     disk_engine = DiskEngine(self.workdir, self.target_root, self.output_name, config=build_config, mode=self.mode)
                     img_file = disk_engine.build_disk_image()
                     logger.info(f"Disk image build completed successfully! Output: {img_file}")
                     return img_file
 
-                # Default target: livecd-stage2
+                # Default target: livecd-stage2 ISO
                 # 8. Build ISO with GRUB bootloader options
-                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
                 iso_file = iso_engine.build_iso()
                 
                 logger.info(f"Build completed successfully! Output: {iso_file}")

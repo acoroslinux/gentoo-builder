@@ -44,7 +44,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../usage.html">Comprehensive Usage &amp; Configuration Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture &amp; Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture &amp; System Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced.html">Advanced Customization &amp; Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials &amp; Practical Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Python API Reference</a></li>
@@ -76,6 +76,7 @@
              
   <h1>Source code for core.customizer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
@@ -244,10 +245,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_system</span> <span class="o">==</span> <span class="s2">&quot;openrc&quot;</span><span class="p">:</span>
             <span class="n">hostname_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;conf.d&quot;</span> <span class="o">/</span> <span class="s2">&quot;hostname&quot;</span>
             <span class="n">hostname_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;hostname=&quot;gentoo-live&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;hostname=&quot;gentoo-modern-live&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">hostname_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;hostname&quot;</span>
-            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;gentoo-live</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">hostname_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;gentoo-modern-live</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="c1"># Fstab</span>
         <span class="n">fstab_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span> <span class="o">/</span> <span class="s2">&quot;etc&quot;</span> <span class="o">/</span> <span class="s2">&quot;fstab&quot;</span>

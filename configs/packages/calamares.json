@@ -12,7 +12,8 @@
     "networkmanager",
     "python",
     "mount",
-    "libproxy"
+    "libproxy",
+    "icu"
   ],
   "custom_files": [
     {
