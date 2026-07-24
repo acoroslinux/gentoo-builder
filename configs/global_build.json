@@ -1,6 +1,6 @@
 {
   "global": {
-    "distro": "Gentoo Linux",
+    "distro": "Gentoo Modern",
     "version": "rolling",
     "maintainer": "AçorOS Linux Team"
   },

@@ -35,6 +35,18 @@
     {
       "source": "sddm/sddm.conf.d",
       "destination": "/etc/sddm.conf.d"
+    },
+    {
+      "source": "etc/os-release",
+      "destination": "/etc/os-release"
+    },
+    {
+      "source": "etc/issue",
+      "destination": "/etc/issue"
+    },
+    {
+      "source": "etc/gentoo_modern-release",
+      "destination": "/etc/gentoo_modern-release"
     }
   ]
 }

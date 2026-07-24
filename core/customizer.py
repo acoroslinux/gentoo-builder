@@ -155,10 +155,10 @@ class SystemCustomizer:
         if self.init_system == "openrc":
             hostname_path = self.target_root / "etc" / "conf.d" / "hostname"
             hostname_path.parent.mkdir(parents=True, exist_ok=True)
-            hostname_path.write_text('hostname="gentoo-live"\n')
+            hostname_path.write_text('hostname="gentoo-modern-live"\n')
         else:
             hostname_path = self.target_root / "etc" / "hostname"
-            hostname_path.write_text('gentoo-live\n')
+            hostname_path.write_text('gentoo-modern-live\n')
 
         # Fstab
         fstab_path = self.target_root / "etc" / "fstab"

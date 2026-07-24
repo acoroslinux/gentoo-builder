@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install Gentoo Modern
+GenericName=System Installer
+Comment=Install Gentoo Modern operating system to disk
+Exec=calamares
+Icon=calamares
+Terminal=false
+StartupNotify=true
+Categories=System;Qt;

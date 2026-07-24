@@ -1,0 +1,9 @@
+NAME="Gentoo Modern"
+ID=gentoo_modern
+ID_LIKE=gentoo
+PRETTY_NAME="Gentoo Modern GNU/Linux"
+VERSION="2026.07"
+VERSION_ID="2026.07"
+HOME_URL="https://github.com/acoroslinux/gentoo-builder"
+SUPPORT_URL="https://github.com/acoroslinux/gentoo-builder"
+BUG_REPORT_URL="https://github.com/acoroslinux/gentoo-builder"
