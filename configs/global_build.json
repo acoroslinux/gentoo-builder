@@ -24,6 +24,7 @@
     "python",
     "mount",
     "alsa",
+    "libproxy",
     "dist-kernel"
   ],
   "packages": [

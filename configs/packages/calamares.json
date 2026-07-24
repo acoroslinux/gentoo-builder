@@ -11,7 +11,8 @@
     "kpmcore",
     "networkmanager",
     "python",
-    "mount"
+    "mount",
+    "libproxy"
   ],
   "custom_files": [
     {
