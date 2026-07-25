@@ -1,9 +1,13 @@
 {
   "packages": [
+    "sys-kernel/linux-firmware",
+    "sys-kernel/installkernel",
     "sys-kernel/gentoo-kernel-bin"
   ],
   "use_flags": [
     "dracut",
-    "initramfs"
+    "initramfs",
+    "-doc",
+    "-man"
   ]
 }

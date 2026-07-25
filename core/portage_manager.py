@@ -63,6 +63,17 @@ class PortageManager:
             with open(make_conf_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines) + "\n")
 
+        # Write package.use overrides to disable broken build-time doc tools
+        package_use_dir = self.target_root / "etc" / "portage" / "package.use"
+        package_use_dir.mkdir(parents=True, exist_ok=True)
+        with open(package_use_dir / "00-builder-overrides", "w", encoding="utf-8") as f:
+            f.write(
+                "sys-kernel/dracut -doc -man\n"
+                "app-text/asciidoc -doc -man -test\n"
+                "sys-kernel/gentoo-kernel-bin -doc -man\n"
+                "sys-kernel/installkernel -doc -man\n"
+            )
+
     def sync_portage(self):
         logger.info("Syncing Portage ebuild repository (emerge-webrsync)...")
         res = self.chroot.run_in_chroot(["emerge-webrsync"])

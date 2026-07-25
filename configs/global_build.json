@@ -40,7 +40,11 @@
     "pam",
     "acl",
     "attr",
-    "dist-kernel"
+    "dist-kernel",
+    "-doc",
+    "-gtk-doc",
+    "-man",
+    "-handbook"
   ],
   "packages": [
     "app-admin/sudo",
