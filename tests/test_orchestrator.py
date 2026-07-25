@@ -72,3 +72,20 @@ def test_mock_build_netboot():
         assert gz_path.exists()
         assert (gz_path.parent / f"{gz_path.name}.md5").exists()
         assert (gz_path.parent / f"{gz_path.name}.sha256").exists()
+
+def test_mock_build_stage3_format():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        orchestration = BuildOrchestrator(
+            arch="x86_64",
+            mode="mock",
+            clean=True,
+            output_format="stage3"
+        )
+        orchestration.workdir = Path(tmpdir) / "workdir"
+        orchestration.target_root = orchestration.workdir / "chroot"
+
+        stage3_path = orchestration.build()
+        assert stage3_path.name.endswith(".tar.xz")
+        assert stage3_path.exists()
+        assert (stage3_path.parent / f"{stage3_path.name}.md5").exists()
+        assert (stage3_path.parent / f"{stage3_path.name}.sha256").exists()

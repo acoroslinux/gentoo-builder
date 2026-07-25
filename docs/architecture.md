@@ -43,18 +43,21 @@ The orchestrator executes the build pipeline using the following sequential step
 graph TD
     A["Start cli.py"] --> B["Load & Merge Profiles (ConfigLoader)"]
     B --> C["Toolchain Check / Bootstrap (ToolchainManager)"]
-    C --> D["Fetch & Extract Stage3 (Stage3Manager)"]
+    C --> D["Fetch & Extract Stage3 (Stage3Manager - Online or Local --stage3)"]
     D --> E["Prepare Chroot Setup & Bind Caches"]
     E --> F["Mount Virtual Filesystems (/proc, /sys, /dev)"]
-    F --> G["Portage Auto-Unmasking & Emerge (@world & packages)"]
-    G --> H["Apply Customizer (Users, Hostname, os-release, Services)"]
-    H --> I{"Select Output Format / Target"}
-    I -->|ISO| J["Build SquashFS + GRUB/Syslinux ISO"]
-    I -->|Disk Image| K["Partition & Write Raw .img"]
-    I -->|Tarball| L["Compress RootFS into .tar.xz"]
-    J --> M["Generate MD5 / SHA256 Checksums & Finish"]
-    K --> M
-    L --> M
+    F --> G["Kernel & Firmware Emerge FIRST (Step 6.1)"]
+    G --> H["Portage Auto-Unmasking & Emerge Packages (Step 6.2)"]
+    H --> I{"Select Output Format"}
+    I -->|Stage3 Seed| J["Clean Build Caches & Compress Pristine Stage3 .tar.xz"]
+    I -->|ISO / DiskImage / Tarball| K["Apply Customizer (Users, Hostname, os-release, Services)"]
+    K -->|ISO| L["Build SquashFS + GRUB / xorriso Fallback ISO"]
+    K -->|Disk Image| M["Partition & Write Raw .img"]
+    K -->|Tarball| N["Compress RootFS into .tar.xz"]
+    J --> O["Generate MD5 / SHA256 Checksums & Finish"]
+    L --> O
+    M --> O
+    N --> O
 ```
 
 ---
@@ -63,9 +66,11 @@ graph TD
 
 1. **Multi-Init Compatibility**:
    To ensure full compatibility across OpenRC, Systemd, Runit, and S6, `/etc/machine-id` is created as a real text file in the chroot, while `/var/lib/dbus/machine-id` is set as a symlink pointing to `/etc/machine-id`.
-2. **Architecture-Agnostic Build Defaults**:
-   Global build options in `global_build.json` specify generic options like `COMMON_FLAGS="-O2 -pipe"`, while architecture profiles in `configs/architectures/*.json` supply target `CFLAGS` (`-march=x86-64`, `-march=armv8-a`, `-march=rv64gc`) and `ACCEPT_KEYWORDS`.
-3. **Calamares Offline Installation**:
+2. **Prioritized Kernel Installation**:
+   Kernel packages (`sys-kernel/gentoo-kernel-bin`) are emerged **FIRST** before driver and desktop packages, guaranteeing `/usr/src/linux` and kernel symbols exist for out-of-tree hardware modules (`xf86-video-*`, `evdev`, `synaptics`).
+3. **Pristine Stage3 Seed Building**:
+   `--format stage3` creates pre-compiled rootfs seeds (`gentoo-modern-stage3-openrc-xfce-x86_64.tar.xz`). It cleans Portage temporary build files (`/var/tmp/portage/*`, `/tmp/*`) and skips live user/desktop customization, keeping the seed pristine for instant (< 2 min) downstream ISO builds via `--stage3`.
+4. **Calamares Offline Installation**:
    Calamares extracts the pre-built, customized SquashFS image (`/live/filesystem.squashfs`) directly to the destination drive during installation, avoiding online Stage3 downloads and accelerating installation times.
-4. **Portage Auto-Unmasking & Caching**:
+5. **Portage Auto-Unmasking & Caching**:
    `emerge` commands pass `--autounmask-write=y --autounmask-continue=y` to handle ebuild USE flag dependencies automatically. Package tarballs are saved in `workdir/<arch>/cache` to make subsequent builds fast and incremental.

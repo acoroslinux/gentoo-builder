@@ -363,32 +363,62 @@
             <span class="n">vol_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vol_id&quot;</span><span class="p">,</span> <span class="s2">&quot;gentoo_modern&quot;</span><span class="p">)</span>
             <span class="n">btype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;grub-uefi&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="s2">&quot;syslinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">or</span> <span class="s2">&quot;isolinux&quot;</span> <span class="ow">in</span> <span class="n">btype</span><span class="p">:</span>
-                <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="s2">&quot;xorriso&quot;</span><span class="p">,</span> <span class="s2">&quot;-as&quot;</span><span class="p">,</span> <span class="s2">&quot;mkisofs&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-iso-level&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-full-iso9660-filenames&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-volid&quot;</span><span class="p">,</span> <span class="n">vol_id</span><span class="p">,</span>
-                    <span class="s2">&quot;-eltorito-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/isolinux.bin&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-eltorito-catalog&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/boot.cat&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-no-emul-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-load-size&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-info-table&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;-output&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_iso</span><span class="p">),</span>
-                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="p">)</span>
-                <span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="s2">&quot;syslinux&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">and</span> <span class="s2">&quot;isolinux&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">btype</span> <span class="ow">and</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;mformat&quot;</span><span class="p">):</span>
                 <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="s2">&quot;grub-mkrescue&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;-volid&quot;</span><span class="p">,</span> <span class="n">vol_id</span><span class="p">,</span>
                     <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_iso</span><span class="p">),</span>
                     <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="p">)</span>
                 <span class="p">]</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;grub-mkrescue failed (</span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">), falling back to xorriso...&quot;</span><span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ISOEngineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ISO creation failed: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using xorriso to build ISO image: </span><span class="si">{</span><span class="n">output_iso</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;xorriso&quot;</span><span class="p">,</span> <span class="s2">&quot;-as&quot;</span><span class="p">,</span> <span class="s2">&quot;mkisofs&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-iso-level&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-full-iso9660-filenames&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-volid&quot;</span><span class="p">,</span> <span class="n">vol_id</span><span class="p">,</span>
+                    <span class="s2">&quot;-output&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_iso</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">isolinux_bin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span> <span class="o">/</span> <span class="s2">&quot;isolinux&quot;</span> <span class="o">/</span> <span class="s2">&quot;isolinux.bin&quot;</span>
+                <span class="k">if</span> <span class="n">isolinux_bin</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;-eltorito-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/isolinux.bin&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;-eltorito-catalog&quot;</span><span class="p">,</span> <span class="s2">&quot;isolinux/boot.cat&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;-no-emul-boot&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-load-size&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;-boot-info-table&quot;</span>
+                    <span class="p">])</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iso_dir</span><span class="p">))</span>
+
+                <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ISOEngineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ISO creation failed: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_generate_checksums</span><span class="p">(</span><span class="n">output_iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output_iso</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.clean_chroot_for_stage3">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.clean_chroot_for_stage3">[docs]</a>
+    <span class="k">def</span> <span class="nf">clean_chroot_for_stage3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleans temporary build caches and logs from chroot before creating a stage3 seed tarball.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning chroot temporary files for Stage3 seed packaging...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">clean_pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;var/tmp/portage/*&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp/*&quot;</span><span class="p">,</span> <span class="s2">&quot;var/log/portage/*&quot;</span><span class="p">]:</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rm -rf </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">clean_pattern</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ISOEngine.build_stage3">
+<a class="viewcode-back" href="../../api.html#core.iso_engine.ISOEngine.build_stage3">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_stage3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mock&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clean_chroot_for_stage3</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_tarball</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ISOEngine.build_tarball">

@@ -13,7 +13,8 @@
     "python",
     "mount",
     "libproxy",
-    "icu"
+    "icu",
+    "-openmp"
   ],
   "custom_files": [
     {

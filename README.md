@@ -9,7 +9,8 @@ Modular, dynamic, and fully automated Gentoo Linux LiveCD, Disk Image, and Tarba
 * **Multi-Init System Support**: Native support for `OpenRC`, `Systemd`, `Runit`, and `S6` init systems with automatic service initialization and multi-init `/etc/machine-id` compatibility.
 * **Multi-Architecture Support**: 20 supported target architectures including `x86_64`, `x86`, `arm64`, `arm`, `riscv64`, `riscv`, `ppc64`, `ppc64le`, `loong`, `s390x`, `sparc64`, and more with architecture-agnostic global build configs.
 * **Calamares Installer Integration**: Pre-configured Calamares graphical installer with `Gentoo Modern` branding, offline SquashFS extraction, and automated `grub-install` / `/boot` kernel search logic.
-* **Multiple Output Formats**: Supports building bootable LiveCD ISOs (`--format iso`), disk images (`--format img`), and rootfs tarballs for WSL2 / LXC / Docker / Cloud snapshots (`--format tarball`).
+* **Multiple Output Formats**: Supports building bootable LiveCD ISOs (`--format iso`), disk images (`--format img`), rootfs tarballs (`--format tarball`), and pristine Stage3 seed tarballs (`--format stage3`).
+* **Custom & Reusable Stage3 Seeds**: Pass custom Stage3 tarballs via `--stage3 /path/to/stage3.tar.xz` (or custom URL) to bypass lengthy Portage updates and build final ISOs in under 2 minutes.
 * **Flexible CLI Argument Syntax**: Package and service profiles can be passed via comma-separated strings, space-separated lists, or repeated arguments (`--packages filesystems,network-tools` or `--package audio`).
 * **Portage Auto-Unmasking & Caching**: Automatic handling of package USE flag dependency resolution via `--autounmask-write=y --autounmask-continue=y` and incremental build caching.
 * **Gentoo Modern Visual Design**: Unified dark-mode theme across Desktop (XFCE / GNOME / KDE), GRUB bootloader (`modern`), Plymouth bootsplash (`gentoo-modern`), LightDM, and SDDM greeters.
@@ -38,11 +39,11 @@ gentoo-builder/
 │   ├── config_loader.py         # Profile merger & config assembly
 │   ├── customizer.py            # System customization, users, and branding
 │   ├── disk_engine.py           # Disk image builder (.img)
-│   ├── iso_engine.py            # LiveCD ISO and Tarball builder (.iso, .tar.xz)
+│   ├── iso_engine.py            # LiveCD ISO, Tarball, and Stage3 seed builder (.iso, .tar.xz)
 │   ├── logger_setup.py          # Structured logging
 │   ├── orchestrator.py          # Pipeline build orchestrator
 │   ├── portage_manager.py       # Portage/emerge package installation
-│   ├── stage3_manager.py        # Automatic Stage3 fetching and extraction
+│   ├── stage3_manager.py        # Automatic Stage3 fetching, local cache, & extraction
 │   └── toolchain_manager.py     # Isolated build_host bootstrap manager
 ├── docs/                        # Project documentation (Sphinx / Markdown)
 ├── pytest.ini
@@ -61,20 +62,26 @@ python3 cli.py --list-options
 
 ### 2. Mock Build Simulation (No Root Required)
 ```bash
-python3 cli.py x86_64 --init openrc --desktop xfce --kernel gentoo-kernel-bin --mode mock
+python3 cli.py x86_64 --init openrc --desktop xfce --mode mock
 ```
 
 ### 3. Real Build (Requires Root / Sudo)
 ```bash
-sudo python3 cli.py x86_64 --init openrc --desktop xfce --kernel gentoo-kernel-bin --force-isolated-toolchain --mode real
+sudo python3 cli.py x86_64 --init openrc --desktop xfce --force-isolated-toolchain --mode real
 ```
 
-### 4. Build RootFS Tarball (For WSL2 / LXC / Cloud Container Base)
+### 4. Build Pristine Stage3 Seed Tarball (Pre-compiled Base / Desktop Seed)
 ```bash
-python3 cli.py x86_64 --init openrc --desktop xfce --format tarball --mode mock
+# Build pristine pre-compiled Stage3 seed
+sudo python3 cli.py x86_64 --init openrc --desktop xfce --format stage3 --mode real
 ```
 
-### 5. Flexible Package Selection Examples
+### 5. Build ISO Using a Custom Local Stage3 Seed (Ultra-fast Build < 2 Minutes)
+```bash
+sudo python3 cli.py x86_64 --stage3 output/gentoo-modern-stage3-openrc-xfce-x86_64.tar.xz --desktop xfce --mode real
+```
+
+### 6. Flexible Package Selection Examples
 ```bash
 # Comma-separated package profiles
 python3 cli.py x86_64 --packages filesystems,network-tools,system-utils
@@ -83,7 +90,7 @@ python3 cli.py x86_64 --packages filesystems,network-tools,system-utils
 python3 cli.py x86_64 --packages filesystems network-tools --package audio -s dbus,NetworkManager
 ```
 
-### 6. Run Unit Tests
+### 7. Run Unit Tests
 ```bash
 pytest
 ```
@@ -96,5 +103,5 @@ pytest
 | --- | --- |
 | **Architectures** | `x86_64`, `x86`, `arm64`, `arm`, `riscv64`, `riscv`, `ppc64`, `ppc64le`, `ppc`, `loong`, `s390x`, `s390`, `sparc64`, `sparc`, `alpha`, `hppa`, `ia64`, `m68k`, `mips`, `sh` |
 | **Init Systems** | `openrc`, `systemd`, `runit`, `s6` |
-| **Output Formats** | `iso` (Bootable ISO), `img` (Disk Image), `tarball` (`.tar.xz` rootfs tarball) |
-| **Kernel Profiles** | `gentoo-kernel-bin`, `gentoo-sources`, `vanilla-kernel-bin` |
+| **Output Formats** | `iso` (Bootable ISO), `img` (Disk Image), `tarball` (`.tar.xz` rootfs tarball), `stage3` (Pristine Stage3 Seed `.tar.xz`) |
+| **Kernel Profiles** | `gentoo-kernel-bin` (Default), `gentoo-sources`, `vanilla-kernel-bin` |

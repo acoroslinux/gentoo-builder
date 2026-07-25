@@ -1,7 +1,10 @@
 {
   "packages": [
     "xfce-base/xfce4-meta",
-    "x11-terms/xterm"
+    "x11-terms/xterm",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter",
+    "gui-libs/display-manager-init"
   ],
   "services": [
     "lightdm"

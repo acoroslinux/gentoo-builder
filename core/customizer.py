@@ -63,13 +63,22 @@ class SystemCustomizer:
 
         for srv in services:
             if self.init_system == "systemd":
-                self.chroot.run_in_chroot(f"systemctl enable {srv}")
+                self.chroot.run_in_chroot(f"systemctl enable {srv}", check=False)
             elif self.init_system == "openrc":
-                self.chroot.run_in_chroot(f"rc-update add {srv} default")
+                init_script = self.target_root / "etc" / "init.d" / srv
+                target_srv = srv
+                if not init_script.exists():
+                    dm_script = self.target_root / "etc" / "init.d" / "display-manager"
+                    if dm_script.exists():
+                        target_srv = "display-manager"
+                    elif srv in ["lightdm", "sddm", "gdm", "xdm"]:
+                        logger.warning(f"Init script for {srv} not found; skipping service enable.")
+                        continue
+                self.chroot.run_in_chroot(f"rc-update add {target_srv} default", check=False)
             elif self.init_system == "runit":
-                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/")
+                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/", check=False)
             elif self.init_system == "s6":
-                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
+                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}", check=False)
 
     def copy_custom_files(self):
         """Copies structured files from configs/custom_files/ into the chroot as specified in configs."""
@@ -159,6 +168,14 @@ class SystemCustomizer:
         else:
             hostname_path = self.target_root / "etc" / "hostname"
             hostname_path.write_text('gentoo-modern-live\n')
+
+        # Stage3 Seed Info Manifest
+        stage3_info = self.target_root / "etc" / "gentoo_modern-stage3-info"
+        stage3_info.write_text(
+            f"DISTRO=Gentoo Modern\n"
+            f"INIT={self.init_system}\n"
+            f"DESKTOP={self.config.get('desktop', 'base')}\n"
+        )
 
         # Fstab
         fstab_path = self.target_root / "etc" / "fstab"

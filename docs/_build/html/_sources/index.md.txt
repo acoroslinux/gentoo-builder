@@ -22,6 +22,7 @@ api
 * **Multi-Init System Support**: Native support for `OpenRC`, `Systemd`, `Runit`, and `S6` init system profiles with multi-init `/etc/machine-id` compatibility.
 * **Calamares Graphical Installer**: Pre-configured Calamares installer with offline SquashFS extraction and automatic GRUB EFI configuration.
 * **Flexible CLI Argument Syntax**: Pass package and service profiles via comma-separated strings, space-separated lists, or repeated arguments (`--packages filesystems,network-tools` or `--package audio`).
-* **Multiple Output Artifact Formats**: Generate bootable LiveCD ISOs (`--format iso`), raw disk images (`--format img`), or compressed rootfs tarballs (`--format tarball`).
+* **Multiple Output Artifact Formats**: Generate bootable LiveCD ISOs (`--format iso`), raw disk images (`--format img`), compressed rootfs tarballs (`--format tarball`), or pristine Stage3 seed tarballs (`--format stage3`).
+* **Reusable Stage3 Seeds**: Pass custom pre-compiled Stage3 seed tarballs via `--stage3 /path/to/stage3.tar.xz` to bypass lengthy Portage updates and build ISOs in under 2 minutes.
 * **Modular Software Selection**: Select packages dynamically via structured JSON profiles (`filesystems`, `network-tools`, `system-utils`, `browsers`, `office`, `multimedia`, `gaming`, etc.).
 * **Host-Agnostic Isolated Toolchain**: Option to use an isolated build-host chroot system toolchain for compilation, preventing pollution of the host system.

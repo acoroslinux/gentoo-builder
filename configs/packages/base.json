@@ -13,7 +13,13 @@
     "sys-apps/coreutils",
     "sys-apps/findutils",
     "sys-apps/grep",
-    "sys-apps/sed"
+    "sys-apps/sed",
+    "sys-apps/acl",
+    "sys-apps/attr",
+    "virtual/pkgconfig",
+    "dev-util/pkgconf",
+    "sys-devel/gettext",
+    "dev-build/make"
   ],
   "use_flags": [
     "unicode",

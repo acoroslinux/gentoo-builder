@@ -48,26 +48,32 @@ class Stage3Manager:
 
     def fetch_and_extract(self, target_root: Path):
         configured_url = self.config.get("url", "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt")
-        url = self._resolve_latest_stage3_url(configured_url)
-        filename = url.split("/")[-1]
-        tarball_path = self.cache_dir / filename
+        if configured_url.startswith("file://") or Path(configured_url).exists():
+            tarball_path = Path(configured_url.replace("file://", "")).resolve()
+            logger.info(f"Using local Stage3 tarball: {tarball_path}")
+            if not tarball_path.exists():
+                raise Stage3ManagerError(f"Local Stage3 file not found: {tarball_path}")
+        else:
+            url = self._resolve_latest_stage3_url(configured_url)
+            filename = url.split("/")[-1]
+            tarball_path = self.cache_dir / filename
 
-        if self.mode == "mock":
-            logger.info(f"[MOCK STAGE3] Fetching stage3 from {url}")
-            logger.info(f"[MOCK STAGE3] Extracting to {target_root}")
-            target_root.mkdir(parents=True, exist_ok=True)
-            (target_root / "etc").mkdir(parents=True, exist_ok=True)
-            (target_root / "bin").mkdir(parents=True, exist_ok=True)
-            return
+            if self.mode == "mock":
+                logger.info(f"[MOCK STAGE3] Fetching stage3 from {url}")
+                logger.info(f"[MOCK STAGE3] Extracting to {target_root}")
+                target_root.mkdir(parents=True, exist_ok=True)
+                (target_root / "etc").mkdir(parents=True, exist_ok=True)
+                (target_root / "bin").mkdir(parents=True, exist_ok=True)
+                return
 
-        if not tarball_path.exists():
-            logger.info(f"Downloading Gentoo Stage3 from {url}...")
-            try:
-                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                with urllib.request.urlopen(req) as response, open(tarball_path, "wb") as out_file:
-                    shutil.copyfileobj(response, out_file)
-            except Exception as e:
-                raise Stage3ManagerError(f"Failed to download Stage3: {e}")
+            if not tarball_path.exists():
+                logger.info(f"Downloading Gentoo Stage3 from {url}...")
+                try:
+                    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req) as response, open(tarball_path, "wb") as out_file:
+                        shutil.copyfileobj(response, out_file)
+                except Exception as e:
+                    raise Stage3ManagerError(f"Failed to download Stage3: {e}")
 
         logger.info(f"Extracting Gentoo Stage3 into {target_root}...")
         target_root.mkdir(parents=True, exist_ok=True)

@@ -13,14 +13,15 @@ Gentoo-Builder is controlled via the `cli.py` script. The available arguments ar
 | `architecture` | Target architecture profile to load. | `x86_64` (options: `arm64`, `x86`, `riscv64`, `ppc64`, `loong`, etc.) |
 | `-c`, `--config` | Path to the global build configuration file. | `configs/global_build.json` |
 | `--mode` | Execution mode. Simulation (`mock`) or real compilation (`real`). | `mock` / `real` |
-| `--format` | Output artifact format. | `iso` (Bootable ISO), `img` (Disk Image), `tarball` (`.tar.xz` rootfs tarball) |
+| `--format` | Output artifact format. | `iso` (Bootable ISO), `img` (Disk Image), `tarball` (`.tar.xz` rootfs tarball), `stage3` (Pristine Stage3 Seed `.tar.xz`) |
+| `--stage3` | Custom local Stage3 tarball path or URL (file or http/https). | Optional (e.g. `output/gentoo-modern-stage3-openrc-xfce-x86_64.tar.xz`) |
 | `--clean` / `--no-clean` | Clean previous build trees before running. Preserves download caches. | Default: `--no-clean` |
 | `--force-isolated-toolchain` | Force compilation inside an isolated build-host chroot. | Flag (false by default) |
 | `--target` | Build compilation type or target stage. | `livecd-stage2` (options: `livecd-stage1`, `livecd-stage2`, `diskimage-stage1`, `diskimage-stage2`, `netboot`, `embedded`) |
 | `--init` | Init system profile to apply. | `openrc` (options: `systemd`, `runit`, `s6`) |
 | `--desktop` | Desktop environment profile to load. | Optional (e.g. `xfce`, `gnome`, `kde`, `awesome`) |
-| `--kernel` | Kernel profile to apply. | Optional (e.g. `gentoo-kernel-bin`, `gentoo-sources`) |
-| `--bootloader` | Bootloader profile to apply. | Optional (e.g. `grub-uefi`, `syslinux`) |
+| `--kernel` | Kernel profile to apply. | Default: `gentoo-kernel-bin` (options: `gentoo-sources`, `vanilla-kernel-bin`) |
+| `--bootloader` | Bootloader profile to apply. | Default: `grub-uefi` (options: `syslinux`, `systemd-boot`) |
 | `--packages`, `--package`, `-p` | Package profiles to include. Supports comma-separated, space-separated, or repeated flags. | Optional (e.g. `filesystems,network-tools,system-utils`) |
 | `--services`, `--service`, `-s` | Service profiles to enable. Supports comma-separated, space-separated, or repeated flags. | Optional (e.g. `NetworkManager,dbus`) |
 | `-o`, `--output` | Customize the final package output filename. | Generates name based on init, desktop, and arch. |

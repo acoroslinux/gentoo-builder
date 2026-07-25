@@ -76,18 +76,19 @@ def main():
 
     parser.add_argument("--init", type=str, default="openrc", help="Init system profile (openrc, systemd, runit, s6). Default: openrc")
     parser.add_argument("--desktop", type=str, help="Desktop environment profile (e.g. xfce, gnome)")
-    parser.add_argument("--kernel", type=str, help="Kernel profile (e.g. gentoo-kernel-bin)")
-    parser.add_argument("--bootloader", type=str, help="Bootloader profile (e.g. grub-uefi)")
+    parser.add_argument("--kernel", type=str, default="gentoo-kernel-bin", help="Kernel profile (e.g. gentoo-kernel-bin). Default: gentoo-kernel-bin")
+    parser.add_argument("--bootloader", type=str, default="grub-uefi", help="Bootloader profile (e.g. grub-uefi). Default: grub-uefi")
     parser.add_argument("--packages", "--package", nargs="+", action="append", help="Package profiles to include (comma or space separated, or repeated)")
     parser.add_argument("--services", "--service", nargs="+", action="append", help="Service profiles to enable (comma or space separated, or repeated)")
     parser.add_argument("-o", "--output", type=str, help="Custom output filename")
     parser.add_argument("--list-options", action="store_true", help="List all available profiles")
 
+    parser.add_argument("--stage3", type=str, help="Custom Stage3 tarball path or URL (local file or http/https)")
     parser.add_argument(
         "--format",
-        choices=["iso", "img", "tarball"],
+        choices=["iso", "img", "tarball", "stage3"],
         default="iso",
-        help="Target build artifact format: 'iso' (bootable ISO), 'img' (disk image), or 'tarball' (rootfs tar.xz). Default: iso"
+        help="Target build artifact format: 'iso' (bootable ISO), 'img' (disk image), 'tarball' (rootfs tar.xz), or 'stage3' (cleaned stage3 seed tar.xz). Default: iso"
     )
 
     args = parser.parse_args()
@@ -120,7 +121,8 @@ def main():
             output_name=args.output,
             force_isolated_toolchain=args.force_isolated_toolchain,
             target=args.target,
-            output_format=args.format
+            output_format=args.format,
+            stage3_url=args.stage3
         )
         orchestrator.build()
     except BuildOrchestratorError as e:

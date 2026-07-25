@@ -2,7 +2,8 @@
   "packages": [
     "kde-plasma/plasma-meta",
     "kde-apps/konsole",
-    "kde-apps/dolphin"
+    "kde-apps/dolphin",
+    "gui-libs/sddm"
   ],
   "services": [
     "sddm"

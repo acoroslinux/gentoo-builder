@@ -120,7 +120,8 @@
         <span class="n">output_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">force_isolated_toolchain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;livecd-stage2&quot;</span><span class="p">,</span>
-        <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;iso&quot;</span>
+        <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;iso&quot;</span><span class="p">,</span>
+        <span class="n">stage3_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="n">arch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="o">=</span> <span class="n">resolve_from_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
@@ -135,13 +136,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">live_profile</span> <span class="o">=</span> <span class="n">live_profile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span> <span class="ow">or</span> <span class="s2">&quot;livecd-stage2&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">=</span> <span class="n">output_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stage3_url</span> <span class="o">=</span> <span class="n">stage3_url</span>
 
         <span class="c1"># Automatically include calamares installer profile ONLY for LiveCD target ISO builds</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;livecd&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;iso&quot;</span> <span class="ow">and</span> <span class="s2">&quot;calamares&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_profiles</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">package_profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;calamares&quot;</span><span class="p">)</span>
 
         <span class="c1"># Determine extension based on format or target</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;tarball&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;livecd-stage1&quot;</span><span class="p">,</span> <span class="s2">&quot;diskimage-stage1&quot;</span><span class="p">,</span> <span class="s2">&quot;embedded&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;tarball&quot;</span><span class="p">,</span> <span class="s2">&quot;stage3&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;livecd-stage1&quot;</span><span class="p">,</span> <span class="s2">&quot;diskimage-stage1&quot;</span><span class="p">,</span> <span class="s2">&quot;embedded&quot;</span><span class="p">]:</span>
             <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;tar.xz&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;img&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;diskimage-stage2&quot;</span><span class="p">:</span>
             <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
@@ -150,7 +152,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;iso&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span> <span class="o">=</span> <span class="n">output_name</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;gentoo-builder-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">init_system</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">desktop</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;base&#39;</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">arch</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">output_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span> <span class="o">=</span> <span class="n">output_name</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;stage3&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gentoo-modern-stage3-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">init_system</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">desktop</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;base&#39;</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">arch</span><span class="si">}</span><span class="s2">.tar.xz&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gentoo-builder-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">init_system</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">desktop</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;base&#39;</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">arch</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">force_isolated_toolchain</span> <span class="o">=</span> <span class="n">force_isolated_toolchain</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">resolve_from_project</span><span class="p">(</span><span class="s2">&quot;workdir&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">arch</span>
@@ -228,6 +235,11 @@
             <span class="n">live_profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">live_profile</span>
         <span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stage3_url</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;stage3&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">build_config</span><span class="p">:</span>
+                <span class="n">build_config</span><span class="p">[</span><span class="s2">&quot;stage3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">build_config</span><span class="p">[</span><span class="s2">&quot;stage3&quot;</span><span class="p">][</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stage3_url</span>
+
         <span class="c1"># 2. Toolchain / Build Host Setup (Isolated Environment)</span>
         <span class="n">toolchain</span> <span class="o">=</span> <span class="n">ToolchainManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">force_isolated</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_isolated_toolchain</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_isolated_toolchain</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">toolchain</span><span class="o">.</span><span class="n">check_host_tools</span><span class="p">():</span>
@@ -254,6 +266,14 @@
                 <span class="n">portage</span> <span class="o">=</span> <span class="n">PortageManager</span><span class="p">(</span><span class="n">chroot</span><span class="p">,</span> <span class="n">build_config</span><span class="p">)</span>
                 <span class="n">portage</span><span class="o">.</span><span class="n">configure_make_conf</span><span class="p">()</span>
                 <span class="n">portage</span><span class="o">.</span><span class="n">sync_portage</span><span class="p">()</span>
+
+                <span class="c1"># 6.1 Prioritize Kernel &amp; Firmware installation so /usr/src/linux exists for driver modules</span>
+                <span class="n">kernel_pkgs</span> <span class="o">=</span> <span class="n">build_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kernel_packages&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="n">kernel_pkgs</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prioritizing kernel package installation FIRST: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernel_pkgs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">portage</span><span class="o">.</span><span class="n">install_packages</span><span class="p">(</span><span class="n">kernel_pkgs</span><span class="p">)</span>
+
+                <span class="c1"># 6.2 Install remaining target system packages</span>
                 <span class="n">portage</span><span class="o">.</span><span class="n">install_packages</span><span class="p">(</span><span class="n">build_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;packages&quot;</span><span class="p">,</span> <span class="p">[]))</span>
 
                 <span class="c1"># Handle Stage 1 and minimal embedded tarball targets</span>
@@ -281,13 +301,18 @@
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Netboot target completed successfully! Output: </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">output_file</span>
 
-                <span class="c1"># 7. Customize target system defaults (only for Stage 2 targets)</span>
+                <span class="n">iso_engine</span> <span class="o">=</span> <span class="n">ISOEngine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">build_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bootloader&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;stage3&quot;</span><span class="p">:</span>
+                    <span class="n">stage3_file</span> <span class="o">=</span> <span class="n">iso_engine</span><span class="o">.</span><span class="n">build_stage3</span><span class="p">()</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pristine Stage3 seed tarball build completed successfully! Output: </span><span class="si">{</span><span class="n">stage3_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">stage3_file</span>
+
+                <span class="c1"># 7. Customize target system defaults (only for LiveCD / DiskImage targets)</span>
                 <span class="n">customizer</span> <span class="o">=</span> <span class="n">SystemCustomizer</span><span class="p">(</span><span class="n">chroot</span><span class="p">,</span> <span class="n">build_config</span><span class="p">)</span>
                 <span class="n">customizer</span><span class="o">.</span><span class="n">setup_live_users</span><span class="p">()</span>
                 <span class="n">customizer</span><span class="o">.</span><span class="n">configure_system_defaults</span><span class="p">()</span>
                 <span class="n">customizer</span><span class="o">.</span><span class="n">setup_services</span><span class="p">()</span>
-
-                <span class="n">iso_engine</span> <span class="o">=</span> <span class="n">ISOEngine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">build_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bootloader&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;tarball&quot;</span><span class="p">:</span>
                     <span class="n">tarball_file</span> <span class="o">=</span> <span class="n">iso_engine</span><span class="o">.</span><span class="n">build_tarball</span><span class="p">()</span>

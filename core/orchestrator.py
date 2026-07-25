@@ -38,7 +38,8 @@ class BuildOrchestrator:
         output_name: Optional[str] = None,
         force_isolated_toolchain: bool = False,
         target: str = "livecd-stage2",
-        output_format: str = "iso"
+        output_format: str = "iso",
+        stage3_url: str = None
     ):
         self.arch = arch
         self.config_path = resolve_from_project(config_path)
@@ -53,13 +54,14 @@ class BuildOrchestrator:
         self.live_profile = live_profile
         self.target = target or "livecd-stage2"
         self.output_format = output_format
+        self.stage3_url = stage3_url
 
         # Automatically include calamares installer profile ONLY for LiveCD target ISO builds
         if self.target.startswith("livecd") and self.output_format == "iso" and "calamares" not in self.package_profiles:
             self.package_profiles.append("calamares")
 
         # Determine extension based on format or target
-        if self.output_format == "tarball" or self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:
+        if self.output_format in ["tarball", "stage3"] or self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:
             ext = "tar.xz"
         elif self.output_format == "img" or self.target == "diskimage-stage2":
             ext = "img"
@@ -68,7 +70,12 @@ class BuildOrchestrator:
         else:
             ext = "iso"
 
-        self.output_name = output_name or f"gentoo-builder-{self.init_system}-{desktop or 'base'}-{arch}.{ext}"
+        if output_name:
+            self.output_name = output_name
+        elif self.output_format == "stage3":
+            self.output_name = f"gentoo-modern-stage3-{self.init_system}-{desktop or 'base'}-{arch}.tar.xz"
+        else:
+            self.output_name = f"gentoo-builder-{self.init_system}-{desktop or 'base'}-{arch}.{ext}"
         self.force_isolated_toolchain = force_isolated_toolchain
 
         self.workdir = resolve_from_project("workdir") / self.arch
@@ -144,6 +151,11 @@ class BuildOrchestrator:
             live_profile=self.live_profile
         )
 
+        if self.stage3_url:
+            if "stage3" not in build_config:
+                build_config["stage3"] = {}
+            build_config["stage3"]["url"] = self.stage3_url
+
         # 2. Toolchain / Build Host Setup (Isolated Environment)
         toolchain = ToolchainManager(self.workdir, mode=self.mode, force_isolated=self.force_isolated_toolchain)
         if self.force_isolated_toolchain or not toolchain.check_host_tools():
@@ -170,6 +182,14 @@ class BuildOrchestrator:
                 portage = PortageManager(chroot, build_config)
                 portage.configure_make_conf()
                 portage.sync_portage()
+
+                # 6.1 Prioritize Kernel & Firmware installation so /usr/src/linux exists for driver modules (skipped for Stage3 seeds)
+                kernel_pkgs = build_config.get("kernel_packages", [])
+                if kernel_pkgs and self.output_format != "stage3":
+                    logger.info(f"Prioritizing kernel package installation FIRST: {' '.join(kernel_pkgs)}")
+                    portage.install_packages(kernel_pkgs)
+
+                # 6.2 Install remaining target system packages
                 portage.install_packages(build_config.get("packages", []))
 
                 # Handle Stage 1 and minimal embedded tarball targets
@@ -197,13 +217,18 @@ class BuildOrchestrator:
                     logger.info(f"Netboot target completed successfully! Output: {output_file}")
                     return output_file
 
-                # 7. Customize target system defaults (only for Stage 2 targets)
+                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
+
+                if self.output_format == "stage3":
+                    stage3_file = iso_engine.build_stage3()
+                    logger.info(f"Pristine Stage3 seed tarball build completed successfully! Output: {stage3_file}")
+                    return stage3_file
+
+                # 7. Customize target system defaults (only for LiveCD / DiskImage targets)
                 customizer = SystemCustomizer(chroot, build_config)
                 customizer.setup_live_users()
                 customizer.configure_system_defaults()
                 customizer.setup_services()
-
-                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
 
                 if self.output_format == "tarball":
                     tarball_file = iso_engine.build_tarball()

@@ -119,11 +119,17 @@ class PortageManager:
             return
 
         self.setup_custom_overlay()
+        self.chroot.run_in_chroot("ldconfig")
         self.chroot.run_in_chroot("env-update")
         self.update_world()
 
         logger.info(f"Installing packages via emerge: {' '.join(packages)}")
+        self.chroot.run_in_chroot("ldconfig")
         self.chroot.run_in_chroot("env-update")
+        self.chroot.run_in_chroot(["emerge", "--ask=n", "--oneshot", "--nodeps", "dev-util/pkgconf", "virtual/pkgconfig"])
+        self.chroot.run_in_chroot("ldconfig")
+        self.chroot.run_in_chroot("env-update")
+        self.chroot.run_in_chroot(["emerge", "--ask=n", "--autounmask-write=y", "--autounmask-continue=y", "@preserved-rebuild"])
         cmd = ["emerge", "--ask=n", "--noreplace", "--verbose", "--autounmask-write=y", "--autounmask-continue=y"] + packages
         res = self.chroot.run_in_chroot(cmd)
         if res.returncode != 0 and self.chroot.mode == "real":

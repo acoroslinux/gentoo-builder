@@ -121,49 +121,53 @@
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--format</span></code></p></td>
 <td><p>Output artifact format.</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">iso</span></code> (Bootable ISO), <code class="docutils literal notranslate"><span class="pre">img</span></code> (Disk Image), <code class="docutils literal notranslate"><span class="pre">tarball</span></code> (<code class="docutils literal notranslate"><span class="pre">.tar.xz</span></code> rootfs tarball)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">iso</span></code> (Bootable ISO), <code class="docutils literal notranslate"><span class="pre">img</span></code> (Disk Image), <code class="docutils literal notranslate"><span class="pre">tarball</span></code> (<code class="docutils literal notranslate"><span class="pre">.tar.xz</span></code> rootfs tarball), <code class="docutils literal notranslate"><span class="pre">stage3</span></code> (Pristine Stage3 Seed <code class="docutils literal notranslate"><span class="pre">.tar.xz</span></code>)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--clean</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--stage3</span></code></p></td>
+<td><p>Custom local Stage3 tarball path or URL (file or http/https).</p></td>
+<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">output/gentoo-modern-stage3-openrc-xfce-x86_64.tar.xz</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--clean</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
 <td><p>Clean previous build trees before running. Preserves download caches.</p></td>
 <td><p>Default: <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--force-isolated-toolchain</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--force-isolated-toolchain</span></code></p></td>
 <td><p>Force compilation inside an isolated build-host chroot.</p></td>
 <td><p>Flag (false by default)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--target</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--target</span></code></p></td>
 <td><p>Build compilation type or target stage.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">livecd-stage2</span></code> (options: <code class="docutils literal notranslate"><span class="pre">livecd-stage1</span></code>, <code class="docutils literal notranslate"><span class="pre">livecd-stage2</span></code>, <code class="docutils literal notranslate"><span class="pre">diskimage-stage1</span></code>, <code class="docutils literal notranslate"><span class="pre">diskimage-stage2</span></code>, <code class="docutils literal notranslate"><span class="pre">netboot</span></code>, <code class="docutils literal notranslate"><span class="pre">embedded</span></code>)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--init</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--init</span></code></p></td>
 <td><p>Init system profile to apply.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">openrc</span></code> (options: <code class="docutils literal notranslate"><span class="pre">systemd</span></code>, <code class="docutils literal notranslate"><span class="pre">runit</span></code>, <code class="docutils literal notranslate"><span class="pre">s6</span></code>)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--desktop</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--desktop</span></code></p></td>
 <td><p>Desktop environment profile to load.</p></td>
 <td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">xfce</span></code>, <code class="docutils literal notranslate"><span class="pre">gnome</span></code>, <code class="docutils literal notranslate"><span class="pre">kde</span></code>, <code class="docutils literal notranslate"><span class="pre">awesome</span></code>)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--kernel</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--kernel</span></code></p></td>
 <td><p>Kernel profile to apply.</p></td>
-<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">gentoo-kernel-bin</span></code>, <code class="docutils literal notranslate"><span class="pre">gentoo-sources</span></code>)</p></td>
+<td><p>Default: <code class="docutils literal notranslate"><span class="pre">gentoo-kernel-bin</span></code> (options: <code class="docutils literal notranslate"><span class="pre">gentoo-sources</span></code>, <code class="docutils literal notranslate"><span class="pre">vanilla-kernel-bin</span></code>)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--bootloader</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--bootloader</span></code></p></td>
 <td><p>Bootloader profile to apply.</p></td>
-<td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">grub-uefi</span></code>, <code class="docutils literal notranslate"><span class="pre">syslinux</span></code>)</p></td>
+<td><p>Default: <code class="docutils literal notranslate"><span class="pre">grub-uefi</span></code> (options: <code class="docutils literal notranslate"><span class="pre">syslinux</span></code>, <code class="docutils literal notranslate"><span class="pre">systemd-boot</span></code>)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--packages</span></code>, <code class="docutils literal notranslate"><span class="pre">--package</span></code>, <code class="docutils literal notranslate"><span class="pre">-p</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--packages</span></code>, <code class="docutils literal notranslate"><span class="pre">--package</span></code>, <code class="docutils literal notranslate"><span class="pre">-p</span></code></p></td>
 <td><p>Package profiles to include. Supports comma-separated, space-separated, or repeated flags.</p></td>
 <td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">filesystems,network-tools,system-utils</span></code>)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--services</span></code>, <code class="docutils literal notranslate"><span class="pre">--service</span></code>, <code class="docutils literal notranslate"><span class="pre">-s</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--services</span></code>, <code class="docutils literal notranslate"><span class="pre">--service</span></code>, <code class="docutils literal notranslate"><span class="pre">-s</span></code></p></td>
 <td><p>Service profiles to enable. Supports comma-separated, space-separated, or repeated flags.</p></td>
 <td><p>Optional (e.g. <code class="docutils literal notranslate"><span class="pre">NetworkManager,dbus</span></code>)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code>, <code class="docutils literal notranslate"><span class="pre">--output</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code>, <code class="docutils literal notranslate"><span class="pre">--output</span></code></p></td>
 <td><p>Customize the final package output filename.</p></td>
 <td><p>Generates name based on init, desktop, and arch.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--list-options</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--list-options</span></code></p></td>
 <td><p>Prints all available JSON config profiles and exits.</p></td>
 <td><p>Flag</p></td>
 </tr>

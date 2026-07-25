@@ -122,18 +122,21 @@
 <div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>graph TD
     A[&quot;Start cli.py&quot;] --&gt; B[&quot;Load &amp; Merge Profiles (ConfigLoader)&quot;]
     B --&gt; C[&quot;Toolchain Check / Bootstrap (ToolchainManager)&quot;]
-    C --&gt; D[&quot;Fetch &amp; Extract Stage3 (Stage3Manager)&quot;]
+    C --&gt; D[&quot;Fetch &amp; Extract Stage3 (Stage3Manager - Online or Local --stage3)&quot;]
     D --&gt; E[&quot;Prepare Chroot Setup &amp; Bind Caches&quot;]
     E --&gt; F[&quot;Mount Virtual Filesystems (/proc, /sys, /dev)&quot;]
-    F --&gt; G[&quot;Portage Auto-Unmasking &amp; Emerge (@world &amp; packages)&quot;]
-    G --&gt; H[&quot;Apply Customizer (Users, Hostname, os-release, Services)&quot;]
-    H --&gt; I{&quot;Select Output Format / Target&quot;}
-    I --&gt;|ISO| J[&quot;Build SquashFS + GRUB/Syslinux ISO&quot;]
-    I --&gt;|Disk Image| K[&quot;Partition &amp; Write Raw .img&quot;]
-    I --&gt;|Tarball| L[&quot;Compress RootFS into .tar.xz&quot;]
-    J --&gt; M[&quot;Generate MD5 / SHA256 Checksums &amp; Finish&quot;]
-    K --&gt; M
-    L --&gt; M
+    F --&gt; G[&quot;Kernel &amp; Firmware Emerge FIRST (Step 6.1)&quot;]
+    G --&gt; H[&quot;Portage Auto-Unmasking &amp; Emerge Packages (Step 6.2)&quot;]
+    H --&gt; I{&quot;Select Output Format&quot;}
+    I --&gt;|Stage3 Seed| J[&quot;Clean Build Caches &amp; Compress Pristine Stage3 .tar.xz&quot;]
+    I --&gt;|ISO / DiskImage / Tarball| K[&quot;Apply Customizer (Users, Hostname, os-release, Services)&quot;]
+    K --&gt;|ISO| L[&quot;Build SquashFS + GRUB / xorriso Fallback ISO&quot;]
+    K --&gt;|Disk Image| M[&quot;Partition &amp; Write Raw .img&quot;]
+    K --&gt;|Tarball| N[&quot;Compress RootFS into .tar.xz&quot;]
+    J --&gt; O[&quot;Generate MD5 / SHA256 Checksums &amp; Finish&quot;]
+    L --&gt; O
+    M --&gt; O
+    N --&gt; O
 </pre></div>
 </div>
 </section>
@@ -143,8 +146,10 @@
 <ol class="arabic simple">
 <li><p><strong>Multi-Init Compatibility</strong>:
 To ensure full compatibility across OpenRC, Systemd, Runit, and S6, <code class="docutils literal notranslate"><span class="pre">/etc/machine-id</span></code> is created as a real text file in the chroot, while <code class="docutils literal notranslate"><span class="pre">/var/lib/dbus/machine-id</span></code> is set as a symlink pointing to <code class="docutils literal notranslate"><span class="pre">/etc/machine-id</span></code>.</p></li>
-<li><p><strong>Architecture-Agnostic Build Defaults</strong>:
-Global build options in <code class="docutils literal notranslate"><span class="pre">global_build.json</span></code> specify generic options like <code class="docutils literal notranslate"><span class="pre">COMMON_FLAGS=&quot;-O2</span> <span class="pre">-pipe&quot;</span></code>, while architecture profiles in <code class="docutils literal notranslate"><span class="pre">configs/architectures/*.json</span></code> supply target <code class="docutils literal notranslate"><span class="pre">CFLAGS</span></code> (<code class="docutils literal notranslate"><span class="pre">-march=x86-64</span></code>, <code class="docutils literal notranslate"><span class="pre">-march=armv8-a</span></code>, <code class="docutils literal notranslate"><span class="pre">-march=rv64gc</span></code>) and <code class="docutils literal notranslate"><span class="pre">ACCEPT_KEYWORDS</span></code>.</p></li>
+<li><p><strong>Prioritized Kernel Installation</strong>:
+Kernel packages (<code class="docutils literal notranslate"><span class="pre">sys-kernel/gentoo-kernel-bin</span></code>) are emerged <strong>FIRST</strong> before driver and desktop packages, guaranteeing <code class="docutils literal notranslate"><span class="pre">/usr/src/linux</span></code> and kernel symbols exist for out-of-tree hardware modules (<code class="docutils literal notranslate"><span class="pre">xf86-video-*</span></code>, <code class="docutils literal notranslate"><span class="pre">evdev</span></code>, <code class="docutils literal notranslate"><span class="pre">synaptics</span></code>).</p></li>
+<li><p><strong>Pristine Stage3 Seed Building</strong>:
+<code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">stage3</span></code> creates pre-compiled rootfs seeds (<code class="docutils literal notranslate"><span class="pre">gentoo-modern-stage3-openrc-xfce-x86_64.tar.xz</span></code>). It cleans Portage temporary build files (<code class="docutils literal notranslate"><span class="pre">/var/tmp/portage/*</span></code>, <code class="docutils literal notranslate"><span class="pre">/tmp/*</span></code>) and skips live user/desktop customization, keeping the seed pristine for instant (&lt; 2 min) downstream ISO builds via <code class="docutils literal notranslate"><span class="pre">--stage3</span></code>.</p></li>
 <li><p><strong>Calamares Offline Installation</strong>:
 Calamares extracts the pre-built, customized SquashFS image (<code class="docutils literal notranslate"><span class="pre">/live/filesystem.squashfs</span></code>) directly to the destination drive during installation, avoiding online Stage3 downloads and accelerating installation times.</p></li>
 <li><p><strong>Portage Auto-Unmasking &amp; Caching</strong>:

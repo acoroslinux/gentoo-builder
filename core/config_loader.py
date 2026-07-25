@@ -58,6 +58,7 @@ class ConfigLoader:
             "packages": base_cfg.get("packages", []),
             "services": base_cfg.get("services", []),
             "kernel": {},
+            "kernel_packages": [],
             "bootloader": {},
             "live_user": base_cfg.get("live_user", {}),
             "custom_files": base_cfg.get("custom_files", []),
@@ -126,7 +127,9 @@ class ConfigLoader:
         if kernel:
             k_cfg = self.load_profile("kernels", kernel)
             merged["kernel"] = k_cfg
-            merged["packages"].extend(k_cfg.get("packages", []))
+            k_pkgs = k_cfg.get("packages", [])
+            merged["kernel_packages"].extend(k_pkgs)
+            merged["packages"].extend(k_pkgs)
             merged["use_flags"].extend(k_cfg.get("use_flags", []))
 
         # Bootloader profile

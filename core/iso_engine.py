@@ -261,32 +261,56 @@ class ISOEngine:
             vol_id = self.config.get("vol_id", "gentoo_modern")
             btype = self.config.get("type", "grub-uefi")
 
-            if "syslinux" in btype or "isolinux" in btype:
-                cmd = [
-                    "xorriso", "-as", "mkisofs",
-                    "-iso-level", "3",
-                    "-full-iso9660-filenames",
-                    "-volid", vol_id,
-                    "-eltorito-boot", "isolinux/isolinux.bin",
-                    "-eltorito-catalog", "isolinux/boot.cat",
-                    "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table",
-                    "-output", str(output_iso),
-                    str(self.iso_dir)
-                ]
-            else:
+            success = False
+            if "syslinux" not in btype and "isolinux" not in btype and shutil.which("mformat"):
                 cmd = [
                     "grub-mkrescue",
                     "-volid", vol_id,
                     "-o", str(output_iso),
                     str(self.iso_dir)
                 ]
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode == 0:
+                    success = True
+                else:
+                    logger.warning(f"grub-mkrescue failed ({res.stderr.strip()}), falling back to xorriso...")
 
-            res = subprocess.run(cmd, capture_output=True, text=True)
-            if res.returncode != 0:
-                raise ISOEngineError(f"ISO creation failed: {res.stderr}")
+            if not success:
+                logger.info(f"Using xorriso to build ISO image: {output_iso}")
+                cmd = [
+                    "xorriso", "-as", "mkisofs",
+                    "-iso-level", "3",
+                    "-full-iso9660-filenames",
+                    "-volid", vol_id,
+                    "-output", str(output_iso)
+                ]
+                isolinux_bin = self.iso_dir / "isolinux" / "isolinux.bin"
+                if isolinux_bin.exists():
+                    cmd.extend([
+                        "-eltorito-boot", "isolinux/isolinux.bin",
+                        "-eltorito-catalog", "isolinux/boot.cat",
+                        "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table"
+                    ])
+                cmd.append(str(self.iso_dir))
+
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode != 0:
+                    raise ISOEngineError(f"ISO creation failed: {res.stderr}")
 
         self._generate_checksums(output_iso)
         return output_iso
+
+    def clean_chroot_for_stage3(self):
+        """Cleans temporary build caches and logs from chroot before creating a stage3 seed tarball."""
+        logger.info("Cleaning chroot temporary files for Stage3 seed packaging...")
+        for clean_pattern in ["var/tmp/portage/*", "tmp/*", "var/log/portage/*"]:
+            cmd = f"rm -rf {self.target_root}/{clean_pattern}"
+            subprocess.run(cmd, shell=True, capture_output=True)
+
+    def build_stage3(self) -> Path:
+        if self.mode != "mock":
+            self.clean_chroot_for_stage3()
+        return self.build_tarball()
 
     def build_tarball(self) -> Path:
         output_tarball = self.workdir / self.output_name

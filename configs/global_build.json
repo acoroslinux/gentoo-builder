@@ -26,13 +26,28 @@
     "alsa",
     "libproxy",
     "icu",
+    "-openmp",
+    "polkit",
+    "udisks",
+    "png",
+    "jpeg",
+    "svg",
+    "ssl",
+    "curl",
+    "zstd",
+    "lz4",
+    "xattr",
+    "pam",
+    "acl",
+    "attr",
     "dist-kernel"
   ],
   "packages": [
     "app-admin/sudo",
     "net-misc/dhcpcd",
     "net-misc/networkmanager",
-    "sys-apps/util-linux"
+    "sys-apps/util-linux",
+    "sys-kernel/gentoo-kernel-bin"
   ],
   "services": [
     "dbus",

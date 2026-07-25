@@ -148,6 +148,7 @@
             <span class="s2">&quot;packages&quot;</span><span class="p">:</span> <span class="n">base_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;packages&quot;</span><span class="p">,</span> <span class="p">[]),</span>
             <span class="s2">&quot;services&quot;</span><span class="p">:</span> <span class="n">base_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;services&quot;</span><span class="p">,</span> <span class="p">[]),</span>
             <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;kernel_packages&quot;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s2">&quot;bootloader&quot;</span><span class="p">:</span> <span class="p">{},</span>
             <span class="s2">&quot;live_user&quot;</span><span class="p">:</span> <span class="n">base_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;live_user&quot;</span><span class="p">,</span> <span class="p">{}),</span>
             <span class="s2">&quot;custom_files&quot;</span><span class="p">:</span> <span class="n">base_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_files&quot;</span><span class="p">,</span> <span class="p">[]),</span>
@@ -216,7 +217,9 @@
         <span class="k">if</span> <span class="n">kernel</span><span class="p">:</span>
             <span class="n">k_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_profile</span><span class="p">(</span><span class="s2">&quot;kernels&quot;</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
             <span class="n">merged</span><span class="p">[</span><span class="s2">&quot;kernel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k_cfg</span>
-            <span class="n">merged</span><span class="p">[</span><span class="s2">&quot;packages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;packages&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">k_pkgs</span> <span class="o">=</span> <span class="n">k_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;packages&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">merged</span><span class="p">[</span><span class="s2">&quot;kernel_packages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k_pkgs</span><span class="p">)</span>
+            <span class="n">merged</span><span class="p">[</span><span class="s2">&quot;packages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k_pkgs</span><span class="p">)</span>
             <span class="n">merged</span><span class="p">[</span><span class="s2">&quot;use_flags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_flags&quot;</span><span class="p">,</span> <span class="p">[]))</span>
 
         <span class="c1"># Bootloader profile</span>
