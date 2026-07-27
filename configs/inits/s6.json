@@ -5,6 +5,12 @@
   },
   "packages": [
     "sys-apps/s6",
-    "sys-apps/s6-rc"
-  ]
+    "sys-apps/s6-rc",
+    "sys-apps/s6-linux-init",
+    "sys-auth/elogind"
+  ],
+  "use_flags": [
+    "elogind"
+  ],
+  "extra_bootargs": "init=/bin/s6-linux-init"
 }

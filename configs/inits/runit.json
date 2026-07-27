@@ -4,6 +4,11 @@
     "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
   },
   "packages": [
-    "sys-process/runit"
-  ]
+    "sys-process/runit",
+    "sys-auth/elogind"
+  ],
+  "use_flags": [
+    "elogind"
+  ],
+  "extra_bootargs": "init=/sbin/runit-init"
 }
