@@ -18,7 +18,8 @@
     "virtual/pkgconfig",
     "dev-util/pkgconf",
     "sys-devel/gettext",
-    "dev-build/make"
+    "dev-build/make",
+    "sys-apps/flatpak"
   ],
   "use_flags": [
     "unicode",
