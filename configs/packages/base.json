@@ -8,7 +8,6 @@
     "net-misc/dhcpcd",
     "net-misc/networkmanager",
     "sys-apps/util-linux",
-    "sys-apps/openrc",
     "net-misc/iputils",
     "sys-apps/coreutils",
     "sys-apps/findutils",
@@ -26,7 +25,6 @@
     "nls",
     "udev",
     "dbus",
-    "elogind",
     "policykit"
   ]
 }

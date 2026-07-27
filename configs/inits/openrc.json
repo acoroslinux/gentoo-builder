@@ -4,6 +4,10 @@
     "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
   },
   "packages": [
-    "sys-apps/openrc"
+    "sys-apps/openrc",
+    "sys-auth/elogind"
+  ],
+  "use_flags": [
+    "elogind"
   ]
 }
