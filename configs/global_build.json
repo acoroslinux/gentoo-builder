@@ -29,6 +29,7 @@
     "polkit",
     "udisks",
     "png",
+    "harfbuzz",
     "jpeg",
     "svg",
     "ssl",
