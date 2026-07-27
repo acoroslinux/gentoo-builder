@@ -1,5 +1,5 @@
 #!/bin/sh
-# Configuração crítica para Void Linux Live: Inicia a sessão dentro do DBUS
+# Configuração crítica para Gentoo Linux Live: Inicia a sessão dentro do DBUS
 # para que o Polkit, pkexec e o Elogind funcionem sem ecrãs em branco.
 
 # Disable screen locking and screensaver for the Live environment

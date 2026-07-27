@@ -151,6 +151,13 @@ class BuildOrchestrator:
             live_profile=self.live_profile
         )
 
+        if self.output_format == "stage3":
+            logger.info("Stripping kernel and bootloader packages for pristine Stage3 build...")
+            build_config["packages"] = [
+                pkg for pkg in build_config.get("packages", [])
+                if not pkg.startswith("sys-kernel/") and not pkg.startswith("sys-boot/")
+            ]
+
         if self.stage3_url:
             if "stage3" not in build_config:
                 build_config["stage3"] = {}
@@ -161,11 +168,12 @@ class BuildOrchestrator:
         if self.force_isolated_toolchain or not toolchain.check_host_tools():
             toolchain.bootstrap_build_host()
             toolchain.mount_virtual_fs()
+            toolchain.ensure_build_tools()
 
         try:
             # 3. Target Stage3 Bootstrap
             stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode)
-            stage3.fetch_and_extract(self.target_root)
+            stage3.fetch_and_extract(self.target_root, clean=self.clean)
 
             # 4. Setup Host Network and Profile Symlinks inside Chroot
             chroot_setup = ChrootSetup(self.target_root, mode=self.mode, default_profile=build_config.get("default_profile"))
@@ -183,7 +191,17 @@ class BuildOrchestrator:
                 portage.configure_make_conf()
                 portage.sync_portage()
 
-                # 6.1 Prioritize Kernel & Firmware installation so /usr/src/linux exists for driver modules (skipped for Stage3 seeds)
+                # 6.1 Write dracut LiveCD conf and install dracut BEFORE the kernel,
+                # so installkernel picks up the LiveCD dmsquash-live config at build time.
+                if self.output_format != "stage3":
+                    portage.setup_dracut_livecd_conf()
+                    logger.info("Installing sys-kernel/dracut explicitly before kernel package...")
+                    portage.chroot.run_in_chroot(
+                        ["emerge", "--ask=n", "--noreplace", "--verbose", "sys-kernel/dracut"],
+                        check=False
+                    )
+
+                # 6.2 Prioritize Kernel & Firmware installation so /usr/src/linux exists for driver modules (skipped for Stage3 seeds)
                 kernel_pkgs = build_config.get("kernel_packages", [])
                 if kernel_pkgs and self.output_format != "stage3":
                     logger.info(f"Prioritizing kernel package installation FIRST: {' '.join(kernel_pkgs)}")
@@ -194,6 +212,7 @@ class BuildOrchestrator:
 
                 # Handle Stage 1 and minimal embedded tarball targets
                 if self.target in ["livecd-stage1", "diskimage-stage1", "embedded"]:
+                    chroot.umount_virtual_fs()
                     output_file = self.workdir / self.output_name
                     self._create_tarball(self.target_root, output_file)
                     logger.info(f"Target build completed successfully! Output: {output_file}")
@@ -217,9 +236,10 @@ class BuildOrchestrator:
                     logger.info(f"Netboot target completed successfully! Output: {output_file}")
                     return output_file
 
-                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode)
+                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode, toolchain=toolchain)
 
                 if self.output_format == "stage3":
+                    chroot.umount_virtual_fs()
                     stage3_file = iso_engine.build_stage3()
                     logger.info(f"Pristine Stage3 seed tarball build completed successfully! Output: {stage3_file}")
                     return stage3_file
@@ -229,6 +249,51 @@ class BuildOrchestrator:
                 customizer.setup_live_users()
                 customizer.configure_system_defaults()
                 customizer.setup_services()
+
+                # Ensure Dracut initramfs is freshly regenerated with LiveCD support before unmounting & packaging
+                if self.output_format != "stage3" and self.mode != "mock":
+                    logger.info("Regenerating Dracut initramfs with LiveCD dmsquash-live support...")
+                    # Find the installed kernel version to target the correct initramfs
+                    # Sort to always pick the newest if multiple kernels exist
+                    boot_dir = self.target_root / "boot"
+                    kver = None
+                    if boot_dir.exists():
+                        kfiles = sorted(
+                            [f.name.replace("vmlinuz-", "") for f in boot_dir.glob("vmlinuz-*")
+                             if not f.name.endswith(('.old', '.bak', '.tmp'))],
+                            reverse=True
+                        )
+                        if kfiles:
+                            kver = kfiles[0]
+
+                    if kver:
+                        logger.info(f"Regenerating initramfs for kernel version: {kver}")
+                        try:
+                            chroot.run_in_chroot(
+                                f'dracut --force --no-hostonly --xz '
+                                f'--add "dmsquash-live dmsquash-live-autooverlay pollcdrom" '
+                                f'--add-drivers "squashfs loop overlay ext3 ext4 iso9660 vfat" '
+                                f'/boot/initramfs-{kver}.img {kver}',
+                                check=False
+                            )
+                            # Create a RELATIVE symlink so Python on the HOST can resolve it
+                            # correctly without chroot-absolute path confusion.
+                            # ln -sf initramfs-kver.img /boot/initramfs  (relative target)
+                            chroot.run_in_chroot(
+                                f'ln -sf initramfs-{kver}.img /boot/initramfs',
+                                check=False
+                            )
+                        except Exception as e:
+                            logger.warning(
+                                f"Dracut regeneration failed ({e}). "
+                                f"The kernel-generated initramfs will be used instead. "
+                                f"The ISO may still boot if installkernel produced a valid initramfs."
+                            )
+                    else:
+                        logger.warning("Could not detect kernel version — skipping dracut regeneration.")
+
+                # Unmount chroot virtual filesystems before creating ISO / tarball / disk image
+                chroot.umount_virtual_fs()
 
                 if self.output_format == "tarball":
                     tarball_file = iso_engine.build_tarball()
@@ -246,6 +311,21 @@ class BuildOrchestrator:
                 # 8. Build ISO with GRUB bootloader options
                 iso_file = iso_engine.build_iso()
                 
+                # Copy final ISO to output/ directory for easy user access
+                project_output_dir = resolve_from_project("output")
+                project_output_dir.mkdir(parents=True, exist_ok=True)
+                final_output_file = project_output_dir / iso_file.name
+                if iso_file != final_output_file:
+                    try:
+                        shutil.copy2(iso_file, final_output_file)
+                        if iso_file.with_suffix(iso_file.suffix + ".md5").exists():
+                            shutil.copy2(iso_file.with_suffix(iso_file.suffix + ".md5"), final_output_file.with_suffix(final_output_file.suffix + ".md5"))
+                        if iso_file.with_suffix(iso_file.suffix + ".sha256").exists():
+                            shutil.copy2(iso_file.with_suffix(iso_file.suffix + ".sha256"), final_output_file.with_suffix(final_output_file.suffix + ".sha256"))
+                        logger.info(f"Copied final ISO to: {final_output_file}")
+                    except OSError as e:
+                        logger.warning(f"Could not copy ISO to output directory: {e}")
+
                 logger.info(f"Build completed successfully! Output: {iso_file}")
                 return iso_file
             finally:

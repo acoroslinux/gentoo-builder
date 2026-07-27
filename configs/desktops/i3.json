@@ -11,6 +11,8 @@
   "use_flags": [
     "X",
     "i3wm",
-    "pango"
+    "pango",
+    "opengl",
+    "egl"
   ]
 }

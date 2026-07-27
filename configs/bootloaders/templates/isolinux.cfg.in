@@ -1,0 +1,54 @@
+UI vesamenu.c32
+PROMPT 0
+TIMEOUT 150
+ONTIMEOUT gentoo
+
+MENU TABMSG Press ENTER to boot or TAB to edit a menu entry
+MENU AUTOBOOT BIOS default device boot in # second{,s}...
+MENU TITLE @@BOOT_TITLE@@ @@DESKTOP@@ (@@KERNVER@@ @@ARCH@@)
+MENU BACKGROUND /isolinux/splash.png
+MENU RESOLUTION 640 480
+MENU WIDTH 78
+MENU MARGIN 1
+MENU ROWS 12
+MENU VSHIFT 2
+MENU TIMEOUTROW 13
+MENU TABMSGROW 2
+MENU CMDLINEROW 16
+MENU HELPMSGROW 20
+
+MENU COLOR title        * #FF5255FF *
+MENU COLOR border       * #00000000 #00000000 none
+MENU COLOR sel          * #ffffffff #FF5255FF *
+
+LABEL gentoo
+  MENU LABEL @@BOOT_TITLE@@ @@DESKTOP@@ (Kernel @@KERNVER@@ @@ARCH@@)
+  KERNEL /boot/vmlinuz
+  APPEND initrd=/boot/initramfs root=live:CDLABEL=@@VOL_ID@@ rd.live.image rd.overlay=1 init=/sbin/init ro loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ console=tty1 quiet splash plymouth.theme=gentoo-modern @@BOOT_CMDLINE@@
+
+LABEL gentooram
+  MENU LABEL @@BOOT_TITLE@@ @@DESKTOP@@ (Copy to RAM)
+  KERNEL /boot/vmlinuz
+  APPEND initrd=/boot/initramfs root=live:CDLABEL=@@VOL_ID@@ rd.live.image rd.live.ram rd.overlay=1 init=/sbin/init ro loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ console=tty1 quiet splash plymouth.theme=gentoo-modern @@BOOT_CMDLINE@@
+
+LABEL gentoonogfx
+  MENU LABEL @@BOOT_TITLE@@ @@DESKTOP@@ (Safe Graphics - nomodeset)
+  KERNEL /boot/vmlinuz
+  APPEND initrd=/boot/initramfs root=live:CDLABEL=@@VOL_ID@@ rd.live.image rd.overlay=1 init=/sbin/init ro loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ console=tty1 nomodeset @@BOOT_CMDLINE@@
+
+LABEL c
+  MENU LABEL Boot first HD found by BIOS
+  COM32 chain.c32
+  APPEND hd0
+
+LABEL memtest
+  MENU LABEL Run Memtest86+ (RAM test)
+  LINUX /boot/memtest.bin
+
+LABEL reboot
+  MENU LABEL Reboot
+  COM32 reboot.c32
+
+LABEL poweroff
+  MENU LABEL Power Off
+  COM32 poweroff.c32

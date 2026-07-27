@@ -1,9 +1,10 @@
 {
   "packages": [
-    "sys-boot/grub"
+    "sys-boot/grub",
+    "sys-boot/syslinux"
   ],
   "bootloader": {
-    "type": "grub-hybrid",
+    "type": "hybrid-isolinux-grub",
     "vol_id": "gentoo_modern",
     "title": "Gentoo Modern"
   }

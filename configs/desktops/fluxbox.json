@@ -5,6 +5,8 @@
   ],
   "services": [],
   "use_flags": [
-    "X"
+    "X",
+    "opengl",
+    "egl"
   ]
 }

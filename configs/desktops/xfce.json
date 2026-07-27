@@ -15,7 +15,9 @@
     "xfce",
     "harfbuzz",
     "udisks",
-    "gtk3"
+    "gtk3",
+    "opengl",
+    "egl"
   ],
   "desktop_environment": {
     "name": "xfce",

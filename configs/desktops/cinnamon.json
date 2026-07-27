@@ -10,6 +10,8 @@
     "X",
     "gtk",
     "gtk3",
-    "cinnamon"
+    "cinnamon",
+    "opengl",
+    "egl"
   ]
 }

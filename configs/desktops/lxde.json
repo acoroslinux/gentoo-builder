@@ -9,6 +9,8 @@
   "use_flags": [
     "X",
     "gtk",
-    "lxde"
+    "lxde",
+    "opengl",
+    "egl"
   ]
 }

@@ -10,7 +10,9 @@
     "X",
     "gtk",
     "gtk3",
-    "mate"
+    "mate",
+    "opengl",
+    "egl"
   ],
   "desktop_environment": {
     "name": "mate",

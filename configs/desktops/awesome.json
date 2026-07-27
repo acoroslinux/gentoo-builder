@@ -9,6 +9,8 @@
   ],
   "use_flags": [
     "X",
-    "lua"
+    "lua",
+    "opengl",
+    "egl"
   ]
 }

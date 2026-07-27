@@ -6,6 +6,8 @@
   "services": [],
   "use_flags": [
     "X",
-    "wayland"
+    "wayland",
+    "opengl",
+    "egl"
   ]
 }

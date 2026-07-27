@@ -63,22 +63,42 @@ class SystemCustomizer:
 
         for srv in services:
             if self.init_system == "systemd":
-                self.chroot.run_in_chroot(f"systemctl enable {srv}", check=False)
+                self.chroot.run_in_chroot(f"systemctl enable {srv}")
             elif self.init_system == "openrc":
                 init_script = self.target_root / "etc" / "init.d" / srv
                 target_srv = srv
                 if not init_script.exists():
                     dm_script = self.target_root / "etc" / "init.d" / "display-manager"
-                    if dm_script.exists():
+                    if dm_script.exists() and srv in ["lightdm", "sddm", "gdm", "xdm", "lxdm"]:
                         target_srv = "display-manager"
-                    elif srv in ["lightdm", "sddm", "gdm", "xdm"]:
+                        if self.chroot.mode != "mock":
+                            conf_d = self.target_root / "etc" / "conf.d" / "display-manager"
+                            conf_d.parent.mkdir(parents=True, exist_ok=True)
+                            conf_d.write_text(f'DISPLAYMANAGER="{srv}"\n')
+                            
+                            # Configure Autologin for the Live User
+                            username = self.config.get("live_user", "live")
+                            session = self.config.get("desktop_environment", {}).get("name", "")
+                            if srv == "lightdm":
+                                lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
+                                if lconf.exists():
+                                    with open(lconf, "a") as f:
+                                        f.write(f"\n[Seat:*]\nautologin-user={username}\nautologin-user-timeout=0\n")
+                                        if session:
+                                            f.write(f"user-session={session}\n")
+                            elif srv == "sddm":
+                                sddm_dir = self.target_root / "etc" / "sddm.conf.d"
+                                sddm_dir.mkdir(parents=True, exist_ok=True)
+                                sddm_conf = sddm_dir / "autologin.conf"
+                                sddm_conf.write_text(f"[Autologin]\nUser={username}\nSession={session}\n")
+                    elif srv in ["lightdm", "sddm", "gdm", "xdm", "lxdm"]:
                         logger.warning(f"Init script for {srv} not found; skipping service enable.")
                         continue
-                self.chroot.run_in_chroot(f"rc-update add {target_srv} default", check=False)
+                self.chroot.run_in_chroot(f"rc-update add {target_srv} default")
             elif self.init_system == "runit":
-                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/", check=False)
+                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/")
             elif self.init_system == "s6":
-                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}", check=False)
+                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
     def copy_custom_files(self):
         """Copies structured files from configs/custom_files/ into the chroot as specified in configs."""

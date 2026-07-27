@@ -12,6 +12,8 @@
     "gles2",
     "sway",
     "elogind",
-    "polkit"
+    "polkit",
+    "opengl",
+    "egl"
   ]
 }

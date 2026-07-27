@@ -5,6 +5,7 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 from core.logger_setup import setup_logger
+from core.command_runner import CommandRunner
 
 logger = setup_logger("toolchain_manager")
 
@@ -77,6 +78,10 @@ class ToolchainManager:
             return
 
         url = self._resolve_latest_stage3_url()
+        if self.build_host_dir.exists() and (self.build_host_dir / "etc").exists():
+            logger.info(f"Isolated build_host already exists at {self.build_host_dir}. Skipping Stage3 extraction.")
+            return
+
         tarball_path = self.cache_dir / "stage3-build-host.tar.xz"
 
         if not tarball_path.exists():
@@ -98,6 +103,18 @@ class ToolchainManager:
         if host_resolv.exists():
             shutil.copy2(host_resolv, self.build_host_dir / "etc" / "resolv.conf")
 
+    def ensure_build_tools(self):
+        """Ensures that isolated build tools (grub, mtools, libisoburn, squashfs-tools) exist inside build_host."""
+        if self.mode == "mock":
+            return
+
+        grub_bin = self.build_host_dir / "usr" / "bin" / "grub-mkrescue"
+        mtools_bin = self.build_host_dir / "usr" / "bin" / "mformat"
+        if not grub_bin.exists() or not mtools_bin.exists():
+            logger.info("Installing isolated ISO build tools (sys-boot/grub, sys-fs/mtools, dev-libs/libisoburn, sys-fs/squashfs-tools) inside build_host...")
+            self.run_in_build_host("emerge-webrsync")
+            self.run_in_build_host("emerge --ask=n --noreplace sys-boot/grub sys-fs/mtools dev-libs/libisoburn sys-fs/squashfs-tools")
+
     def mount_virtual_fs(self):
         if self.mode == "mock":
             logger.info(f"[MOCK TOOLCHAIN] Mounting virtual filesystems into build_host")
@@ -107,7 +124,7 @@ class ToolchainManager:
         if os.geteuid() != 0:
             raise ToolchainManagerError("Root privileges required to mount build_host.")
 
-        logger.info(f"Mounting proc, sys, dev into build_host at {self.build_host_dir}")
+        logger.info(f"Mounting proc, sys, dev and workdir into build_host at {self.build_host_dir}")
         mounts = [
             ("proc", self.build_host_dir / "proc", "proc", None),
             ("sysfs", self.build_host_dir / "sys", "sysfs", None),
@@ -126,6 +143,13 @@ class ToolchainManager:
             if res.returncode != 0 and "already mounted" not in res.stderr:
                 logger.warning(f"Warning mounting {target}: {res.stderr.strip()}")
 
+        # Bind-mount workdir into build_host/workdir for isolated ISO creation
+        workdir_target = self.build_host_dir / "workdir"
+        workdir_target.mkdir(parents=True, exist_ok=True)
+        res = subprocess.run(["mount", "--bind", str(self.workdir), str(workdir_target)], capture_output=True, text=True)
+        if res.returncode != 0 and "already mounted" not in res.stderr:
+            logger.warning(f"Warning bind-mounting workdir into build_host: {res.stderr.strip()}")
+
         self.is_mounted = True
 
     def umount_virtual_fs(self):
@@ -139,6 +163,7 @@ class ToolchainManager:
 
         logger.info(f"Unmounting filesystems from build_host at {self.build_host_dir}")
         targets = [
+            self.build_host_dir / "workdir",
             self.build_host_dir / "dev" / "shm",
             self.build_host_dir / "dev" / "pts",
             self.build_host_dir / "dev",

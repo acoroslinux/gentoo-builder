@@ -14,7 +14,9 @@
     "gtk4",
     "systemd",
     "introspection",
-    "policykit"
+    "policykit",
+    "opengl",
+    "egl"
   ],
   "desktop_environment": {
     "name": "gnome",

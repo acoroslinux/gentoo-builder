@@ -1,4 +1,4 @@
-// Void Modern Simple Plymouth Script
+// Gentoo Modern Simple Plymouth Script
 
 // Load the splash image
 wallpaper_image = Image("splash.png");

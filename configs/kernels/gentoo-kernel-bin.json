@@ -1,6 +1,7 @@
 {
   "packages": [
     "sys-kernel/linux-firmware",
+    "sys-kernel/dracut",
     "sys-kernel/installkernel",
     "sys-kernel/gentoo-kernel-bin"
   ],

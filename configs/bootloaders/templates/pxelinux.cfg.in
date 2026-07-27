@@ -1,0 +1,36 @@
+UI vesamenu.c32
+PROMPT 0
+TIMEOUT 100
+ONTIMEOUT gentoo
+
+MENU TABMSG Press ENTER to boot or TAB to edit a menu entry
+MENU AUTOBOOT BIOS default device boot in # second{,s}...
+MENU BACKGROUND /isolinux/splash.png
+MENU TITLE @@BOOT_TITLE@@ PXE Network Boot (@@ARCH@@)
+MENU WIDTH 78
+MENU MARGIN 1
+MENU ROWS 4
+MENU VSHIFT 2
+MENU TIMEOUTROW 8
+MENU TABMSGROW 2
+MENU CMDLINEROW 11
+MENU HELPMSGROW 16
+
+MENU COLOR title        * #FF5255FF *
+MENU COLOR border       * #00000000 #00000000 none
+MENU COLOR sel          * #ffffffff #FF5255FF *
+
+LABEL gentoo
+  MENU LABEL @@BOOT_TITLE@@ @@DESKTOP@@ Interactive Session (@@KERNVER@@ @@ARCH@@)
+  KERNEL /boot/vmlinuz
+  APPEND initrd=/boot/initramfs root=/dev/null loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ quiet splash @@BOOT_CMDLINE@@
+
+LABEL auto
+  MENU LABEL @@BOOT_TITLE@@ @@DESKTOP@@ AutoInstall Session (@@KERNVER@@ @@ARCH@@)
+  KERNEL /boot/vmlinuz
+  APPEND initrd=/boot/initramfs root=/dev/null auto loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ quiet splash @@BOOT_CMDLINE@@
+
+LABEL c
+  MENU LABEL Boot first HD found by BIOS
+  COM32 chain.c32
+  APPEND hd0

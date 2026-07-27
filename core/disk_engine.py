@@ -31,10 +31,21 @@ class DiskEngine:
             if os.geteuid() != 0:
                 raise DiskEngineError("Real mode disk image generation requires root privileges.")
             
-            # Step 1: Allocate space (default 4GB)
-            img_size = self.config.get("size", "4G")
+            # Step 1: Allocate space using fallocate (faster than dd for sparse files)
+            img_size = self.config.get("bootloader", {}).get("size", self.config.get("size", "4G"))
             logger.info(f"Allocating {img_size} disk image at {output_img}...")
-            subprocess.run(["dd", "if=/dev/zero", f"of={output_img}", "bs=1G", "count=4"], check=True)
+            # Use fallocate for speed; fall back to truncate if fallocate is unavailable
+            fallocate_res = subprocess.run(
+                ["fallocate", "-l", str(img_size), str(output_img)],
+                capture_output=True
+            )
+            if fallocate_res.returncode != 0:
+                # Convert size string (e.g. "4G") to bytes for truncate
+                size_map = {"K": 1024, "M": 1024**2, "G": 1024**3, "T": 1024**4}
+                size_str = str(img_size).upper().strip()
+                multiplier = size_map.get(size_str[-1], 1)
+                size_bytes = int(size_str[:-1]) * multiplier if size_str[-1] in size_map else int(size_str)
+                subprocess.run(["truncate", "-s", str(size_bytes), str(output_img)], check=True)
 
             # Step 2: Set up partition table (GPT)
             logger.info("Setting up GPT partition table...")
@@ -51,11 +62,23 @@ class DiskEngine:
         return output_img
 
     def _generate_checksums(self, img_path: Path):
+        if self.mode == "mock":
+            logger.info(f"[MOCK DISK ENGINE] Generating dummy checksums for {img_path.name}")
+            try:
+                (img_path.parent / f"{img_path.name}.md5").write_text(f"MOCK_MD5  {img_path.name}\n")
+                (img_path.parent / f"{img_path.name}.sha256").write_text(f"MOCK_SHA256  {img_path.name}\n")
+            except OSError:
+                pass
+            return
+
         logger.info(f"Generating checksums for {img_path.name}")
-        content = img_path.read_bytes()
+        # Stream file in 8MB chunks to avoid loading multi-GB images into RAM
+        md5 = hashlib.md5()
+        sha256 = hashlib.sha256()
+        with open(img_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8 * 1024 * 1024), b""):
+                md5.update(chunk)
+                sha256.update(chunk)
 
-        md5 = hashlib.md5(content).hexdigest()
-        sha256 = hashlib.sha256(content).hexdigest()
-
-        (img_path.parent / f"{img_path.name}.md5").write_text(f"{md5}  {img_path.name}\n")
-        (img_path.parent / f"{img_path.name}.sha256").write_text(f"{sha256}  {img_path.name}\n")
+        (img_path.parent / f"{img_path.name}.md5").write_text(f"{md5.hexdigest()}  {img_path.name}\n")
+        (img_path.parent / f"{img_path.name}.sha256").write_text(f"{sha256.hexdigest()}  {img_path.name}\n")

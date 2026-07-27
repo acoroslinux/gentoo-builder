@@ -2,7 +2,8 @@
   "global": {
     "distro": "Gentoo Modern",
     "version": "rolling",
-    "maintainer": "AçorOS Linux Team"
+    "maintainer": "AçorOS Linux Team",
+    "workdir": "/tmp/gentoo-mock-build"
   },
   "stage3": {
     "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
@@ -13,15 +14,13 @@
     "VIDEO_CARDS": "amdgpu radeon radeonsi nouveau intel fbdev vesa",
     "INPUT_DEVICES": "libinput synaptics evdev"
   },
-  "use_flags": [
-    "unicode",
-    "nls",
-    "udev",
-    "dbus",
-    "opengl",
-    "egl",
-    "text",
-    "python",
+    "use_flags": [
+      "unicode",
+      "nls",
+      "udev",
+      "dbus",
+      "text",
+      "python",
     "mount",
     "alsa",
     "libproxy",

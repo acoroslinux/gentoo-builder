@@ -5,6 +5,6 @@
   "bootloader": {
     "type": "grub-uefi",
     "vol_id": "gentoo_modern",
-    "bootargs": "root=/dev/ram0 looptype=squashfs loop=/live/filesystem.squashfs udev nodevfs"
+    "bootargs": "root=live:CDLABEL=gentoo_modern rd.live.image quiet splash"
   }
 }

@@ -16,7 +16,9 @@
     "qt6",
     "kde",
     "policykit",
-    "udisks"
+    "udisks",
+    "opengl",
+    "egl"
   ],
   "desktop_environment": {
     "name": "kde",

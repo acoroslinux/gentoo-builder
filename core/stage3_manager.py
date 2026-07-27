@@ -46,7 +46,11 @@ class Stage3Manager:
         base_path_url = txt_url.rsplit("/", 1)[0] + "/" if "/" in txt_url else "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
         return f"{base_path_url}current-{pattern}-openrc/{pattern}-openrc-latest.tar.xz"
 
-    def fetch_and_extract(self, target_root: Path):
+    def fetch_and_extract(self, target_root: Path, clean: bool = False):
+        if not clean and target_root.exists() and (target_root / "etc").exists():
+            logger.info(f"Target chroot already exists at {target_root} and --no-clean specified. Skipping Stage3 extraction.")
+            return
+
         configured_url = self.config.get("url", "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt")
         if configured_url.startswith("file://") or Path(configured_url).exists():
             tarball_path = Path(configured_url.replace("file://", "")).resolve()
@@ -86,7 +90,7 @@ class Stage3Manager:
                 "  sudo python3 cli.py x86_64 --mode real ..."
             )
 
-        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner", "--xattrs-include='*.*'"]
+        tar_cmd = ["tar", "xpf", str(tarball_path), "-C", str(target_root), "--numeric-owner", "--xattrs-include=*.*"]
         res = subprocess.run(tar_cmd, capture_output=True, text=True)
         if res.returncode != 0:
             raise Stage3ManagerError(f"Failed to extract Stage3 tarball: {res.stderr}")

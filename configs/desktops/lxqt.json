@@ -10,6 +10,8 @@
     "X",
     "qt5",
     "qt6",
-    "lxqt"
+    "lxqt",
+    "opengl",
+    "egl"
   ]
 }

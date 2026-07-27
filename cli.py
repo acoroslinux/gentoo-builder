@@ -4,6 +4,9 @@ import sys
 from pathlib import Path
 
 from core.orchestrator import BuildOrchestrator, BuildOrchestratorError
+from core.iso_engine import ISOEngineError
+from core.portage_manager import PortageManagerError
+from core.stage3_manager import Stage3ManagerError
 from core.path_utils import resolve_from_project
 
 def _available_profiles(config_root: Path, category: str):
@@ -84,6 +87,7 @@ def main():
     parser.add_argument("--list-options", action="store_true", help="List all available profiles")
 
     parser.add_argument("--stage3", type=str, help="Custom Stage3 tarball path or URL (local file or http/https)")
+    parser.add_argument("--live-profile", type=str, dest="live_profile", help="Live user profile override")
     parser.add_argument(
         "--format",
         choices=["iso", "img", "tarball", "stage3"],
@@ -118,6 +122,7 @@ def main():
             bootloader=args.bootloader,
             package_profiles=_parse_list_arg(raw_pkgs),
             service_profiles=_parse_list_arg(raw_srvs),
+            live_profile=getattr(args, "live_profile", None),
             output_name=args.output,
             force_isolated_toolchain=args.force_isolated_toolchain,
             target=args.target,
@@ -125,9 +130,12 @@ def main():
             stage3_url=args.stage3
         )
         orchestrator.build()
-    except BuildOrchestratorError as e:
-        print(f"Error: {e}", file=sys.stderr)
+    except (BuildOrchestratorError, ISOEngineError, PortageManagerError, Stage3ManagerError) as e:
+        print(f"Build error: {e}", file=sys.stderr)
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nBuild interrupted by user.", file=sys.stderr)
+        sys.exit(130)
 
 if __name__ == "__main__":
     main()

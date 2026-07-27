@@ -9,6 +9,8 @@
   "use_flags": [
     "X",
     "wayland",
-    "eet"
+    "eet",
+    "opengl",
+    "egl"
   ]
 }

@@ -12,6 +12,8 @@
   "use_flags": [
     "wayland",
     "gles2",
-    "hyprland"
+    "hyprland",
+    "opengl",
+    "egl"
   ]
 }

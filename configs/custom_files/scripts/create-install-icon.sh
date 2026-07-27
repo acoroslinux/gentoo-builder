@@ -18,17 +18,28 @@ fi
 # Ensure the directory exists
 mkdir -p "$DESKTOP"
 
-LAUNCHER_SRC="/usr/share/applications/install.desktop"
 LAUNCHER_DEST="$DESKTOP/install.desktop"
 
-if [ -f "$LAUNCHER_SRC" ]; then
-    cp "$LAUNCHER_SRC" "$LAUNCHER_DEST"
-    chmod +x "$LAUNCHER_DEST"
+# Create the desktop file dynamically
+cat << 'EOF' > "$LAUNCHER_DEST"
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install Gentoo Modern
+GenericName=System Installer
+Comment=Install Gentoo Modern operating system to disk
+Exec=sudo -E calamares
+Icon=calamares
+Terminal=false
+StartupNotify=true
+Categories=System;Qt;
+EOF
 
-    # Set launcher as trusted under XFCE/Gnome to avoid execution warnings
-    if command -v gio >/dev/null 2>&1; then
-        gio set --type=string "$LAUNCHER_DEST" metadata::trusted true 2>/dev/null
-        gio set --type=string "$LAUNCHER_DEST" metadata::xfce-exe-checksum "$(sha256sum "$LAUNCHER_DEST" | cut -f1 -d' ')" 2>/dev/null
-    fi
-    touch "$LAUNCHER_DEST"
+chmod +x "$LAUNCHER_DEST"
+
+# Set launcher as trusted under XFCE/Gnome to avoid execution warnings
+if command -v gio >/dev/null 2>&1; then
+    gio set --type=string "$LAUNCHER_DEST" metadata::trusted true 2>/dev/null
+    gio set --type=string "$LAUNCHER_DEST" metadata::xfce-exe-checksum "$(sha256sum "$LAUNCHER_DEST" | cut -f1 -d' ')" 2>/dev/null
 fi
+touch "$LAUNCHER_DEST"

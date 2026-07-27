@@ -112,7 +112,7 @@ class ConfigLoader:
             base_srv = self.load_json(base_srv_path)
             merged["services"].extend(base_srv.get("services", []))
 
-                # Desktop profile
+        # Desktop profile
         if desktop:
             d_cfg = self.load_profile("desktops", desktop)
             merged["packages"].extend(d_cfg.get("packages", []))
@@ -135,16 +135,22 @@ class ConfigLoader:
         # Bootloader profile
         if bootloader:
             b_cfg = self.load_profile("bootloaders", bootloader)
-            merged["bootloader"] = b_cfg
+            merged["bootloader"] = b_cfg.get("bootloader", b_cfg)
+            merged["packages"].extend(b_cfg.get("packages", []))
 
-        # Package profiles
+        # Package profiles — xorg/wayland are auto-added only when a desktop is selected
         resolved_pkg_profiles = list(package_profiles) if package_profiles is not None else []
-        for default_profile in ["xorg", "wayland"]:
-            if default_profile not in resolved_pkg_profiles:
-                resolved_pkg_profiles.append(default_profile)
+        if desktop:
+            for default_profile in ["xorg", "wayland"]:
+                if default_profile not in resolved_pkg_profiles:
+                    resolved_pkg_profiles.append(default_profile)
 
         for pkg_p in resolved_pkg_profiles:
-            p_cfg = self.load_profile("packages", pkg_p)
+            try:
+                p_cfg = self.load_profile("packages", pkg_p)
+            except ConfigLoaderError as e:
+                logger.warning(f"Package profile '{pkg_p}' not found, skipping: {e}")
+                continue
             merged["packages"].extend(p_cfg.get("packages", []))
             merged["use_flags"].extend(p_cfg.get("use_flags", []))
             merged["custom_files"].extend(p_cfg.get("custom_files", []))
