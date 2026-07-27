@@ -12,7 +12,6 @@
     "wayland",
     "gtk",
     "gtk4",
-    "systemd",
     "introspection",
     "policykit",
     "opengl",
