@@ -113,7 +113,7 @@ class PortageManager:
             '# dmsquash-live: mounts SquashFS from CD/USB label\n'
             '# pollcdrom: scans optical/virtual drives for the live medium\n'
             '# dmsquash-live-autooverlay: auto overlayfs write layer in RAM\n'
-            'add_dracutmodules+=" dmsquash-live dmsquash-live-autooverlay pollcdrom "\n'
+            'add_dracutmodules+=" dmsquash-live dmsquash-live-autooverlay pollcdrom plymouth "\n'
             'add_drivers+=" squashfs loop overlay ext3 ext4 iso9660 vfat "\n'
             'filesystems+=" squashfs ext3 ext4 iso9660 vfat "\n'
             'compress="xz"\n'
