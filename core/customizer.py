@@ -85,7 +85,15 @@ class SystemCustomizer:
 
         for srv in services:
             if self.init_system == "systemd":
-                self.chroot.run_in_chroot(f"systemctl enable {srv}")
+                self.chroot.run_in_chroot(f"systemctl enable {srv} 2>/dev/null || true")
+                if srv in ["lightdm", "sddm", "gdm", "gdm3"]:
+                    self.chroot.run_in_chroot("systemctl set-default graphical.target 2>/dev/null || true")
+                    live_user_cfg = self.config.get("live_user", {})
+                    username = live_user_cfg.get("username", "live") if isinstance(live_user_cfg, dict) else "live"
+                    if srv in ["gdm", "gdm3"]:
+                        gdm_conf = self.target_root / "etc" / "gdm" / "custom.conf"
+                        gdm_conf.parent.mkdir(parents=True, exist_ok=True)
+                        gdm_conf.write_text(f"[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin={username}\n")
             elif self.init_system == "openrc":
                 service_aliases = {
                     "cups": ["cupsd", "cups"],
@@ -141,6 +149,10 @@ class SystemCustomizer:
                                 sddm_dir.mkdir(parents=True, exist_ok=True)
                                 sddm_conf = sddm_dir / "autologin.conf"
                                 sddm_conf.write_text(f"[Autologin]\nUser={username}\nSession={session}\n")
+                            elif srv == "gdm":
+                                gdm_conf = self.target_root / "etc" / "gdm" / "custom.conf"
+                                gdm_conf.parent.mkdir(parents=True, exist_ok=True)
+                                gdm_conf.write_text(f"[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin={username}\n")
                     else:
                         logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
                         continue
