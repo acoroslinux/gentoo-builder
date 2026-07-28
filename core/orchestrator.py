@@ -195,9 +195,9 @@ class BuildOrchestrator:
                 # so installkernel picks up the LiveCD dmsquash-live config at build time.
                 if self.output_format != "stage3":
                     portage.setup_dracut_livecd_conf()
-                    logger.info("Installing sys-kernel/dracut explicitly before kernel package...")
+                    logger.info("Installing sys-kernel/dracut, lvm2, and cryptsetup explicitly before kernel package...")
                     portage.chroot.run_in_chroot(
-                        ["emerge", "--ask=n", "--noreplace", "--verbose", "sys-kernel/dracut"],
+                        ["emerge", "--ask=n", "--noreplace", "--verbose", "sys-kernel/dracut", "sys-fs/lvm2", "sys-fs/cryptsetup"],
                         check=False
                     )
 
