@@ -20,7 +20,7 @@
     "app-shells/bash-completion",
     "app-shells/zsh",
     "app-shells/zsh-completions",
-    "sys-apps/tree",
+    "app-text/tree",
     "sys-apps/less",
     "net-misc/curl",
     "net-misc/wget",

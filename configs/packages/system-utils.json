@@ -10,7 +10,7 @@
     "app-misc/neofetch",
     "app-shells/zsh",
     "app-shells/zsh-completions",
-    "sys-apps/tree",
+    "app-text/tree",
     "net-misc/curl",
     "net-misc/wget",
     "sys-apps/bat",
