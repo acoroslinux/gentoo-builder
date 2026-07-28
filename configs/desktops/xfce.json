@@ -4,7 +4,10 @@
     "x11-terms/xterm",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter",
-    "gui-libs/display-manager-init"
+    "gui-libs/display-manager-init",
+    "gnome-extra/nm-applet",
+    "xfce-extra/xfce4-pulseaudio-plugin",
+    "xfce-extra/xfce4-whiskermenu-plugin"
   ],
   "services": [
     "lightdm"
