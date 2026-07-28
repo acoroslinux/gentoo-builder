@@ -83,17 +83,16 @@ class SystemCustomizer:
             logger.info(f"[MOCK CUSTOMIZER] Enabling {self.init_system} services: {services}")
             return
 
+        live_user_cfg = self.config.get("live_user", {})
+        username = live_user_cfg.get("username", "live") if isinstance(live_user_cfg, dict) else "live"
+        session = self.config.get("desktop_environment", {}).get("name", "xfce")
+
         for srv in services:
             if self.init_system == "systemd":
                 self.chroot.run_in_chroot(f"systemctl enable {srv} 2>/dev/null || true")
-                if srv in ["lightdm", "sddm", "gdm", "gdm3"]:
+                if srv in ["lightdm", "sddm", "gdm", "gdm3", "lxdm"]:
                     self.chroot.run_in_chroot("systemctl set-default graphical.target 2>/dev/null || true")
-                    live_user_cfg = self.config.get("live_user", {})
-                    username = live_user_cfg.get("username", "live") if isinstance(live_user_cfg, dict) else "live"
-                    if srv in ["gdm", "gdm3"]:
-                        gdm_conf = self.target_root / "etc" / "gdm" / "custom.conf"
-                        gdm_conf.parent.mkdir(parents=True, exist_ok=True)
-                        gdm_conf.write_text(f"[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin={username}\n")
+                    self.configure_autologin(srv, username, session)
             elif self.init_system == "openrc":
                 service_aliases = {
                     "cups": ["cupsd", "cups"],
@@ -113,46 +112,15 @@ class SystemCustomizer:
 
                 if not target_srv:
                     dm_script = self.target_root / "etc" / "init.d" / "display-manager"
-                    if dm_script.exists() and srv in ["lightdm", "sddm", "gdm", "xdm", "lxdm"]:
+                    if dm_script.exists() and srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                         target_srv = "display-manager"
                         if self.chroot.mode != "mock":
                             conf_d = self.target_root / "etc" / "conf.d" / "display-manager"
                             conf_d.parent.mkdir(parents=True, exist_ok=True)
                             conf_d.write_text(f'DISPLAYMANAGER="{srv}"\n')
-                            
-                            # Configure Autologin for the Live User
-                            live_user_cfg = self.config.get("live_user", {})
-                            if isinstance(live_user_cfg, dict):
-                                username = live_user_cfg.get("username", "live")
-                            else:
-                                username = str(live_user_cfg) if live_user_cfg else "live"
-
-                            session = self.config.get("desktop_environment", {}).get("name", "xfce")
-                            if srv == "lightdm":
-                                lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
-                                if lconf.exists():
-                                    content = lconf.read_text()
-                                    lines = [line for line in content.splitlines() if not line.startswith("autologin-user=")]
-                                    clean_content = "\n".join(lines)
-                                    autologin_block = (
-                                        f"\n\n[Seat:*]\n"
-                                        f"autologin-user={username}\n"
-                                        f"autologin-user-timeout=0\n"
-                                        f"autologin-session={session}\n"
-                                        f"user-session={session}\n"
-                                        f"pam-service=lightdm-autologin\n"
-                                        f"pam-autologin-service=lightdm-autologin\n"
-                                    )
-                                    lconf.write_text(clean_content + autologin_block)
-                            elif srv == "sddm":
-                                sddm_dir = self.target_root / "etc" / "sddm.conf.d"
-                                sddm_dir.mkdir(parents=True, exist_ok=True)
-                                sddm_conf = sddm_dir / "autologin.conf"
-                                sddm_conf.write_text(f"[Autologin]\nUser={username}\nSession={session}\n")
-                            elif srv == "gdm":
-                                gdm_conf = self.target_root / "etc" / "gdm" / "custom.conf"
-                                gdm_conf.parent.mkdir(parents=True, exist_ok=True)
-                                gdm_conf.write_text(f"[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin={username}\n")
+                            self.configure_autologin(srv, username, session)
+                    elif srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
+                        self.configure_autologin(srv, username, session)
                     else:
                         logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
                         continue
@@ -161,6 +129,55 @@ class SystemCustomizer:
                 self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/")
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
+
+    def configure_autologin(self, dm: str, username: str, session: str):
+        """Configures automatic login for LightDM, SDDM, GDM, LXDM, and TTY1 console."""
+        if self.chroot.mode == "mock":
+            return
+
+        logger.info(f"Configuring autologin for display manager '{dm}' (user: {username}, session: {session})...")
+
+        if dm == "lightdm":
+            lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
+            if lconf.exists():
+                content = lconf.read_text()
+                lines = [line for line in content.splitlines() if not line.startswith("autologin-user=")]
+                clean_content = "\n".join(lines)
+                autologin_block = (
+                    f"\n\n[Seat:*]\n"
+                    f"autologin-user={username}\n"
+                    f"autologin-user-timeout=0\n"
+                    f"autologin-session={session}\n"
+                    f"user-session={session}\n"
+                    f"pam-service=lightdm-autologin\n"
+                    f"pam-autologin-service=lightdm-autologin\n"
+                )
+                lconf.write_text(clean_content + autologin_block)
+
+        elif dm == "sddm":
+            sddm_dir = self.target_root / "etc" / "sddm.conf.d"
+            sddm_dir.mkdir(parents=True, exist_ok=True)
+            sddm_conf = sddm_dir / "autologin.conf"
+            sddm_conf.write_text(f"[Autologin]\nUser={username}\nSession={session}\n")
+
+        elif dm in ["gdm", "gdm3"]:
+            gdm_conf = self.target_root / "etc" / "gdm" / "custom.conf"
+            gdm_conf.parent.mkdir(parents=True, exist_ok=True)
+            gdm_conf.write_text(f"[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin={username}\n")
+
+        elif dm == "lxdm":
+            lxdm_conf = self.target_root / "etc" / "lxdm" / "lxdm.conf"
+            if lxdm_conf.exists():
+                content = lxdm_conf.read_text()
+                lines = []
+                for line in content.splitlines():
+                    if line.startswith("autologin="):
+                        lines.append(f"autologin={username}")
+                    elif line.startswith("session="):
+                        lines.append(f"session=/usr/bin/{session}")
+                    else:
+                        lines.append(line)
+                lxdm_conf.write_text("\n".join(lines))
 
     def copy_custom_files(self):
         """Copies structured files from configs/custom_files/ into the chroot as specified in configs."""
