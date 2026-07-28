@@ -89,6 +89,8 @@ class PortageManager:
                     "dev-python/markupsafe python_targets_python3_13\n"
                     "sys-kernel/gentoo-kernel-bin -doc -man\n"
                     "sys-kernel/installkernel -doc -man\n"
+                    "# PulseAudio ALSA plugin required by xfce4-pulseaudio-plugin\n"
+                    "media-plugins/alsa-plugins pulseaudio\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
