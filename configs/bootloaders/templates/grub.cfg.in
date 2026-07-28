@@ -2,8 +2,11 @@ set default=0
 set timeout=15
 set timeout_style=menu
 
-# Search for ISO root volume first so root points to the ISO drive
-search --no-floppy --set=root -l @@VOL_ID@@
+# Search for ISO root volume by file /LiveOS/squashfs.img, fallback to volume label
+search --no-floppy --set=root -f /LiveOS/squashfs.img
+if [ -z "$root" ]; then
+    search --no-floppy --set=root -l @@VOL_ID@@
+fi
 
 if [ -e "${prefix}/${grub_cpu}-${grub_platform}/all_video.mod" ]; then
 	insmod all_video
@@ -34,6 +37,7 @@ fi
 play 600 988 1 1319 4
 
 menuentry '@@BOOT_TITLE@@ @@DESKTOP@@ (Kernel @@KERNVER@@ @@ARCH@@)' --class gnu-linux --class os {
+    search --no-floppy --set=root -f /LiveOS/squashfs.img
     linux /boot/vmlinuz root=live:CDLABEL=@@VOL_ID@@ rd.live.image rd.overlay=1 init=/sbin/init ro loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ console=tty1 quiet splash plymouth.theme=gentoo-modern @@BOOT_CMDLINE@@
     initrd /boot/initramfs
 }

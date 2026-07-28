@@ -360,15 +360,27 @@ class ISOEngine:
         bootx64 = efi_tmp / "BOOTX64.EFI"
 
         if self.toolchain and getattr(self.toolchain, "is_mounted", False):
-            self.toolchain.run_in_build_host(
-                "grub-mkstandalone --format=x86_64-efi --output=/workdir/tmp_efi/BOOTX64.EFI boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg"
+            cmd_str = (
+                "grub-mkstandalone --format=x86_64-efi --output=/workdir/tmp_efi/BOOTX64.EFI "
+                "boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg "
+                "boot/grub/fonts/unicode.pf2=/workdir/iso_root/boot/grub/fonts/unicode.pf2 "
+                "boot/grub/themes/modern/theme.txt=/workdir/iso_root/boot/grub/themes/modern/theme.txt "
+                "boot/grub/themes/modern/background.png=/workdir/iso_root/boot/grub/themes/modern/background.png"
             )
+            self.toolchain.run_in_build_host(cmd_str)
         elif shutil.which("grub-mkstandalone"):
             grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
-            subprocess.run([
-                "grub-mkstandalone", "--format=x86_64-efi",
-                f"-o={bootx64}", f"boot/grub/grub.cfg={grub_cfg}"
-            ], capture_output=True)
+            font_file = self.iso_dir / "boot" / "grub" / "fonts" / "unicode.pf2"
+            theme_txt = self.iso_dir / "boot" / "grub" / "themes" / "modern" / "theme.txt"
+            theme_bg = self.iso_dir / "boot" / "grub" / "themes" / "modern" / "background.png"
+            mk_args = ["grub-mkstandalone", "--format=x86_64-efi", f"-o={bootx64}", f"boot/grub/grub.cfg={grub_cfg}"]
+            if font_file.exists():
+                mk_args.append(f"boot/grub/fonts/unicode.pf2={font_file}")
+            if theme_txt.exists():
+                mk_args.append(f"boot/grub/themes/modern/theme.txt={theme_txt}")
+            if theme_bg.exists():
+                mk_args.append(f"boot/grub/themes/modern/background.png={theme_bg}")
+            subprocess.run(mk_args, capture_output=True)
 
         if bootx64.exists():
             # 1. Copy BOOTX64.EFI and grub.cfg directly to /EFI/BOOT/ in iso_root
