@@ -18,9 +18,21 @@ class SystemCustomizer:
 
     def setup_live_users(self):
         live_user_cfg = self.config.get("live_user", {})
-        username = live_user_cfg.get("username", "live")
-        password = live_user_cfg.get("password", "live")
-        groups = live_user_cfg.get("groups", ["wheel", "audio", "video", "input", "plugdev"])
+        if isinstance(live_user_cfg, dict):
+            username = live_user_cfg.get("username", "live")
+            password = live_user_cfg.get("password", "live")
+            groups = live_user_cfg.get("groups", ["wheel", "audio", "video", "input", "plugdev"])
+        else:
+            username = str(live_user_cfg) if live_user_cfg else "live"
+            password = "live"
+            groups = ["wheel", "audio", "video", "input", "plugdev"]
+
+        # Ensure autologin, nopasswdlogin, render, and lightdm groups exist
+        for g in ["autologin", "nopasswdlogin", "render", "lightdm"]:
+            self.chroot.run_in_chroot(f"groupadd -f {g}")
+            if g not in groups and g != "lightdm":
+                groups.append(g)
+
         groups_str = ",".join(groups)
 
         logger.info(f"Setting up live user '{username}' (password: '{password}') and root (password: 'root')...")
@@ -30,8 +42,7 @@ class SystemCustomizer:
             return
 
         self.chroot.run_in_chroot(f"groupadd -f {username}")
-        user_cmd = f"useradd -m -g {username} -G {groups_str} -s /bin/bash {username}"
-        self.chroot.run_in_chroot(user_cmd)
+        self.chroot.run_in_chroot(f"useradd -m -g {username} -G {groups_str} -s /bin/bash {username} 2>/dev/null || usermod -aG {groups_str} {username}")
 
         # Set live user password
         if password:
@@ -41,9 +52,20 @@ class SystemCustomizer:
         self.chroot.run_in_chroot("sh -c \"echo 'root:root' | chpasswd\"")
 
         # Fix authentication files permissions and ownership so login/PAM works properly
-        self.chroot.run_in_chroot("chown 0:0 /etc/passwd /etc/shadow /etc/group /etc/gshadow")
+        self.chroot.run_in_chroot("chown 0:0 /etc/passwd /etc/group")
+        self.chroot.run_in_chroot("chown 0:shadow /etc/shadow /etc/gshadow 2>/dev/null || chown 0:0 /etc/shadow /etc/gshadow")
         self.chroot.run_in_chroot("chmod 0644 /etc/passwd /etc/group")
-        self.chroot.run_in_chroot("chmod 0600 /etc/shadow /etc/gshadow")
+        self.chroot.run_in_chroot("chmod 0640 /etc/shadow /etc/gshadow")
+
+        # Ensure SUID binaries (unix_chkpwd, sudo, su) have correct permissions for PAM authentication
+        self.chroot.run_in_chroot("chmod 4755 /sbin/unix_chkpwd /usr/sbin/unix_chkpwd /usr/bin/sudo /bin/su /usr/bin/su 2>/dev/null || true")
+
+        # Ensure user home directory permissions
+        self.chroot.run_in_chroot(f"chown -R {username}:{username} /home/{username}")
+
+        # Ensure LightDM system directories belong to lightdm user
+        self.chroot.run_in_chroot("mkdir -p /var/lib/lightdm /var/log/lightdm /run/lightdm")
+        self.chroot.run_in_chroot("chown -R lightdm:lightdm /var/lib/lightdm /var/log/lightdm /run/lightdm 2>/dev/null || true")
 
         sudoers_file = self.target_root / "etc" / "sudoers.d" / "live_user"
         sudoers_file.parent.mkdir(parents=True, exist_ok=True)
@@ -77,15 +99,29 @@ class SystemCustomizer:
                             conf_d.write_text(f'DISPLAYMANAGER="{srv}"\n')
                             
                             # Configure Autologin for the Live User
-                            username = self.config.get("live_user", "live")
-                            session = self.config.get("desktop_environment", {}).get("name", "")
+                            live_user_cfg = self.config.get("live_user", {})
+                            if isinstance(live_user_cfg, dict):
+                                username = live_user_cfg.get("username", "live")
+                            else:
+                                username = str(live_user_cfg) if live_user_cfg else "live"
+
+                            session = self.config.get("desktop_environment", {}).get("name", "xfce")
                             if srv == "lightdm":
                                 lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
                                 if lconf.exists():
-                                    with open(lconf, "a") as f:
-                                        f.write(f"\n[Seat:*]\nautologin-user={username}\nautologin-user-timeout=0\n")
-                                        if session:
-                                            f.write(f"user-session={session}\n")
+                                    content = lconf.read_text()
+                                    lines = [line for line in content.splitlines() if not line.startswith("autologin-user=")]
+                                    clean_content = "\n".join(lines)
+                                    autologin_block = (
+                                        f"\n\n[Seat:*]\n"
+                                        f"autologin-user={username}\n"
+                                        f"autologin-user-timeout=0\n"
+                                        f"autologin-session={session}\n"
+                                        f"user-session={session}\n"
+                                        f"pam-service=lightdm-autologin\n"
+                                        f"pam-autologin-service=lightdm-autologin\n"
+                                    )
+                                    lconf.write_text(clean_content + autologin_block)
                             elif srv == "sddm":
                                 sddm_dir = self.target_root / "etc" / "sddm.conf.d"
                                 sddm_dir.mkdir(parents=True, exist_ok=True)
