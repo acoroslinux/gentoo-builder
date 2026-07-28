@@ -7,7 +7,7 @@
     "gui-libs/wlroots",
     "x11-libs/libxkbcommon",
     "x11-base/xwayland",
-    "app-misc/wayland-utils"
+    "gui-apps/wayland-utils"
   ],
   "use_flags": [
     "wayland",
