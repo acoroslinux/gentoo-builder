@@ -87,9 +87,23 @@ class SystemCustomizer:
             if self.init_system == "systemd":
                 self.chroot.run_in_chroot(f"systemctl enable {srv}")
             elif self.init_system == "openrc":
-                init_script = self.target_root / "etc" / "init.d" / srv
-                target_srv = srv
-                if not init_script.exists():
+                service_aliases = {
+                    "cups": ["cupsd", "cups"],
+                    "cupsd": ["cupsd", "cups"],
+                    "samba": ["samba", "smbd"],
+                    "lvm": ["lvm", "device-mapper"],
+                    "nfs": ["nfs", "nfsmount"],
+                    "cronie": ["cronie", "cron", "vixie-cron"],
+                    "lm_sensors": ["lm_sensors", "sensord"]
+                }
+                candidates = service_aliases.get(srv, [srv])
+                target_srv = None
+                for cand in candidates:
+                    if (self.target_root / "etc" / "init.d" / cand).exists():
+                        target_srv = cand
+                        break
+
+                if not target_srv:
                     dm_script = self.target_root / "etc" / "init.d" / "display-manager"
                     if dm_script.exists() and srv in ["lightdm", "sddm", "gdm", "xdm", "lxdm"]:
                         target_srv = "display-manager"
@@ -127,8 +141,8 @@ class SystemCustomizer:
                                 sddm_dir.mkdir(parents=True, exist_ok=True)
                                 sddm_conf = sddm_dir / "autologin.conf"
                                 sddm_conf.write_text(f"[Autologin]\nUser={username}\nSession={session}\n")
-                    elif srv in ["lightdm", "sddm", "gdm", "xdm", "lxdm"]:
-                        logger.warning(f"Init script for {srv} not found; skipping service enable.")
+                    else:
+                        logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
                         continue
                 self.chroot.run_in_chroot(f"rc-update add {target_srv} default")
             elif self.init_system == "runit":

@@ -13,5 +13,9 @@
     "sys-fs/ntfs3g",
     "sys-fs/f2fs-tools",
     "sys-fs/squashfs-tools"
+  ],
+  "services": [
+    "lvm"
   ]
+}
 }

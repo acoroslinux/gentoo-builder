@@ -12,5 +12,9 @@
     "client",
     "server",
     "nfs"
+  ],
+  "services": [
+    "samba",
+    "nfs"
   ]
 }

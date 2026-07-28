@@ -11,5 +11,9 @@
   "use_flags": [
     "cups",
     "usb"
+  ],
+  "services": [
+    "cupsd",
+    "cups"
   ]
 }
