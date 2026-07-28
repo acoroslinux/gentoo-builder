@@ -271,7 +271,7 @@ class BuildOrchestrator:
                         try:
                             chroot.run_in_chroot(
                                 f'dracut --force --no-hostonly --xz '
-                                f'--add "dmsquash-live dmsquash-live-autooverlay pollcdrom" '
+                                f'--add "dmsquash-live pollcdrom" '
                                 f'--add-drivers "squashfs loop overlay ext3 ext4 iso9660 vfat" '
                                 f'/boot/initramfs-{kver}.img {kver}',
                                 check=False
