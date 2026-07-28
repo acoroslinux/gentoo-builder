@@ -106,6 +106,20 @@ class ISOEngine:
             except OSError as e:
                 logger.warning(f"Could not copy GRUB theme to ISO root: {e}")
 
+        # Copy GRUB unicode font into iso_root/boot/grub/fonts/unicode.pf2
+        font_paths = [
+            self.target_root / "usr" / "share" / "grub" / "unicode.pf2",
+            self.workdir / "build_host" / "usr" / "share" / "grub" / "unicode.pf2",
+            Path("/usr/share/grub/unicode.pf2")
+        ]
+        iso_fonts_dir = self.iso_dir / "boot" / "grub" / "fonts"
+        iso_fonts_dir.mkdir(parents=True, exist_ok=True)
+        for font_path in font_paths:
+            if font_path.exists():
+                shutil.copy2(font_path, iso_fonts_dir / "unicode.pf2")
+                logger.info(f"Copied GRUB font {font_path} -> {iso_fonts_dir / 'unicode.pf2'}")
+                break
+
         splash_src = resolve_from_project("configs/custom_files/grub/modern/background.png")
         if splash_src.exists():
             isolinux_target = self.iso_dir / "isolinux"

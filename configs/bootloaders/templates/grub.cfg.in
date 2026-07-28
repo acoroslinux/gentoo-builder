@@ -2,6 +2,9 @@ set default=0
 set timeout=15
 set timeout_style=menu
 
+# Search for ISO root volume first so root points to the ISO drive
+search --no-floppy --set=root -l @@VOL_ID@@
+
 if [ -e "${prefix}/${grub_cpu}-${grub_platform}/all_video.mod" ]; then
 	insmod all_video
 else
@@ -19,15 +22,18 @@ insmod fat
 insmod iso9660
 insmod ext2
 
-set theme=/boot/grub/themes/modern/theme.txt
-terminal_input console
-terminal_output gfxterm
+# Load unicode font & modern dark theme
+if loadfont /boot/grub/fonts/unicode.pf2 ; then
+    set gfxmode=auto
+    insmod gfxterm
+    set theme=/boot/grub/themes/modern/theme.txt
+    terminal_output gfxterm
+fi
 
 # Audio accessibility tune
 play 600 988 1 1319 4
 
 menuentry '@@BOOT_TITLE@@ @@DESKTOP@@ (Kernel @@KERNVER@@ @@ARCH@@)' --class gnu-linux --class os {
-    search --no-floppy --set=root -l @@VOL_ID@@
     linux /boot/vmlinuz root=live:CDLABEL=@@VOL_ID@@ rd.live.image rd.overlay=1 init=/sbin/init ro loglevel=4 vconsole.unicode=1 vconsole.keymap=@@KEYMAP@@ locale.LANG=@@LOCALE@@ console=tty1 quiet splash plymouth.theme=gentoo-modern @@BOOT_CMDLINE@@
     initrd /boot/initramfs
 }
