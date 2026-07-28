@@ -22,7 +22,7 @@
     "sys-apps/pciutils",
     "sys-apps/ripgrep",
     "sys-apps/usbutils",
-    "sys-arch/p7zip",
+    "app-arch/7zip",
     "sys-power/cpupower",
     "sys-power/upower",
     "sys-process/htop",
