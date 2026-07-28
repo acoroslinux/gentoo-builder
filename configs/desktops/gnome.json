@@ -15,7 +15,8 @@
     "introspection",
     "policykit",
     "opengl",
-    "egl"
+    "egl",
+    "libei"
   ],
   "desktop_environment": {
     "name": "gnome",
