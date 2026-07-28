@@ -110,10 +110,11 @@ class ToolchainManager:
 
         grub_bin = self.build_host_dir / "usr" / "bin" / "grub-mkrescue"
         mtools_bin = self.build_host_dir / "usr" / "bin" / "mformat"
-        if not grub_bin.exists() or not mtools_bin.exists():
-            logger.info("Installing isolated ISO build tools (sys-boot/grub, sys-fs/mtools, dev-libs/libisoburn, sys-fs/squashfs-tools) inside build_host...")
+        syslinux_bin = self.build_host_dir / "usr" / "bin" / "syslinux"
+        if not grub_bin.exists() or not mtools_bin.exists() or not syslinux_bin.exists():
+            logger.info("Installing isolated ISO build tools (sys-boot/grub, sys-boot/syslinux, sys-fs/mtools, dev-libs/libisoburn, sys-fs/squashfs-tools) inside build_host...")
             self.run_in_build_host("emerge-webrsync")
-            self.run_in_build_host("emerge --ask=n --noreplace sys-boot/grub sys-fs/mtools dev-libs/libisoburn sys-fs/squashfs-tools")
+            self.run_in_build_host("emerge --ask=n --noreplace sys-boot/grub sys-boot/syslinux sys-fs/mtools dev-libs/libisoburn sys-fs/squashfs-tools")
 
     def mount_virtual_fs(self):
         if self.mode == "mock":

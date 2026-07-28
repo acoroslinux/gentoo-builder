@@ -357,13 +357,44 @@ class ISOEngine:
             ], capture_output=True)
 
         if bootx64.exists():
+            # 1. Copy BOOTX64.EFI and grub.cfg directly to /EFI/BOOT/ in iso_root
+            # This allows direct UEFI filesystem booting on VirtualBox/QEMU/hardware
+            iso_efi_dir = self.iso_dir / "EFI" / "BOOT"
+            iso_efi_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(bootx64, iso_efi_dir / "BOOTX64.EFI")
+
+            grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
+            if grub_cfg.exists():
+                shutil.copy2(grub_cfg, iso_efi_dir / "grub.cfg")
+
+            # 2. Package BOOTX64.EFI into El Torito FAT image (efiboot.img)
             subprocess.run(["truncate", "-s", "32M", str(efiboot_img)], check=True)
-            if shutil.which("mformat") and shutil.which("mcopy"):
+
+            packed = False
+            if self.toolchain and getattr(self.toolchain, "is_mounted", False):
+                res = self.toolchain.run_in_build_host(
+                    "mformat -i /workdir/iso_root/boot/grub/efiboot.img -h 32 -t 32 -n 64 -c 1 :: && "
+                    "mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI && "
+                    "mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI/BOOT && "
+                    "mcopy -i /workdir/iso_root/boot/grub/efiboot.img /workdir/tmp_efi/BOOTX64.EFI ::/EFI/BOOT/BOOTX64.EFI"
+                )
+                if res.returncode == 0:
+                    packed = True
+                    logger.info(f"Successfully packaged BOOTX64.EFI into {efiboot_img} via isolated toolchain mtools")
+
+            if not packed and shutil.which("mformat") and shutil.which("mcopy"):
                 subprocess.run(["mformat", "-i", str(efiboot_img), "-h", "32", "-t", "32", "-n", "64", "-c", "1", "::"], check=True, capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI"], capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI/BOOT"], capture_output=True)
                 subprocess.run(["mcopy", "-i", str(efiboot_img), str(bootx64), "::/EFI/BOOT/BOOTX64.EFI"], check=True, capture_output=True)
-                logger.info(f"Successfully packaged BOOTX64.EFI into {efiboot_img} via mtools")
+                packed = True
+                logger.info(f"Successfully packaged BOOTX64.EFI into {efiboot_img} via host mtools")
+
+            if not packed:
+                mkfs_fat = shutil.which("mkfs.vfat") or shutil.which("mkfs.fat")
+                if mkfs_fat:
+                    subprocess.run([mkfs_fat, str(efiboot_img)], capture_output=True)
+                    logger.info(f"Formatted FAT image {efiboot_img} with {mkfs_fat}")
 
         shutil.rmtree(efi_tmp, ignore_errors=True)
 
@@ -458,6 +489,8 @@ class ISOEngine:
                 isohdpfx_paths = [
                     self.target_root / "usr" / "share" / "syslinux" / "isohdpfx.bin",
                     self.target_root / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
+                    self.workdir / "build_host" / "usr" / "share" / "syslinux" / "isohdpfx.bin",
+                    self.workdir / "build_host" / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
                     Path("/usr/share/syslinux/isohdpfx.bin"),
                     Path("/usr/lib/syslinux/bios/isohdpfx.bin")
                 ]
