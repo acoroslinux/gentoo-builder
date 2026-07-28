@@ -24,9 +24,7 @@
     "sys-apps/usbutils",
     "app-arch/7zip",
     "sys-power/cpupower",
-    "sys-power/upower",
-    "sys-process/htop",
-    "sys-process/lsof"
+    "sys-power/upower"
   ],
   "services": [
     "lm_sensors",

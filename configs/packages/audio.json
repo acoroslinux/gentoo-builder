@@ -3,11 +3,10 @@
   "description": "Complete audio stack: PipeWire/PulseAudio, ALSA, mixers and music players",
   "packages": [
     "media-sound/alsa-utils",
-    "media-sound/alsamixer-app",
     "media-sound/pavucontrol",
     "media-sound/pulseaudio-daemon",
-    "media-sound/pipewire",
-    "media-sound/wireplumber",
+    "media-video/pipewire",
+    "media-video/wireplumber",
     "media-sound/rhythmbox",
     "media-sound/deadbeef",
     "media-sound/qmmp",
