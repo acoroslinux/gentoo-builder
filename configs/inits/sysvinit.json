@@ -1,18 +1,15 @@
 {
-  "init_system": "s6",
+  "init_system": "sysvinit",
   "stage3": {
     "url": "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
   },
   "packages": [
-    "sys-apps/s6",
-    "sys-apps/s6-rc",
-    "sys-apps/s6-linux-init",
+    "sys-apps/sysvinit",
     "sys-auth/elogind"
   ],
   "use_flags": [
     "elogind",
-    "-sysvinit",
-    "s6"
+    "sysvinit"
   ],
-  "extra_bootargs": "init=/bin/s6-linux-init"
+  "extra_bootargs": "init=/sbin/init"
 }
