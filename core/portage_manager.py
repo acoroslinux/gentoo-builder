@@ -28,7 +28,7 @@ class PortageManager:
         cpu_count = os.cpu_count() or 2
         makeopts = f"-j{cpu_count}"
         load_avg = str(cpu_count)
-        emerge_opts = f"--jobs={max(1, cpu_count // 2)} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y"
+        emerge_opts = f"--jobs={max(1, cpu_count // 2)} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
 
         # Allow explicit override from config if provided
         cflags = make_conf_data.get("CFLAGS", "-O2 -pipe -march=x86-64")
