@@ -222,7 +222,7 @@ class ISOEngine:
             "-processors", str(cpu_cores),
             "-progress",
             "-wildcards",
-            "-e", "boot/*", "proc/*", "sys/*", "dev/*", "run/*", "var/tmp/portage/*", "tmp/*", "var/tmp/*", "var/log/portage/*", "root/.cache/*"
+            "-e", "proc/*", "sys/*", "dev/*", "run/*", "var/tmp/portage/*", "tmp/*", "var/tmp/*", "var/log/portage/*", "root/.cache/*"
         ]
         res = subprocess.run(cmd)
         if res.returncode != 0:
