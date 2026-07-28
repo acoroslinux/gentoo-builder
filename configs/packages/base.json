@@ -21,7 +21,7 @@
     "app-shells/zsh",
     "app-shells/zsh-completions",
     "app-text/tree",
-    "app-text/less",
+    "sys-apps/less",
     "net-misc/curl",
     "net-misc/wget",
     "sys-apps/bat",
