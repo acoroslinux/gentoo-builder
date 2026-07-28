@@ -1,15 +1,32 @@
 {
   "name": "office",
-  "description": "Office suites, document viewers, and desktop publishing packages",
+  "description": "Office suites, document viewers, PDF tools and desktop publishing",
   "packages": [
     "app-office/libreoffice-bin",
     "app-text/evince",
+    "app-text/okular",
     "app-office/abiword",
     "app-office/gnumeric",
-    "app-office/scribus"
+    "app-office/scribus",
+    "app-text/mupdf",
+    "app-text/ghostscript-gpl",
+    "app-text/poppler",
+    "app-text/aspell",
+    "app-dicts/aspell-en",
+    "app-dicts/aspell-pt",
+    "app-office/calcurse",
+    "app-office/gnome-calendar"
   ],
   "use_flags": [
     "pdf",
-    "cups"
+    "cups",
+    "spell",
+    "odf",
+    "xml",
+    "gtk",
+    "java"
+  ],
+  "package_use": [
+    "app-office/libreoffice-bin java cups"
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "name": "science",
+  "description": "Scientific computing, mathematics, data analysis and research tools",
+  "packages": [
+    "sci-mathematics/octave",
+    "sci-mathematics/maxima",
+    "sci-visualization/gnuplot",
+    "dev-python/numpy",
+    "dev-python/scipy",
+    "dev-python/matplotlib",
+    "dev-python/pandas",
+    "dev-python/jupyter",
+    "sci-misc/root",
+    "app-text/texlive",
+    "dev-tex/latexmk",
+    "app-text/jabref",
+    "sci-physics/openmx"
+  ],
+  "use_flags": [
+    "python",
+    "lapack",
+    "openmp",
+    "hdf5",
+    "netcdf",
+    "fftw",
+    "readline"
+  ]
+}

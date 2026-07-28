@@ -1,15 +1,37 @@
 {
   "name": "development",
-  "description": "Software development compilers, toolchains, VCS, and runtimes",
+  "description": "Core software development: compilers, interpreters, VCS and build systems",
   "packages": [
     "dev-vcs/git",
+    "dev-vcs/git-lfs",
+    "dev-vcs/mercurial",
     "dev-build/cmake",
+    "dev-build/ninja",
+    "dev-build/make",
+    "dev-build/autoconf",
+    "dev-build/automake",
+    "dev-build/libtool",
+    "dev-build/meson",
+    "dev-lang/python",
+    "dev-lang/ruby",
+    "dev-lang/go",
+    "dev-lang/rust",
     "net-libs/nodejs",
-    "dev-lang/python"
+    "sys-devel/gcc",
+    "sys-devel/gdb",
+    "sys-devel/llvm",
+    "sys-devel/clang",
+    "dev-util/pkgconf",
+    "dev-util/strace",
+    "dev-util/valgrind",
+    "dev-util/perf"
   ],
   "use_flags": [
     "git",
     "python",
-    "nodejs"
+    "nodejs",
+    "debugger",
+    "threads",
+    "openmp"
   ]
 }

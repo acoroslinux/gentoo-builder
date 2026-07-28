@@ -1,12 +1,40 @@
 {
+  "name": "system-utils",
+  "description": "System monitoring, hardware info, power management, and administration utilities",
   "packages": [
-    "app-editors/neovim",
-    "app-shells/zsh",
     "app-admin/htop",
+    "app-admin/iotop",
+    "app-admin/sysstat",
+    "app-editors/neovim",
+    "app-editors/nano",
+    "app-misc/neofetch",
+    "app-shells/zsh",
+    "app-shells/zsh-completions",
+    "app-text/tree",
     "net-misc/curl",
     "net-misc/wget",
-    "sys-apps/ripgrep",
+    "sys-apps/bat",
     "sys-apps/fd",
-    "app-arch/p7zip"
+    "sys-apps/hwinfo",
+    "sys-apps/inxi",
+    "sys-apps/lm-sensors",
+    "sys-apps/lsof",
+    "sys-apps/pciutils",
+    "sys-apps/ripgrep",
+    "sys-apps/usbutils",
+    "sys-arch/p7zip",
+    "sys-power/cpupower",
+    "sys-power/upower",
+    "sys-process/htop",
+    "sys-process/lsof"
+  ],
+  "services": [
+    "lm_sensors",
+    "upower"
+  ],
+  "use_flags": [
+    "ncurses",
+    "python",
+    "perl"
   ]
 }

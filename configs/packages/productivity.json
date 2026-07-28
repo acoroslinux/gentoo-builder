@@ -1,14 +1,25 @@
 {
   "name": "productivity",
-  "description": "Productivity, note-taking, document conversion, and scheduling packages",
+  "description": "Productivity tools: note-taking, calendars, task managers, document conversion and finance",
   "packages": [
     "app-text/cherrytree",
+    "app-text/obsidian",
     "app-text/pandoc",
-    "app-office/gnucash"
+    "app-office/gnucash",
+    "app-office/calcurse",
+    "app-misc/recoll",
+    "app-text/hunspell",
+    "app-dicts/hunspell-en",
+    "app-dicts/hunspell-pt",
+    "app-misc/remind",
+    "dev-python/reportlab",
+    "app-office/homebank"
   ],
   "use_flags": [
     "sqlite",
     "xml",
-    "finance"
+    "pdf",
+    "spell",
+    "gtk"
   ]
 }

@@ -1,12 +1,38 @@
 {
   "name": "gaming",
-  "description": "Gaming runtime, compatibility layers, and packages",
+  "description": "Gaming platform, compatibility layers, performance tools and emulators",
   "packages": [
-    "app-emulation/wine-vanilla",
-    "games-util/lutris"
+    "app-emulation/wine-staging",
+    "app-emulation/winetricks",
+    "games-util/lutris",
+    "games-util/gamemode",
+    "games-util/mangohud",
+    "games-emulation/retroarch",
+    "app-emulation/dosbox-staging",
+    "media-libs/vulkan-loader",
+    "media-libs/mesa",
+    "dev-util/vulkan-tools",
+    "sys-apps/gamemode",
+    "games-util/steam-launcher"
   ],
   "use_flags": [
     "vulkan",
-    "opengl"
+    "opengl",
+    "gamepad",
+    "joystick",
+    "sdl",
+    "openal",
+    "alsa",
+    "pulseaudio",
+    "pipewire",
+    "wine",
+    "d3d9",
+    "d3d11",
+    "staging"
+  ],
+  "package_use": [
+    "app-emulation/wine-staging alsa pulseaudio opengl vulkan d3d9 sdl faudio",
+    "media-libs/mesa vulkan vaapi vdpau opencl llvm",
+    "games-util/retroarch alsa pulseaudio opengl vulkan cheevos"
   ]
 }

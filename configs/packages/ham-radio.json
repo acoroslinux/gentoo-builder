@@ -1,0 +1,23 @@
+{
+  "name": "ham-radio",
+  "description": "Amateur radio, SDR, digital modes and satellite tracking tools",
+  "packages": [
+    "net-wireless/wsjtx",
+    "net-wireless/fldigi",
+    "net-wireless/hamlib",
+    "net-wireless/gpredict",
+    "net-wireless/direwolf",
+    "media-radio/gnuradio",
+    "net-wireless/rtl-sdr",
+    "net-wireless/sdrpp",
+    "net-wireless/chirp"
+  ],
+  "use_flags": [
+    "hamlib",
+    "alsa",
+    "pulseaudio",
+    "opengl",
+    "python",
+    "usb"
+  ]
+}

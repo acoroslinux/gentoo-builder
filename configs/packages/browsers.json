@@ -1,10 +1,24 @@
 {
   "name": "browsers",
-  "description": "Popular web browsers",
+  "description": "Web browsers — mainstream and privacy-focused alternatives",
   "packages": [
-    "www-client/firefox-bin"
+    "www-client/firefox-bin",
+    "www-client/chromium",
+    "www-client/falkon",
+    "www-client/lynx",
+    "www-client/w3m"
   ],
   "use_flags": [
-    "hwaccel"
+    "hwaccel",
+    "vaapi",
+    "pulseaudio",
+    "alsa",
+    "dbus",
+    "gtk",
+    "spell"
+  ],
+  "package_use": [
+    "www-client/firefox-bin pulseaudio wayland hwaccel",
+    "www-client/chromium pulseaudio vaapi hangouts"
   ]
 }

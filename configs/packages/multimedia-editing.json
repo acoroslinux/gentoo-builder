@@ -1,14 +1,40 @@
 {
   "name": "multimedia-editing",
-  "description": "Audio, video, and streaming production packages (OBS, Audacity, Kdenlive)",
+  "description": "Professional audio, video editing and streaming production (OBS, Audacity, Kdenlive, Blender)",
   "packages": [
     "media-video/obs-studio",
     "media-sound/audacity",
-    "media-video/kdenlive"
+    "media-video/kdenlive",
+    "media-gfx/blender",
+    "media-video/handbrake",
+    "media-sound/mhwaveedit",
+    "media-video/avidemux",
+    "media-libs/libmediaart",
+    "media-libs/faad2",
+    "media-libs/faac",
+    "media-libs/lame",
+    "media-libs/opus",
+    "media-sound/ladspa-sdk",
+    "media-plugins/gst-plugins-lame"
   ],
   "use_flags": [
     "ffmpeg",
     "alsa",
-    "pulseaudio"
+    "pulseaudio",
+    "pipewire",
+    "vaapi",
+    "opengl",
+    "vulkan",
+    "cuda",
+    "jack",
+    "ladspa",
+    "v4l",
+    "mp3"
+  ],
+  "package_use": [
+    "media-video/obs-studio alsa pulseaudio pipewire v4l vaapi nvenc",
+    "media-sound/audacity alsa ladspa ffmpeg",
+    "media-video/kdenlive ffmpeg sdl",
+    "media-gfx/blender cuda openmp opengl"
   ]
 }

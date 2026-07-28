@@ -1,16 +1,47 @@
 {
   "name": "multimedia",
-  "description": "Multimedia codecs and playback applications",
+  "description": "Multimedia codecs, video/audio playback and streaming — common in all desktop distros",
   "packages": [
     "media-video/mpv",
     "media-video/vlc",
     "media-libs/ffmpeg",
-    "media-gfx/gimp"
+    "media-libs/libvpx",
+    "media-libs/opus",
+    "media-libs/libtheora",
+    "media-libs/speex",
+    "media-libs/flac",
+    "media-libs/libvorbis",
+    "media-libs/gstreamer",
+    "media-libs/gst-plugins-base",
+    "media-libs/gst-plugins-good",
+    "media-libs/gst-plugins-bad",
+    "media-libs/gst-plugins-ugly",
+    "media-libs/gst-libav",
+    "media-sound/alsa-utils",
+    "media-sound/pavucontrol"
   ],
   "use_flags": [
     "ffmpeg",
-    "mp4",
-    "h264",
-    "aom"
+    "gstreamer",
+    "ogg",
+    "flac",
+    "mp3",
+    "aac",
+    "opus",
+    "vorbis",
+    "theora",
+    "vpx",
+    "x264",
+    "x265",
+    "vaapi",
+    "vdpau",
+    "opengl",
+    "alsa",
+    "pulseaudio"
+  ],
+  "package_use": [
+    "media-libs/ffmpeg mp3 x264 x265 opus vorbis ogg vaapi vdpau",
+    "media-video/vlc mp3 dvd bluray vcd live matroska opus ogg flac alsa pulseaudio vaapi",
+    "media-video/mpv alsa pulseaudio vaapi vdpau opengl"
   ]
 }

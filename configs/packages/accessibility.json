@@ -1,0 +1,26 @@
+{
+  "name": "accessibility",
+  "description": "Screen readers, magnifiers, on-screen keyboard and accessibility tools",
+  "packages": [
+    "app-accessibility/orca",
+    "app-accessibility/espeak-ng",
+    "app-accessibility/at-spi2-core",
+    "app-accessibility/brltty",
+    "app-accessibility/xdotool",
+    "x11-misc/onboard",
+    "x11-misc/kmag",
+    "app-accessibility/festival",
+    "app-accessibility/speech-dispatcher"
+  ],
+  "services": [
+    "brltty",
+    "speech-dispatcher"
+  ],
+  "use_flags": [
+    "accessibility",
+    "a11y",
+    "atspi",
+    "braille",
+    "espeak"
+  ]
+}

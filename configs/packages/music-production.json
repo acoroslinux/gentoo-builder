@@ -1,0 +1,39 @@
+{
+  "name": "music-production",
+  "description": "Digital Audio Workstation (DAW), synthesizers, MIDI tools and music notation",
+  "packages": [
+    "media-sound/ardour",
+    "media-sound/lmms",
+    "media-sound/hydrogen",
+    "media-sound/rosegarden",
+    "media-sound/musescore",
+    "media-sound/muse-sequencer",
+    "media-sound/jack2",
+    "media-sound/qjackctl",
+    "media-sound/carla",
+    "media-sound/ladspa-sdk",
+    "media-sound/lv2",
+    "media-libs/lv2",
+    "media-plugins/caps-audio-plugin",
+    "media-sound/fluidsynth",
+    "media-sound/a2jmidid"
+  ],
+  "services": [
+    "jack"
+  ],
+  "use_flags": [
+    "alsa",
+    "jack",
+    "ladspa",
+    "lv2",
+    "midi",
+    "vst",
+    "dssi",
+    "pulseaudio",
+    "opengl"
+  ],
+  "package_use": [
+    "media-sound/ardour jack lv2 ladspa vst midi opengl",
+    "media-sound/jack2 alsa dbus"
+  ]
+}

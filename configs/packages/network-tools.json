@@ -1,15 +1,29 @@
 {
   "name": "network-tools",
-  "description": "Network utilities, diagnostics, and VPN support packages",
+  "description": "Network diagnostics, monitoring, VPN clients and bandwidth tools",
   "packages": [
     "net-analyzer/nmap",
+    "net-analyzer/netcat",
+    "net-analyzer/tcpdump",
+    "net-analyzer/iftop",
+    "net-analyzer/nethogs",
+    "net-analyzer/bmon",
     "net-dns/bind-tools",
     "net-misc/traceroute",
+    "net-misc/mtr",
+    "net-misc/iperf",
+    "net-misc/rsync",
+    "net-misc/whois",
+    "net-misc/socat",
     "net-vpn/openvpn",
-    "net-vpn/wireguard-tools"
+    "net-vpn/wireguard-tools",
+    "net-libs/libssh2",
+    "net-misc/openssh"
   ],
   "use_flags": [
     "iproute2",
-    "openssl"
+    "openssl",
+    "ipv6",
+    "ssh"
   ]
 }

@@ -1,13 +1,36 @@
 {
   "name": "security",
-  "description": "Firewalls, security tools, password managers, and backup utilities",
+  "description": "Firewalls, VPN, encryption, password managers, audit and backup tools",
   "packages": [
     "net-firewall/ufw",
+    "net-firewall/nftables",
+    "net-firewall/iptables",
     "app-admin/keepassxc",
     "app-backup/timeshift",
-    "app-crypt/gnupg"
+    "app-backup/rsync",
+    "app-backup/borgbackup",
+    "app-crypt/gnupg",
+    "app-crypt/pinentry",
+    "app-crypt/veracrypt",
+    "net-vpn/openvpn",
+    "net-vpn/wireguard-tools",
+    "net-vpn/networkmanager-openvpn",
+    "net-analyzer/wireshark",
+    "net-analyzer/nmap",
+    "sys-apps/apparmor",
+    "app-forensics/lynis"
+  ],
+  "services": [
+    "ufw",
+    "nftables",
+    "apparmor"
   ],
   "use_flags": [
-    "gpg"
+    "gpg",
+    "ssl",
+    "openssl",
+    "nls",
+    "pam",
+    "caps"
   ]
 }

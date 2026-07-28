@@ -1,16 +1,33 @@
 {
   "name": "desktop-apps",
-  "description": "Common lightweight desktop applications (File Manager, Terminal, Text Editor, Calculator)",
+  "description": "Common desktop applications: file manager, terminal, text editor, image viewer, calculator and archiver",
   "packages": [
     "x11-misc/pcmanfm",
     "x11-terms/alacritty",
+    "x11-terms/xterm",
+    "x11-terms/kitty",
     "app-editors/mousepad",
+    "app-editors/gedit",
     "sci-calculators/galculator",
     "app-arch/file-roller",
-    "media-gfx/scrot"
+    "app-arch/engrampa",
+    "media-gfx/viewnior",
+    "media-gfx/feh",
+    "media-gfx/eog",
+    "app-text/evince",
+    "media-gfx/scrot",
+    "media-gfx/flameshot",
+    "x11-misc/xclip",
+    "x11-misc/xdotool",
+    "x11-misc/rofi",
+    "x11-misc/dunst",
+    "app-misc/nemo"
   ],
   "use_flags": [
     "gtk",
-    "desktop"
+    "desktop",
+    "nls",
+    "dbus",
+    "libnotify"
   ]
 }

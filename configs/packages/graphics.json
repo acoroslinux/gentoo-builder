@@ -1,14 +1,38 @@
 {
   "name": "graphics",
-  "description": "Image viewers, vector design, and raster graphics editor packages",
+  "description": "Image viewing, raster and vector graphics editing, screenshot and color management tools",
   "packages": [
     "media-gfx/gimp",
     "media-gfx/inkscape",
-    "media-gfx/viewnior"
+    "media-gfx/viewnior",
+    "media-gfx/eog",
+    "media-gfx/feh",
+    "media-gfx/imagemagick",
+    "media-gfx/optipng",
+    "media-gfx/pngcrush",
+    "media-gfx/scrot",
+    "media-gfx/flameshot",
+    "media-gfx/darktable",
+    "media-gfx/rawtherapee",
+    "x11-misc/xdg-utils",
+    "app-text/ghostscript-gpl"
   ],
   "use_flags": [
     "png",
     "jpeg",
-    "svg"
+    "svg",
+    "tiff",
+    "webp",
+    "raw",
+    "exif",
+    "heif",
+    "opengl",
+    "gtk",
+    "lcms"
+  ],
+  "package_use": [
+    "media-gfx/gimp jpeg png tiff exif lcms webp heif",
+    "media-gfx/inkscape svg png jpeg openmp",
+    "media-gfx/darktable rawspeed opencl openmp colord"
   ]
 }

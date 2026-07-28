@@ -1,17 +1,42 @@
 {
   "name": "audio",
-  "description": "Audio stack (PipeWire, PulseAudio and ALSA support)",
+  "description": "Complete audio stack: PipeWire/PulseAudio, ALSA, mixers and music players",
   "packages": [
-    "media-video/pipewire",
-    "media-session/wireplumber",
-    "media-sound/pulseaudio",
     "media-sound/alsa-utils",
-    "media-sound/pavucontrol"
+    "media-sound/alsamixer-app",
+    "media-sound/pavucontrol",
+    "media-sound/pulseaudio-daemon",
+    "media-sound/pipewire",
+    "media-sound/wireplumber",
+    "media-sound/rhythmbox",
+    "media-sound/deadbeef",
+    "media-sound/qmmp",
+    "media-sound/mp3gain",
+    "media-sound/sox",
+    "media-libs/alsa-lib",
+    "media-libs/alsa-plugins",
+    "media-plugins/alsa-plugins"
+  ],
+  "services": [
+    "alsasound",
+    "pipewire",
+    "wireplumber"
   ],
   "use_flags": [
-    "sound",
     "alsa",
     "pulseaudio",
-    "pipewire"
+    "pipewire",
+    "sound",
+    "bluetooth",
+    "jack",
+    "ogg",
+    "flac",
+    "mp3",
+    "aac"
+  ],
+  "package_use": [
+    "media-plugins/alsa-plugins pulseaudio",
+    "media-sound/pulseaudio-daemon alsa bluetooth",
+    "media-sound/pipewire alsa bluetooth jack sound-server"
   ]
 }
