@@ -271,3 +271,57 @@ class SystemCustomizer:
                 if not linux_symlink.exists() and not linux_symlink.is_symlink():
                     logger.info(f"Creating /usr/src/linux symlink -> {latest_kernel_dir.name}")
                     linux_symlink.symlink_to(latest_kernel_dir.name)
+
+        # Enforce exact Gentoo system permissions for PAM, shadow, sudoers, and SUID binaries
+        self.fix_system_permissions()
+
+    def fix_system_permissions(self):
+        """Enforces correct permissions and ownership for PAM, shadow, sudoers, SUID binaries, and system directories."""
+        if self.chroot.mode == "mock":
+            return
+
+        logger.info("Enforcing system-wide permissions for PAM, shadow, sudoers, and SUID binaries...")
+
+        username = self.config.get("live_user", {}).get("username", "live") if isinstance(self.config.get("live_user"), dict) else "live"
+
+        # 1. System Auth & Shadow File Permissions
+        self.chroot.run_in_chroot("chown 0:0 /etc/passwd /etc/group /etc/passwd- /etc/group- 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0644 /etc/passwd /etc/group")
+        self.chroot.run_in_chroot("chown 0:shadow /etc/shadow /etc/gshadow 2>/dev/null || chown 0:0 /etc/shadow /etc/gshadow")
+        self.chroot.run_in_chroot("chmod 0640 /etc/shadow /etc/gshadow")
+
+        # 2. PAM Config Files
+        self.chroot.run_in_chroot("chown -R 0:0 /etc/pam.d 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0755 /etc/pam.d")
+        self.chroot.run_in_chroot("chmod 0644 /etc/pam.d/* 2>/dev/null || true")
+
+        # 3. SUID Executables for PAM, sudo, su, and polkit
+        suid_binaries = [
+            "/sbin/unix_chkpwd",
+            "/usr/sbin/unix_chkpwd",
+            "/usr/bin/sudo",
+            "/bin/su",
+            "/usr/bin/su",
+            "/usr/bin/pkexec",
+            "/usr/lib/polkit-1/polkit-agent-helper-1",
+            "/usr/libexec/polkit-agent-helper-1"
+        ]
+        for sbin in suid_binaries:
+            self.chroot.run_in_chroot(f"chmod 4755 {sbin} 2>/dev/null || true")
+
+        # 4. Sudoers permissions
+        self.chroot.run_in_chroot("chown -R 0:0 /etc/sudoers /etc/sudoers.d 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0440 /etc/sudoers 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0750 /etc/sudoers.d 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0440 /etc/sudoers.d/* 2>/dev/null || true")
+
+        # 5. Temporary Directories Sticky Bits
+        self.chroot.run_in_chroot("chmod 1777 /tmp /var/tmp /dev/shm 2>/dev/null || true")
+
+        # 6. LightDM & Display Manager directories
+        self.chroot.run_in_chroot("mkdir -p /var/lib/lightdm /var/log/lightdm /run/lightdm")
+        self.chroot.run_in_chroot("chown -R lightdm:lightdm /var/lib/lightdm /var/log/lightdm /run/lightdm 2>/dev/null || true")
+        self.chroot.run_in_chroot("chmod 0750 /var/lib/lightdm /var/log/lightdm 2>/dev/null || true")
+
+        # 7. User Home Directory Ownership
+        self.chroot.run_in_chroot(f"chown -R {username}:{username} /home/{username} 2>/dev/null || true")
