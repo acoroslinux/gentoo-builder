@@ -25,7 +25,8 @@
     "cairo",
     "theora",
     "ogg",
-    "vorbis"
+    "vorbis",
+    "eds"
   ],
   "desktop_environment": {
     "name": "gnome",

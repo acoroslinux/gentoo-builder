@@ -104,6 +104,7 @@ class PortageManager:
                     "app-text/poppler cairo\n"
                     "media-libs/gst-plugins-base ogg pango theora vorbis\n"
                     "media-libs/libmediaart gtk -qt5 -qt6\n"
+                    "dev-libs/folks eds\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
