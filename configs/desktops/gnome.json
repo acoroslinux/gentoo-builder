@@ -16,7 +16,8 @@
     "policykit",
     "opengl",
     "egl",
-    "libei"
+    "libei",
+    "client"
   ],
   "desktop_environment": {
     "name": "gnome",
