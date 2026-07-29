@@ -24,11 +24,26 @@ class PortageManager:
         make_conf_data = self.config.get("make_conf", {})
         use_flags = self.config.get("use_flags", [])
 
-        # Detect host CPU cores dynamically for maximum build performance
+        # Detect host CPU cores and RAM dynamically for safe, maximum build performance
         cpu_count = os.cpu_count() or 2
         makeopts = f"-j{cpu_count}"
         load_avg = str(cpu_count)
-        emerge_opts = f"--jobs={max(1, cpu_count // 2)} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
+
+        mem_total_gb = 32
+        if os.path.exists("/proc/meminfo"):
+            try:
+                with open("/proc/meminfo", "r") as f:
+                    for line in f:
+                        if line.startswith("MemTotal:"):
+                            mem_kb = int(line.split()[1])
+                            mem_total_gb = max(4, mem_kb // (1024 * 1024))
+                            break
+            except Exception:
+                pass
+
+        # Limit emerge --jobs so that heavy C++/Rust builds never exhaust RAM (~4GB RAM per job, capped at 6)
+        safe_jobs = max(1, min(cpu_count // 2, mem_total_gb // 4, 6))
+        emerge_opts = f"--jobs={safe_jobs} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
 
         # Allow explicit override from config if provided
         cflags = make_conf_data.get("CFLAGS", "-O2 -pipe -march=x86-64")
@@ -41,7 +56,7 @@ class PortageManager:
             'CXXFLAGS="${COMMON_FLAGS}"',
             'FCFLAGS="${COMMON_FLAGS}"',
             'FFLAGS="${COMMON_FLAGS}"',
-            f'MAKEOPTS="{makeopts_val}"',
+            'MAKEOPTS="' + makeopts_val + '"',
             'ACCEPT_KEYWORDS="' + make_conf_data.get("ACCEPT_KEYWORDS", "~amd64") + '"',
             'ACCEPT_LICENSE="' + make_conf_data.get("ACCEPT_LICENSE", "*") + '"',
             'USE="' + " ".join(use_flags) + '"',
@@ -60,7 +75,7 @@ class PortageManager:
         if self.chroot.mode == "mock":
             logger.info(f"[MOCK PORTAGE] Writing hardware-optimized make.conf to {make_conf_path} (MAKEOPTS={makeopts_val})")
         else:
-            logger.info(f"[PORTAGE] Configured make.conf with hardware optimization: MAKEOPTS={makeopts_val}, EMERGE_DEFAULT_OPTS='--jobs={max(1, cpu_count // 2)} --load-average={load_avg}'")
+            logger.info(f"[PORTAGE] Configured make.conf with hardware optimization: MAKEOPTS={makeopts_val}, EMERGE_DEFAULT_OPTS='--jobs={safe_jobs} --load-average={load_avg}'")
             with open(make_conf_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines) + "\n")
 
