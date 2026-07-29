@@ -91,11 +91,12 @@ class PortageManager:
                     "sys-kernel/installkernel -doc -man\n"
                     "# PulseAudio ALSA plugin required by xfce4-pulseaudio-plugin\n"
                     "media-plugins/alsa-plugins pulseaudio\n"
-                    "# GNOME Mutter & Wayland & Samba & libcanberra requirements\n"
+                    "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 requirements\n"
                     "x11-base/xwayland libei\n"
                     "x11-wm/mutter wayland\n"
                     "net-fs/samba client\n"
                     "media-libs/libcanberra pulseaudio sound\n"
+                    "net-libs/ngtcp2 gnutls\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called

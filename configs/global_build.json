@@ -33,6 +33,7 @@
     "jpeg",
     "svg",
     "ssl",
+    "gnutls",
     "curl",
     "zstd",
     "lz4",
@@ -51,6 +52,8 @@
     "net-misc/dhcpcd",
     "net-misc/networkmanager",
     "sys-apps/util-linux",
+    "sys-fs/lvm2",
+    "sys-fs/cryptsetup",
     "sys-kernel/gentoo-kernel-bin"
   ],
   "services": [
