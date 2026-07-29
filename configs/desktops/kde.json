@@ -3,7 +3,7 @@
     "kde-plasma/plasma-meta",
     "kde-apps/konsole",
     "kde-apps/dolphin",
-    "gui-libs/sddm"
+    "x11-misc/sddm"
   ],
   "services": [
     "sddm"
@@ -12,11 +12,13 @@
     "X",
     "plasma",
     "wayland",
-    "qt5",
     "qt6",
     "kde",
     "policykit",
     "udisks",
+    "pam",
+    "networkmanager",
+    "screencast",
     "opengl",
     "egl"
   ],
