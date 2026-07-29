@@ -133,6 +133,26 @@ class PortageManager:
                     "media-libs/phonon gstreamer\n"
                 )
 
+            # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
+            # to restrict compilation threads for memory-heavy packages (nodejs, rust, webkit-gtk, gcc, spidermonkey)
+            env_dir = self.target_root / "etc" / "portage" / "env"
+            env_dir.mkdir(parents=True, exist_ok=True)
+            with open(env_dir / "low-ram.conf", "w", encoding="utf-8") as f:
+                f.write('MAKEOPTS="-j8"\n')
+
+            package_env_dir = self.target_root / "etc" / "portage" / "package.env"
+            package_env_dir.mkdir(parents=True, exist_ok=True)
+            with open(package_env_dir / "00-builder-ram-limits", "w", encoding="utf-8") as f:
+                f.write(
+                    "net-libs/nodejs low-ram.conf\n"
+                    "net-libs/webkit-gtk low-ram.conf\n"
+                    "dev-lang/spidermonkey low-ram.conf\n"
+                    "dev-lang/rust low-ram.conf\n"
+                    "dev-lang/rust-bin low-ram.conf\n"
+                    "sys-devel/gcc low-ram.conf\n"
+                    "dev-db/sqlite low-ram.conf\n"
+                )
+
             # dracut.conf.d is written here for reference but MUST also be called
             # explicitly via setup_dracut_livecd_conf() BEFORE the kernel is installed.
             self.setup_dracut_livecd_conf()
