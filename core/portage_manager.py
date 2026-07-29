@@ -91,7 +91,7 @@ class PortageManager:
                     "sys-kernel/installkernel -doc -man\n"
                     "# PulseAudio ALSA plugin required by xfce4-pulseaudio-plugin\n"
                     "media-plugins/alsa-plugins pulseaudio\n"
-                    "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 & spice-gtk & networkmanager & freerdp requirements\n"
+                    "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 & spice-gtk & networkmanager & freerdp & curl requirements\n"
                     "x11-base/xwayland libei\n"
                     "x11-wm/mutter wayland\n"
                     "net-fs/samba client\n"
@@ -100,6 +100,7 @@ class PortageManager:
                     "net-misc/spice-gtk vala gtk3 introspection\n"
                     "net-misc/networkmanager gnutls -nss\n"
                     "net-misc/freerdp server\n"
+                    "net-misc/curl openssl -gnutls -quic\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
