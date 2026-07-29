@@ -139,12 +139,14 @@ class PortageManager:
             env_dir.mkdir(parents=True, exist_ok=True)
             with open(env_dir / "low-ram.conf", "w", encoding="utf-8") as f:
                 f.write('MAKEOPTS="-j8"\n')
+            with open(env_dir / "low-ram-node.conf", "w", encoding="utf-8") as f:
+                f.write('MAKEOPTS="-j4"\n')
 
             package_env_dir = self.target_root / "etc" / "portage" / "package.env"
             package_env_dir.mkdir(parents=True, exist_ok=True)
             with open(package_env_dir / "00-builder-ram-limits", "w", encoding="utf-8") as f:
                 f.write(
-                    "net-libs/nodejs low-ram.conf\n"
+                    "net-libs/nodejs low-ram-node.conf\n"
                     "net-libs/webkit-gtk low-ram.conf\n"
                     "dev-lang/spidermonkey low-ram.conf\n"
                     "dev-lang/rust low-ram.conf\n"
