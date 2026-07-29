@@ -41,17 +41,17 @@ class PortageManager:
             except Exception:
                 pass
 
-        # Calculate conservative parallel emerge jobs and MAKEOPTS to guarantee RAM safety
-        # Rule of thumb for RAM safety: ~8GB RAM per parallel emerge job (capped at 3 jobs max)
-        safe_jobs = max(1, min(cpu_count // 4, mem_total_gb // 8, 3))
+        # Calculate balanced parallel emerge jobs and MAKEOPTS for maximum performance without OOM
+        # Memory-heavy packages (nodejs, webkit-gtk, rust, gcc, spidermonkey) are individually throttled via package.env
+        safe_jobs = max(1, min(cpu_count // 3, mem_total_gb // 6, 4))
         
-        # Limit per-job compile threads if RAM is 32GB or less to prevent C++/Rust memory spikes
+        # Standard packages use up to -j20 threads, heavy packages use -j4/-j8 via package.env
         if mem_total_gb <= 32:
-            safe_makeopts = f"-j{min(cpu_count, 14)}"
+            safe_makeopts = f"-j{min(cpu_count, 20)}"
         else:
             safe_makeopts = f"-j{cpu_count}"
 
-        load_avg = str(min(cpu_count, 20))
+        load_avg = str(min(cpu_count, 24))
         emerge_opts = f"--jobs={safe_jobs} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
 
         # Allow explicit override from config if provided
