@@ -22,7 +22,10 @@
     "vala",
     "server",
     "screencast",
-    "cairo"
+    "cairo",
+    "theora",
+    "ogg",
+    "vorbis"
   ],
   "desktop_environment": {
     "name": "gnome",

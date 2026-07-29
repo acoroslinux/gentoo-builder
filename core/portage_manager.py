@@ -102,6 +102,7 @@ class PortageManager:
                     "net-misc/freerdp server\n"
                     "net-misc/curl openssl -gnutls ssl curl_ssl_openssl -curl_ssl_gnutls -http3 -quic\n"
                     "app-text/poppler cairo\n"
+                    "media-libs/gst-plugins-base ogg pango theora vorbis\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
