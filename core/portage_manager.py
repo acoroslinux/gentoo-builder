@@ -147,7 +147,7 @@ class PortageManager:
             with open(package_env_dir / "00-builder-ram-limits", "w", encoding="utf-8") as f:
                 f.write(
                     "net-libs/nodejs low-ram-node.conf\n"
-                    "net-libs/webkit-gtk low-ram.conf\n"
+                    "net-libs/webkit-gtk low-ram-node.conf\n"
                     "dev-lang/spidermonkey low-ram.conf\n"
                     "dev-lang/rust low-ram.conf\n"
                     "dev-lang/rust-bin low-ram.conf\n"
