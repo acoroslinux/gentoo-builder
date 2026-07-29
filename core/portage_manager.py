@@ -103,6 +103,7 @@ class PortageManager:
                     "net-misc/curl openssl -gnutls ssl curl_ssl_openssl -curl_ssl_gnutls -http3 -quic\n"
                     "app-text/poppler cairo\n"
                     "media-libs/gst-plugins-base ogg pango theora vorbis\n"
+                    "media-libs/libmediaart gtk -qt5 -qt6\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
