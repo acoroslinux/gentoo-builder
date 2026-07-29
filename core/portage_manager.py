@@ -93,7 +93,7 @@ class PortageManager:
                     "media-plugins/alsa-plugins pulseaudio\n"
                     "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 & spice-gtk & networkmanager & freerdp & curl requirements\n"
                     "x11-base/xwayland libei\n"
-                    "x11-wm/mutter wayland\n"
+                    "x11-wm/mutter wayland screencast\n"
                     "net-fs/samba client\n"
                     "media-libs/libcanberra pulseaudio sound\n"
                     "net-libs/ngtcp2 gnutls\n"

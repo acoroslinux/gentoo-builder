@@ -20,7 +20,8 @@
     "client",
     "pulseaudio",
     "vala",
-    "server"
+    "server",
+    "screencast"
   ],
   "desktop_environment": {
     "name": "gnome",
