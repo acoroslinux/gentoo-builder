@@ -18,7 +18,8 @@
     "egl",
     "libei",
     "client",
-    "pulseaudio"
+    "pulseaudio",
+    "vala"
   ],
   "desktop_environment": {
     "name": "gnome",
