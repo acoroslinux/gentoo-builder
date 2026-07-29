@@ -21,7 +21,8 @@
     "pulseaudio",
     "vala",
     "server",
-    "screencast"
+    "screencast",
+    "cairo"
   ],
   "desktop_environment": {
     "name": "gnome",

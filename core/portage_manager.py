@@ -101,6 +101,7 @@ class PortageManager:
                     "net-misc/networkmanager gnutls -nss\n"
                     "net-misc/freerdp server\n"
                     "net-misc/curl openssl -gnutls ssl curl_ssl_openssl -curl_ssl_gnutls -http3 -quic\n"
+                    "app-text/poppler cairo\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
