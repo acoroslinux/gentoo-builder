@@ -100,7 +100,7 @@ class PortageManager:
                     "net-misc/spice-gtk vala gtk3 introspection\n"
                     "net-misc/networkmanager gnutls -nss\n"
                     "net-misc/freerdp server\n"
-                    "net-misc/curl openssl -gnutls -quic\n"
+                    "net-misc/curl openssl -gnutls ssl curl_ssl_openssl -curl_ssl_gnutls -http3 -quic\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
