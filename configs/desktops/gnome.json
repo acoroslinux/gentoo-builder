@@ -19,7 +19,8 @@
     "libei",
     "client",
     "pulseaudio",
-    "vala"
+    "vala",
+    "server"
   ],
   "desktop_environment": {
     "name": "gnome",

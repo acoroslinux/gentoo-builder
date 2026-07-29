@@ -91,7 +91,7 @@ class PortageManager:
                     "sys-kernel/installkernel -doc -man\n"
                     "# PulseAudio ALSA plugin required by xfce4-pulseaudio-plugin\n"
                     "media-plugins/alsa-plugins pulseaudio\n"
-                    "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 & spice-gtk & networkmanager requirements\n"
+                    "# GNOME Mutter & Wayland & Samba & libcanberra & ngtcp2 & spice-gtk & networkmanager & freerdp requirements\n"
                     "x11-base/xwayland libei\n"
                     "x11-wm/mutter wayland\n"
                     "net-fs/samba client\n"
@@ -99,6 +99,7 @@ class PortageManager:
                     "net-libs/ngtcp2 gnutls\n"
                     "net-misc/spice-gtk vala gtk3 introspection\n"
                     "net-misc/networkmanager gnutls -nss\n"
+                    "net-misc/freerdp server\n"
                 )
 
             # dracut.conf.d is written here for reference but MUST also be called
@@ -166,7 +167,10 @@ class PortageManager:
         repo_name_file.write_text("local_repo\n")
 
         layout_conf = local_repo_dir / "metadata" / "layout.conf"
-        layout_conf.write_text("masters = gentoo\nauto-sync = no\n")
+        layout_conf.write_text(
+            "masters = gentoo\n"
+            "thin-manifests = true\n"
+        )
 
         local_repo_conf = repos_conf_dir / "local_repo.conf"
         local_repo_conf.write_text(
@@ -203,7 +207,7 @@ class PortageManager:
         self.chroot.run_in_chroot("ldconfig")
         self.chroot.run_in_chroot("env-update")
         self.chroot.run_in_chroot(["emerge", "--ask=n", "--autounmask-write=y", "--autounmask-continue=y", "@preserved-rebuild"])
-        cmd = ["emerge", "--ask=n", "--noreplace", "--verbose", "--autounmask-write=y", "--autounmask-continue=y"] + packages
+        cmd = ["emerge", "--ask=n", "--noreplace", "--update", "--deep", "--newuse", "--verbose", "--autounmask-write=y", "--autounmask-continue=y"] + packages
         res = self.chroot.run_in_chroot(cmd)
         if res.returncode != 0 and self.chroot.mode == "real":
             raise PortageManagerError(f"Failed to install packages via emerge:\n{res.stderr}")
