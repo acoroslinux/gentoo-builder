@@ -28,6 +28,7 @@
     "cups",
     "avif",
     "vulkan",
+    "minizip",
     "opengl",
     "egl"
   ],
