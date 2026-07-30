@@ -204,6 +204,16 @@ class PortageManager:
         """Update Gentoo world set non-interactively (--ask=n)."""
         logger.info("Updating base packages and slot dependencies (emerge --ask=n --update --deep --newuse @world)...")
         self.chroot.run_in_chroot("env-update")
+
+        # Resolve init system package conflicts (sysvinit vs s6-linux-init vs systemd)
+        init_sys = self.config.get("init_system", "openrc")
+        if init_sys == "s6":
+            self.chroot.run_in_chroot("emerge --deselect sys-apps/sysvinit 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge -C sys-apps/sysvinit 2>/dev/null || true")
+        elif init_sys == "sysvinit":
+            self.chroot.run_in_chroot("emerge --deselect sys-apps/s6-linux-init sys-apps/s6-rc sys-apps/s6 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge -C sys-apps/s6-linux-init sys-apps/s6-rc sys-apps/s6 2>/dev/null || true")
+
         res = self.chroot.run_in_chroot(["emerge", "--ask=n", "--update", "--deep", "--newuse", "--with-bdeps=y", "--backtrack=30", "--autounmask-write=y", "--autounmask-continue=y", "@world"])
         if res.returncode != 0 and self.chroot.mode == "real":
             logger.warning(f"emerge @world returned warnings: {res.stderr}")
