@@ -1,7 +1,8 @@
 {
   "packages": [
     "gnome-base/gnome",
-    "gnome-extra/gnome-tweaks"
+    "gnome-extra/gnome-tweaks",
+    "gnome-extra/gnome-backgrounds"
   ],
   "services": [
     "gdm"

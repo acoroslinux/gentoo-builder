@@ -37,6 +37,10 @@
       "destination": "/etc/sddm.conf.d"
     },
     {
+      "source": "dconf",
+      "destination": "/etc/dconf"
+    },
+    {
       "source": "etc/os-release",
       "destination": "/etc/os-release"
     },
