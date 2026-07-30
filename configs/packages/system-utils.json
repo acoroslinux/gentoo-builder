@@ -8,6 +8,7 @@
     "app-editors/neovim",
     "app-editors/nano",
     "app-misc/neofetch",
+    "app-misc/fastfetch",
     "app-shells/zsh",
     "app-shells/zsh-completions",
     "app-text/tree",
