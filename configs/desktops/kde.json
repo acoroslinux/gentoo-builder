@@ -27,6 +27,7 @@
     "lock",
     "cups",
     "avif",
+    "vulkan",
     "opengl",
     "egl"
   ],
