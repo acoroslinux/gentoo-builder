@@ -7,6 +7,7 @@
     "kde-apps/gwenview",
     "kde-apps/ark",
     "kde-plasma/spectacle",
+    "kde-plasma/discover",
     "x11-misc/sddm"
   ],
   "services": [
