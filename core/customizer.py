@@ -95,7 +95,7 @@ class SystemCustomizer:
                 self.chroot.run_in_chroot(f"systemctl enable {srv} 2>/dev/null || true")
                 if srv in ["lightdm", "sddm", "gdm", "gdm3", "lxdm"]:
                     self.chroot.run_in_chroot("systemctl set-default graphical.target 2>/dev/null || true")
-            elif self.init_system == "openrc":
+            elif self.init_system in ["openrc", "sysvinit"]:
                 service_aliases = {
                     "cups": ["cupsd", "cups"],
                     "cupsd": ["cupsd", "cups"],
@@ -309,7 +309,7 @@ class SystemCustomizer:
             return
 
         # Hostname
-        if self.init_system == "openrc":
+        if self.init_system in ["openrc", "sysvinit"]:
             hostname_path = self.target_root / "etc" / "conf.d" / "hostname"
             hostname_path.parent.mkdir(parents=True, exist_ok=True)
             hostname_path.write_text('hostname="gentoo-modern-live"\n')
