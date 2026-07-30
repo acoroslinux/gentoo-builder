@@ -88,11 +88,13 @@ class SystemCustomizer:
         session = self.config.get("desktop_environment", {}).get("name", "xfce")
 
         for srv in services:
+            if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
+                self.configure_autologin(srv, username, session)
+
             if self.init_system == "systemd":
                 self.chroot.run_in_chroot(f"systemctl enable {srv} 2>/dev/null || true")
                 if srv in ["lightdm", "sddm", "gdm", "gdm3", "lxdm"]:
                     self.chroot.run_in_chroot("systemctl set-default graphical.target 2>/dev/null || true")
-                    self.configure_autologin(srv, username, session)
             elif self.init_system == "openrc":
                 service_aliases = {
                     "cups": ["cupsd", "cups"],
@@ -110,21 +112,18 @@ class SystemCustomizer:
                         target_srv = cand
                         break
 
-                if not target_srv:
+                if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                     dm_script = self.target_root / "etc" / "init.d" / "display-manager"
-                    if dm_script.exists() and srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
-                        target_srv = "display-manager"
-                        if self.chroot.mode != "mock":
-                            conf_d = self.target_root / "etc" / "conf.d" / "display-manager"
-                            conf_d.parent.mkdir(parents=True, exist_ok=True)
-                            conf_d.write_text(f'DISPLAYMANAGER="{srv}"\n')
-                            self.configure_autologin(srv, username, session)
-                    elif srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
-                        self.configure_autologin(srv, username, session)
-                    else:
-                        logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
-                        continue
-                self.chroot.run_in_chroot(f"rc-update add {target_srv} default")
+                    if dm_script.exists():
+                        conf_d = self.target_root / "etc" / "conf.d" / "display-manager"
+                        conf_d.parent.mkdir(parents=True, exist_ok=True)
+                        conf_d.write_text(f'DISPLAYMANAGER="{srv}"\n')
+                        self.chroot.run_in_chroot("rc-update add display-manager default 2>/dev/null || true")
+
+                if target_srv:
+                    self.chroot.run_in_chroot(f"rc-update add {target_srv} default 2>/dev/null || true")
+                elif srv not in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
+                    logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
             elif self.init_system == "runit":
                 self.chroot.run_in_chroot("mkdir -p /etc/runit/runsvdir/default /var/service 2>/dev/null || true")
                 target_src = None
