@@ -177,7 +177,9 @@ class SystemCustomizer:
                     self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/var/service/{target_name}' 2>/dev/null || true")
                     logger.info(f"Enabled Runit service: {srv} ({target_src})")
             elif self.init_system == "s6":
-                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
+                self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv} 2>/dev/null || true")
+                if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
+                    self.configure_autologin(srv, username, session)
 
     def configure_autologin(self, dm: str, username: str, session: str):
         """Configures automatic login for LightDM, SDDM, GDM, LXDM, and TTY1 console."""

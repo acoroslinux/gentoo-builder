@@ -1,7 +1,10 @@
 {
   "packages": [
     "lxde-base/lxde-meta",
-    "x11-terms/lxterminal"
+    "x11-terms/lxterminal",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter",
+    "x11-fm/pcmanfm"
   ],
   "services": [
     "lightdm"
@@ -9,8 +12,27 @@
   "use_flags": [
     "X",
     "gtk",
+    "gtk3",
     "lxde",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
+    "screencast",
+    "lock",
+    "cups",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "lxde",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/lxde",
+        "destination": "/etc/skel/.config"
+      }
+    ]
+  }
 }
