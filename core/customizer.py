@@ -129,24 +129,53 @@ class SystemCustomizer:
                 elif srv not in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                     logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
             elif self.init_system == "runit":
-                self.chroot.run_in_chroot("mkdir -p /etc/runit/runsvdir/default /var/service 2>/dev/null || true")
-                target_src = None
-                for candidate in [
+                self.chroot.run_in_chroot("mkdir -p /etc/runit/runsvdir/default /var/service /etc/sv /etc/runit/sv 2>/dev/null || true")
+                srv_lower = srv.lower()
+                candidates = [
                     f"/etc/runit/runsvdir/all/{srv}",
+                    f"/etc/runit/runsvdir/all/{srv_lower}",
                     f"/etc/sv/{srv}",
-                    f"/etc/runit/sv/{srv}"
-                ]:
+                    f"/etc/sv/{srv_lower}",
+                    f"/etc/runit/sv/{srv}",
+                    f"/etc/runit/sv/{srv_lower}",
+                    f"/var/service/{srv}",
+                    f"/var/service/{srv_lower}",
+                ]
+                target_src = None
+                for candidate in candidates:
                     if (self.target_root / candidate.lstrip("/")).exists():
                         target_src = candidate
                         break
+
+                # Auto-create minimal valid Runit service script if missing
+                if not target_src:
+                    sv_dir = self.target_root / "etc" / "sv" / srv_lower
+                    sv_dir.mkdir(parents=True, exist_ok=True)
+                    run_script = sv_dir / "run"
+                    
+                    if srv_lower in ["dbus"]:
+                        cmd = "exec dbus-daemon --system --nofork"
+                    elif srv_lower in ["networkmanager"]:
+                        cmd = "exec NetworkManager --no-daemon"
+                    elif srv_lower in ["sddm"]:
+                        cmd = "exec sddm"
+                    elif srv_lower in ["lightdm"]:
+                        cmd = "exec lightdm"
+                    elif srv_lower in ["gdm", "gdm3"]:
+                        cmd = "exec gdm"
+                    else:
+                        cmd = f"exec {srv}"
+                        
+                    run_script.write_text(f"#!/bin/sh\nexec 2>&1\n{cmd}\n")
+                    run_script.chmod(0o755)
+                    target_src = f"/etc/sv/{srv_lower}"
+                    logger.info(f"Auto-created minimal Runit service script for '{srv}' -> {target_src}/run")
+
                 if target_src:
-                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/etc/runit/runsvdir/default/{srv}'")
-                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/var/service/{srv}' 2>/dev/null || true")
+                    target_name = Path(target_src).name
+                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/etc/runit/runsvdir/default/{target_name}'")
+                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/var/service/{target_name}' 2>/dev/null || true")
                     logger.info(f"Enabled Runit service: {srv} ({target_src})")
-                else:
-                    logger.warning(f"Runit service directory for '{srv}' not found; skipping runit service enable.")
-                if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
-                    self.configure_autologin(srv, username, session)
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
