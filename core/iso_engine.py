@@ -279,7 +279,17 @@ class ISOEngine:
         kver = "7.1.5-gentoo-dist-bin"
         boot_dir = self.target_root / "boot"
         if boot_dir.exists():
-            vmlinuz_files = [f.name.replace("vmlinuz-", "") for f in boot_dir.glob("vmlinuz-*") if not f.name.endswith(('.old', '.bak', '.tmp'))]
+            vmlinuz_files = [
+                f.name.replace("vmlinuz-", "").replace("kernel-", "")
+                for f in boot_dir.glob("vmlinuz-*")
+                if not f.name.endswith(('.old', '.bak', '.tmp'))
+            ]
+            if not vmlinuz_files:
+                vmlinuz_files = [
+                    f.name.replace("vmlinuz-", "").replace("kernel-", "")
+                    for f in boot_dir.glob("kernel-*")
+                    if not f.name.endswith(('.old', '.bak', '.tmp'))
+                ]
             if vmlinuz_files:
                 kver = vmlinuz_files[0]
 

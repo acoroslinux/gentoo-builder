@@ -260,13 +260,18 @@ class BuildOrchestrator:
                     boot_dir = self.target_root / "boot"
                     kver = None
                     if boot_dir.exists():
-                        kfiles = sorted(
-                            [f.name.replace("vmlinuz-", "") for f in boot_dir.glob("vmlinuz-*")
-                             if not f.name.endswith(('.old', '.bak', '.tmp'))],
-                            reverse=True
-                        )
+                        kfiles = [
+                            f for f in boot_dir.glob("vmlinuz-*")
+                            if not f.name.endswith(('.old', '.bak', '.tmp'))
+                        ]
+                        if not kfiles:
+                            kfiles = [
+                                f for f in boot_dir.glob("kernel-*")
+                                if not f.name.endswith(('.old', '.bak', '.tmp'))
+                            ]
                         if kfiles:
-                            kver = kfiles[0]
+                            newest_kfile = sorted(kfiles, key=lambda f: f.stat().st_mtime, reverse=True)[0]
+                            kver = newest_kfile.name.replace("vmlinuz-", "").replace("kernel-", "")
 
                     if kver:
                         logger.info(f"Regenerating initramfs for kernel version: {kver}")
