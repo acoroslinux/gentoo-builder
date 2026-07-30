@@ -131,6 +131,7 @@ class PortageManager:
                     "dev-libs/folks eds\n"
                     "kde-frameworks/kimageformats heif avif\n"
                     "media-libs/phonon gstreamer\n"
+                    "kde-frameworks/kconfig qml\n"
                     "dev-qt/qt5compat qml\n"
                     "kde-plasma/kwin lock\n"
                     "dev-util/ostree -dracut\n"
