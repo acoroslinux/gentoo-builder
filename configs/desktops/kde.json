@@ -25,6 +25,7 @@
     "networkmanager",
     "screencast",
     "lock",
+    "cups",
     "opengl",
     "egl"
   ],

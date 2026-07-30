@@ -135,6 +135,7 @@ class PortageManager:
                     "kde-plasma/kwin lock\n"
                     "dev-util/ostree -dracut\n"
                     "media-libs/libheif x265 de265\n"
+                    "dev-qt/qtbase cups\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
