@@ -8,6 +8,8 @@
     "kde-apps/ark",
     "kde-plasma/spectacle",
     "kde-plasma/discover",
+    "kde-plasma/ksystemstats",
+    "kde-plasma/plasma-systemmonitor",
     "x11-misc/sddm"
   ],
   "services": [
