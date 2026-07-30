@@ -1,8 +1,8 @@
 #!/bin/sh
 # Script to dynamically create the "Install System" shortcut on the live user desktop
 
-# Exit immediately if we are not in the live ISO environment
-if [ ! -d /mnt/cdrom ] && [ ! -f /etc/gentoo-release ]; then
+# Exit immediately if we are NOT in a LiveCD environment
+if ! grep -q -E "(rd\.live|root=live|boot=live|livecd)" /proc/cmdline 2>/dev/null; then
     exit 0
 fi
 
