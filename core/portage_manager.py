@@ -136,6 +136,7 @@ class PortageManager:
                     "dev-util/ostree -dracut\n"
                     "media-libs/libheif x265 de265\n"
                     "dev-qt/qtbase cups vulkan\n"
+                    "dev-qt/qtdeclarative vulkan\n"
                     "sys-libs/zlib minizip\n"
                 )
 
