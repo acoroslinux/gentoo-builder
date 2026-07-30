@@ -3,6 +3,10 @@
     "kde-plasma/plasma-meta",
     "kde-apps/konsole",
     "kde-apps/dolphin",
+    "kde-apps/kate",
+    "kde-apps/gwenview",
+    "kde-apps/ark",
+    "kde-apps/spectacle",
     "x11-misc/sddm"
   ],
   "services": [
