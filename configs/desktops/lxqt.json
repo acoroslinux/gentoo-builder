@@ -2,7 +2,7 @@
   "packages": [
     "lxqt-base/lxqt-meta",
     "x11-terms/qterminal",
-    "lxqt-extra/lxqt-archiver",
+    "app-arch/lxqt-archiver",
     "media-gfx/lximage-qt",
     "x11-misc/sddm"
   ],
