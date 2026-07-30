@@ -33,7 +33,7 @@
     "egl"
   ],
   "desktop_environment": {
-    "name": "kde",
+    "name": "plasma",
     "use_common_config": true,
     "customizations_path": "configs/custom_files/",
     "copy_files": [
