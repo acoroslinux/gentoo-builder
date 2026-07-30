@@ -6,7 +6,7 @@
     "kde-apps/kate",
     "kde-apps/gwenview",
     "kde-apps/ark",
-    "kde-apps/spectacle",
+    "kde-plasma/spectacle",
     "x11-misc/sddm"
   ],
   "services": [
