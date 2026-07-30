@@ -129,7 +129,7 @@ class PortageManager:
                     "media-libs/gst-plugins-base ogg pango theora vorbis\n"
                     "media-libs/libmediaart gtk -qt5 -qt6\n"
                     "dev-libs/folks eds\n"
-                    "kde-frameworks/kimageformats heif\n"
+                    "kde-frameworks/kimageformats heif avif\n"
                     "media-libs/phonon gstreamer\n"
                     "dev-qt/qt5compat qml\n"
                     "kde-plasma/kwin lock\n"
