@@ -1,17 +1,37 @@
 {
   "packages": [
     "lxqt-base/lxqt-meta",
-    "x11-terms/qterminal"
+    "x11-terms/qterminal",
+    "lxqt-extra/lxqt-archiver",
+    "media-gfx/lximage-qt",
+    "x11-misc/sddm"
   ],
   "services": [
     "sddm"
   ],
   "use_flags": [
     "X",
-    "qt5",
-    "qt6",
     "lxqt",
+    "qt6",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
+    "screencast",
+    "lock",
+    "cups",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "lxqt",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/lxqt",
+        "destination": "/etc/skel/.config"
+      }
+    ]
+  }
 }
