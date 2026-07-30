@@ -141,6 +141,7 @@ class PortageManager:
                     "dev-qt/qtbase cups vulkan\n"
                     "dev-qt/qtdeclarative vulkan\n"
                     "sys-libs/zlib minizip\n"
+                    "media-gfx/imagemagick svg xml\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
