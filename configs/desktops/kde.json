@@ -13,6 +13,7 @@
     "plasma",
     "wayland",
     "qt6",
+    "qml",
     "kde",
     "policykit",
     "udisks",

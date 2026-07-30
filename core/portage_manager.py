@@ -131,6 +131,7 @@ class PortageManager:
                     "dev-libs/folks eds\n"
                     "kde-frameworks/kimageformats heif\n"
                     "media-libs/phonon gstreamer\n"
+                    "dev-qt/qt5compat qml\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
