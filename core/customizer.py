@@ -126,7 +126,24 @@ class SystemCustomizer:
                         continue
                 self.chroot.run_in_chroot(f"rc-update add {target_srv} default")
             elif self.init_system == "runit":
-                self.chroot.run_in_chroot(f"ln -s /etc/runit/runsvdir/all/{srv} /etc/runit/runsvdir/default/")
+                self.chroot.run_in_chroot("mkdir -p /etc/runit/runsvdir/default /var/service 2>/dev/null || true")
+                target_src = None
+                for candidate in [
+                    f"/etc/runit/runsvdir/all/{srv}",
+                    f"/etc/sv/{srv}",
+                    f"/etc/runit/sv/{srv}"
+                ]:
+                    if (self.target_root / candidate.lstrip("/")).exists():
+                        target_src = candidate
+                        break
+                if target_src:
+                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/etc/runit/runsvdir/default/{srv}'")
+                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/var/service/{srv}' 2>/dev/null || true")
+                    logger.info(f"Enabled Runit service: {srv} ({target_src})")
+                else:
+                    logger.warning(f"Runit service directory for '{srv}' not found; skipping runit service enable.")
+                if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
+                    self.configure_autologin(srv, username, session)
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv}")
 
