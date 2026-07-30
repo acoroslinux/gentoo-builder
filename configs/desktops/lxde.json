@@ -4,7 +4,7 @@
     "x11-terms/lxterminal",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter",
-    "x11-fm/pcmanfm"
+    "x11-misc/pcmanfm"
   ],
   "services": [
     "lightdm"
