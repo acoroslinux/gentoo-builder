@@ -1,7 +1,10 @@
 {
   "packages": [
     "gnome-extra/cinnamon",
-    "x11-terms/gnome-terminal"
+    "gnome-extra/nemo",
+    "x11-terms/gnome-terminal",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
@@ -11,7 +14,26 @@
     "gtk",
     "gtk3",
     "cinnamon",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
+    "screencast",
+    "lock",
+    "cups",
     "opengl",
-    "egl"
-  ]
+    "egl",
+    "introspection"
+  ],
+  "desktop_environment": {
+    "name": "cinnamon",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/cinnamon",
+        "destination": "/etc/skel/.config"
+      }
+    ]
+  }
 }
