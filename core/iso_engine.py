@@ -266,6 +266,7 @@ class ISOEngine:
     def _get_template_placeholders(self) -> dict:
         vol_id = self.config.get("vol_id", "gentoo_modern")
         boot_title = self.config.get("title", "Gentoo Modern")
+        arch = self.workdir.name if self.workdir else "x86_64"
         desktop_raw = self.config.get("desktop") or getattr(self, "desktop", None) or "GNOME"
         desktop = desktop_raw.upper() if isinstance(desktop_raw, str) else "GNOME"
 
