@@ -259,21 +259,23 @@ class BuildOrchestrator:
                     # Sort to always pick the newest if multiple kernels exist
                     boot_dir = self.target_root / "boot"
                     kver = None
+                    kname = None
                     if boot_dir.exists():
                         kfiles = [
                             f for f in boot_dir.glob("vmlinuz-*")
-                            if not f.name.endswith(('.old', '.bak', '.tmp'))
+                            if not f.name.endswith(('.old', '.bak', '.tmp')) and f.exists()
                         ]
                         if not kfiles:
                             kfiles = [
                                 f for f in boot_dir.glob("kernel-*")
-                                if not f.name.endswith(('.old', '.bak', '.tmp'))
+                                if not f.name.endswith(('.old', '.bak', '.tmp')) and f.exists()
                             ]
                         if kfiles:
                             newest_kfile = sorted(kfiles, key=lambda f: f.stat().st_mtime, reverse=True)[0]
-                            kver = newest_kfile.name.replace("vmlinuz-", "").replace("kernel-", "")
+                            kname = newest_kfile.name
+                            kver = kname.replace("vmlinuz-", "").replace("kernel-", "")
 
-                    if kver:
+                    if kver and kname:
                         logger.info(f"Regenerating initramfs for kernel version: {kver}")
                         try:
                             chroot.run_in_chroot(
@@ -290,7 +292,7 @@ class BuildOrchestrator:
                                 check=False
                             )
                             chroot.run_in_chroot(
-                                f'ln -sf vmlinuz-{kver} /boot/vmlinuz',
+                                f'ln -sf {kname} /boot/vmlinuz',
                                 check=False
                             )
                         except Exception as e:

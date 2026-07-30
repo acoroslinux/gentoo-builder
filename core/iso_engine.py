@@ -54,12 +54,12 @@ class ISOEngine:
         if chroot_boot.exists():
             kfiles = [
                 f for f in chroot_boot.glob("vmlinuz*")
-                if not f.name.endswith(('.old', '.bak', '.tmp'))
+                if not f.name.endswith(('.old', '.bak', '.tmp')) and f.name != "vmlinuz" and f.exists()
             ]
             if not kfiles:
                 kfiles = [
                     f for f in chroot_boot.glob("kernel*")
-                    if not f.name.endswith(('.old', '.bak', '.tmp'))
+                    if not f.name.endswith(('.old', '.bak', '.tmp')) and f.name != "vmlinuz" and f.exists()
                 ]
 
             canonical_vmlinuz = chroot_boot / "vmlinuz"
@@ -74,12 +74,12 @@ class ISOEngine:
                 if real_path.exists():
                     kernel_src = real_path
                 else:
-                    logger.warning(f"Symlink /boot/vmlinuz -> {link_target} is broken. Falling back to newest vmlinuz file.")
+                    logger.warning(f"Symlink /boot/vmlinuz -> {link_target} is broken. Falling back to newest kernel file.")
             elif canonical_vmlinuz.is_file():
                 kernel_src = canonical_vmlinuz
 
             if kernel_src is None and kfiles:
-                real_kfiles = [f for f in kfiles if f.is_file() and not f.is_symlink()]
+                real_kfiles = [f for f in kfiles if f.is_file() and not f.is_symlink() and f.exists()]
                 if real_kfiles:
                     kernel_src = max(real_kfiles, key=lambda f: f.stat().st_mtime)
                 else:
