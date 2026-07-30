@@ -236,7 +236,9 @@ class BuildOrchestrator:
                     logger.info(f"Netboot target completed successfully! Output: {output_file}")
                     return output_file
 
-                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=build_config.get("bootloader", {}), mode=self.mode, toolchain=toolchain)
+                bootloader_cfg = build_config.get("bootloader", {})
+                bootloader_cfg["desktop"] = self.desktop or build_config.get("desktop", "GNOME")
+                iso_engine = ISOEngine(self.workdir, self.target_root, self.output_name, config=bootloader_cfg, mode=self.mode, toolchain=toolchain)
 
                 if self.output_format == "stage3":
                     chroot.umount_virtual_fs()
@@ -276,11 +278,14 @@ class BuildOrchestrator:
                                 f'/boot/initramfs-{kver}.img {kver}',
                                 check=False
                             )
-                            # Create a RELATIVE symlink so Python on the HOST can resolve it
+                            # Create RELATIVE symlinks so Python on the HOST can resolve them
                             # correctly without chroot-absolute path confusion.
-                            # ln -sf initramfs-kver.img /boot/initramfs  (relative target)
                             chroot.run_in_chroot(
                                 f'ln -sf initramfs-{kver}.img /boot/initramfs',
+                                check=False
+                            )
+                            chroot.run_in_chroot(
+                                f'ln -sf vmlinuz-{kver} /boot/vmlinuz',
                                 check=False
                             )
                         except Exception as e:

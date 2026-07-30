@@ -50,12 +50,47 @@ class ISOEngine:
         # Copy kernel and initramfs from chroot if available
         chroot_boot = self.target_root / "boot"
         iso_boot = self.iso_dir / "boot"
+        iso_boot.mkdir(parents=True, exist_ok=True)
         if chroot_boot.exists():
-            kfiles = [f for f in chroot_boot.glob("vmlinuz*") if not f.name.endswith(('.old', '.bak', '.tmp'))]
-            if kfiles:
-                newest_kfile = max(kfiles, key=lambda f: f.stat().st_mtime)
-                shutil.copy2(newest_kfile, iso_boot / "vmlinuz")
-                logger.info(f"Copied kernel {newest_kfile.name} -> {iso_boot / 'vmlinuz'}")
+            kfiles = [
+                f for f in chroot_boot.glob("vmlinuz*")
+                if not f.name.endswith(('.old', '.bak', '.tmp'))
+            ]
+            if not kfiles:
+                kfiles = [
+                    f for f in chroot_boot.glob("kernel*")
+                    if not f.name.endswith(('.old', '.bak', '.tmp'))
+                ]
+
+            canonical_vmlinuz = chroot_boot / "vmlinuz"
+            kernel_src = None
+
+            if canonical_vmlinuz.is_symlink():
+                link_target = Path(os.readlink(canonical_vmlinuz))
+                if link_target.is_absolute():
+                    real_path = self.target_root / str(link_target).lstrip("/")
+                else:
+                    real_path = (canonical_vmlinuz.parent / link_target).resolve()
+                if real_path.exists():
+                    kernel_src = real_path
+                else:
+                    logger.warning(f"Symlink /boot/vmlinuz -> {link_target} is broken. Falling back to newest vmlinuz file.")
+            elif canonical_vmlinuz.is_file():
+                kernel_src = canonical_vmlinuz
+
+            if kernel_src is None and kfiles:
+                real_kfiles = [f for f in kfiles if f.is_file() and not f.is_symlink()]
+                if real_kfiles:
+                    kernel_src = max(real_kfiles, key=lambda f: f.stat().st_mtime)
+                else:
+                    kernel_src = max(kfiles, key=lambda f: f.stat().st_mtime)
+
+            if kernel_src and kernel_src.exists():
+                shutil.copyfile(kernel_src, iso_boot / "vmlinuz")
+                shutil.copymode(kernel_src, iso_boot / "vmlinuz")
+                logger.info(f"Copied kernel {kernel_src.name} -> {iso_boot / 'vmlinuz'} ({os.path.getsize(iso_boot / 'vmlinuz')} bytes)")
+            else:
+                logger.error("CRITICAL: No kernel file (vmlinuz) found in chroot /boot — bootloader will fail!")
 
             ifiles = [
                 f for f in chroot_boot.glob("initramfs*")
@@ -231,8 +266,8 @@ class ISOEngine:
     def _get_template_placeholders(self) -> dict:
         vol_id = self.config.get("vol_id", "gentoo_modern")
         boot_title = self.config.get("title", "Gentoo Modern")
-        arch = self.workdir.name if self.workdir else "x86_64"
-        desktop = self.config.get("desktop", "XFCE")
+        desktop_raw = self.config.get("desktop") or getattr(self, "desktop", None) or "GNOME"
+        desktop = desktop_raw.upper() if isinstance(desktop_raw, str) else "GNOME"
 
         # @@BOOT_CMDLINE@@ is for EXTRA args appended AFTER the standard
         # root=live:... rd.live.image ... params already in the template itself.
