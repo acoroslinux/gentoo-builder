@@ -131,6 +131,7 @@ class PortageManager:
                     "dev-libs/folks eds\n"
                     "kde-frameworks/* qml\n"
                     "kde-plasma/* qml\n"
+                    "dev-qt/* qml\n"
                     "kde-frameworks/kimageformats heif avif\n"
                     "media-libs/phonon gstreamer\n"
                     "dev-qt/qt5compat qml\n"
