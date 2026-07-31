@@ -7,8 +7,8 @@
     "gnome-extra/cinnamon-settings-daemon",
     "gnome-extra/nemo",
     "x11-terms/gnome-terminal",
-    "app-editors/xed",
-    "media-gfx/pix",
+    "app-editors/gedit",
+    "media-gfx/eog",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter"
   ],
