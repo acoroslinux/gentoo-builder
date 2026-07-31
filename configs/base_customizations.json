@@ -51,6 +51,10 @@
     {
       "source": "etc/gentoo_modern-release",
       "destination": "/etc/gentoo_modern-release"
+    },
+    {
+      "source": "etc/samba/smb.conf",
+      "destination": "/etc/samba/smb.conf"
     }
   ]
 }
