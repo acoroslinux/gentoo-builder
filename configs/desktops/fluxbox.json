@@ -1,12 +1,34 @@
 {
   "packages": [
     "x11-wm/fluxbox",
-    "x11-terms/xterm"
+    "x11-misc/tint2",
+    "x11-misc/rofi",
+    "x11-terms/alacritty",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
-  "services": [],
+  "services": [
+    "lightdm"
+  ],
   "use_flags": [
     "X",
+    "fluxbox",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "fluxbox",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/fluxbox",
+        "destination": "/etc/skel/.fluxbox"
+      }
+    ]
+  }
 }

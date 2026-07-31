@@ -1,16 +1,33 @@
 {
   "packages": [
     "x11-wm/enlightenment",
-    "x11-terms/terminology"
+    "dev-libs/efl",
+    "x11-terms/terminology",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
   ],
   "use_flags": [
     "X",
-    "wayland",
-    "eet",
+    "enlightenment",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "enlightenment",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/enlightenment",
+        "destination": "/etc/skel/.config/e"
+      }
+    ]
+  }
 }

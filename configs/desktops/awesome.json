@@ -1,8 +1,10 @@
 {
   "packages": [
     "x11-wm/awesome",
+    "x11-terms/alacritty",
     "x11-misc/dmenu",
-    "x11-terms/alacritty"
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
@@ -10,7 +12,23 @@
   "use_flags": [
     "X",
     "lua",
+    "awesome",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "awesome",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/awesome",
+        "destination": "/etc/skel/.config/awesome"
+      }
+    ]
+  }
 }

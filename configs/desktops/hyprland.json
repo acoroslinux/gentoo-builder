@@ -4,7 +4,8 @@
     "gui-apps/waybar",
     "gui-apps/rofi-wayland",
     "gui-apps/kitty",
-    "gui-libs/xdg-desktop-portal-hyprland"
+    "gui-libs/xdg-desktop-portal-hyprland",
+    "x11-misc/sddm"
   ],
   "services": [
     "sddm"
@@ -13,7 +14,22 @@
     "wayland",
     "gles2",
     "hyprland",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "hyprland",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/hyprland",
+        "destination": "/etc/skel/.config/hypr"
+      }
+    ]
+  }
 }

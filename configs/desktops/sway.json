@@ -4,15 +4,32 @@
     "x11-terms/foot",
     "gui-apps/waybar",
     "gui-apps/wofi",
-    "gui-libs/wlroots"
+    "gui-libs/wlroots",
+    "x11-misc/sddm"
   ],
-  "services": [],
+  "services": [
+    "sddm"
+  ],
   "use_flags": [
     "wayland",
     "gles2",
     "sway",
-    "polkit",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "sway",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/sway",
+        "destination": "/etc/skel/.config/sway"
+      }
+    ]
+  }
 }

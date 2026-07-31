@@ -3,13 +3,33 @@
     "x11-wm/bspwm",
     "x11-misc/sxhkd",
     "x11-misc/polybar",
-    "x11-misc/rofi",
-    "x11-terms/alacritty"
+    "x11-misc/dmenu",
+    "x11-terms/alacritty",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
-  "services": [],
+  "services": [
+    "lightdm"
+  ],
   "use_flags": [
     "X",
+    "bspwm",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "bspwm",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/bspwm",
+        "destination": "/etc/skel/.config/bspwm"
+      }
+    ]
+  }
 }

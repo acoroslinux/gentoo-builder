@@ -2,8 +2,11 @@
   "packages": [
     "x11-wm/i3",
     "x11-misc/i3status",
+    "x11-misc/i3lock",
     "x11-misc/dmenu",
-    "x11-terms/alacritty"
+    "x11-terms/alacritty",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
@@ -11,8 +14,22 @@
   "use_flags": [
     "X",
     "i3wm",
-    "pango",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "i3",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/i3",
+        "destination": "/etc/skel/.config/i3"
+      }
+    ]
+  }
 }

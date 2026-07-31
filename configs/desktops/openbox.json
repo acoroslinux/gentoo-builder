@@ -3,15 +3,33 @@
     "x11-wm/openbox",
     "x11-misc/obconf",
     "x11-misc/tint2",
-    "x11-terms/alacritty"
+    "x11-misc/rofi",
+    "x11-terms/alacritty",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
   ],
   "use_flags": [
     "X",
-    "startup-notification",
+    "openbox",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
     "opengl",
     "egl"
-  ]
+  ],
+  "desktop_environment": {
+    "name": "openbox",
+    "use_common_config": true,
+    "customizations_path": "configs/custom_files/",
+    "copy_files": [
+      {
+        "source": "desktops/openbox",
+        "destination": "/etc/skel/.config/openbox"
+      }
+    ]
+  }
 }
