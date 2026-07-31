@@ -1,10 +1,9 @@
 {
   "name": "desktop-apps",
-  "description": "Common desktop applications: file manager, terminal, text editor, image viewer, calculator and archiver",
+  "description": "Common desktop applications and modern GTK/Qt themes and Papirus icon suite",
   "packages": [
     "x11-misc/pcmanfm",
     "x11-terms/alacritty",
-    "x11-terms/xterm",
     "x11-terms/kitty",
     "app-editors/mousepad",
     "app-editors/gedit",
@@ -21,7 +20,10 @@
     "x11-misc/xdotool",
     "x11-misc/rofi",
     "x11-misc/dunst",
-    "app-misc/nemo"
+    "app-misc/nemo",
+    "x11-themes/papirus-icon-theme",
+    "x11-themes/arc-theme",
+    "x11-themes/adwaita-icon-theme"
   ],
   "use_flags": [
     "gtk",
