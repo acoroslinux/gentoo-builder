@@ -416,11 +416,8 @@ class SystemCustomizer:
         self.chroot.run_in_chroot("chown -R lightdm:lightdm /var/lib/lightdm /var/log/lightdm /run/lightdm 2>/dev/null || true")
         self.chroot.run_in_chroot("chmod 0750 /var/lib/lightdm /var/log/lightdm 2>/dev/null || true")
 
-        # 7. Create standard XDG user directories in /etc/skel and /home/{username}
-        xdg_dirs = ["Desktop", "Downloads", "Documents", "Music", "Pictures", "Videos", "Templates", "Public"]
-        for d in xdg_dirs:
-            (self.target_root / "etc" / "skel" / d).mkdir(parents=True, exist_ok=True)
-            (self.target_root / "home" / username / d).mkdir(parents=True, exist_ok=True)
+        # 7. Run xdg-user-dirs-update to generate standard localized XDG user directories
+        self.chroot.run_in_chroot(f"su - {username} -c 'xdg-user-dirs-update --force' 2>/dev/null || true")
 
         # 8. User Home Directory Ownership
         self.chroot.run_in_chroot(f"chown -R {username}:{username} /home/{username} 2>/dev/null || true")
