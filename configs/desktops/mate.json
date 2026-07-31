@@ -1,7 +1,10 @@
 {
   "packages": [
     "mate-base/mate",
-    "x11-terms/mate-terminal"
+    "mate-base/caja",
+    "x11-terms/mate-terminal",
+    "x11-misc/lightdm",
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"
@@ -11,8 +14,16 @@
     "gtk",
     "gtk3",
     "mate",
+    "policykit",
+    "udisks",
+    "pam",
+    "networkmanager",
+    "screencast",
+    "lock",
+    "cups",
     "opengl",
-    "egl"
+    "egl",
+    "introspection"
   ],
   "desktop_environment": {
     "name": "mate",
@@ -21,7 +32,7 @@
     "copy_files": [
       {
         "source": "desktops/mate",
-        "destination": "/etc/skel/.config/mate"
+        "destination": "/etc/skel/.config"
       }
     ]
   }
