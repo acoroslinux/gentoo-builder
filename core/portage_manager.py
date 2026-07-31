@@ -142,6 +142,9 @@ class PortageManager:
                     "dev-qt/qtdeclarative vulkan\n"
                     "sys-libs/zlib minizip\n"
                     "media-gfx/imagemagick svg xml\n"
+                    "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive\n"
+                    "net-fs/samba client server winbind ads\n"
+                    "x11-misc/xdg-user-dirs gtk\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits

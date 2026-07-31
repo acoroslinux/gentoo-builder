@@ -87,6 +87,9 @@ class SystemCustomizer:
         username = live_user_cfg.get("username", "live") if isinstance(live_user_cfg, dict) else "live"
         session = self.config.get("desktop_environment", {}).get("name", "xfce")
 
+        if "avahi-daemon" not in services and (self.target_root / "etc" / "init.d" / "avahi-daemon").exists():
+            services.append("avahi-daemon")
+
         for srv in services:
             if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                 self.configure_autologin(srv, username, session)
@@ -413,5 +416,11 @@ class SystemCustomizer:
         self.chroot.run_in_chroot("chown -R lightdm:lightdm /var/lib/lightdm /var/log/lightdm /run/lightdm 2>/dev/null || true")
         self.chroot.run_in_chroot("chmod 0750 /var/lib/lightdm /var/log/lightdm 2>/dev/null || true")
 
-        # 7. User Home Directory Ownership
+        # 7. Create standard XDG user directories in /etc/skel and /home/{username}
+        xdg_dirs = ["Desktop", "Downloads", "Documents", "Music", "Pictures", "Videos", "Templates", "Public"]
+        for d in xdg_dirs:
+            (self.target_root / "etc" / "skel" / d).mkdir(parents=True, exist_ok=True)
+            (self.target_root / "home" / username / d).mkdir(parents=True, exist_ok=True)
+
+        # 8. User Home Directory Ownership
         self.chroot.run_in_chroot(f"chown -R {username}:{username} /home/{username} 2>/dev/null || true")
