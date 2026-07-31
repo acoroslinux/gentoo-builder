@@ -1,19 +1,27 @@
 {
   "name": "printing",
-  "description": "CUPS printing stack and driver packages",
+  "description": "Complete out-of-the-box CUPS printing stack, HP/Epson/Brother drivers, and network printer discovery",
   "packages": [
     "net-print/cups",
     "net-print/cups-filters",
+    "net-print/hplip",
+    "net-print/epson-inkjet-printer-escpr",
     "net-print/foomatic-db-engine",
+    "net-print/foomatic-db",
     "net-print/gutenprint",
+    "net-dns/avahi",
     "app-admin/system-config-printer"
   ],
   "use_flags": [
     "cups",
-    "usb"
+    "usb",
+    "hpcups",
+    "zeroconf",
+    "dbus"
   ],
   "services": [
     "cupsd",
-    "cups"
+    "cups",
+    "avahi-daemon"
   ]
 }

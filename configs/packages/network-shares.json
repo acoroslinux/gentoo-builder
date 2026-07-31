@@ -1,20 +1,32 @@
 {
   "name": "network-shares",
-  "description": "Network sharing protocol clients and servers (Samba, NFS, SSHFS)",
+  "description": "Complete out-of-the-box Windows/Linux network file sharing stack (Samba, CIFS, NFS, SSHFS, GVFS)",
   "packages": [
     "net-fs/samba",
     "net-fs/cifs-utils",
     "net-fs/nfs-utils",
-    "net-fs/sshfs"
+    "net-fs/sshfs",
+    "gnome-extra/gvfs",
+    "net-dns/avahi"
   ],
   "use_flags": [
     "samba",
     "client",
     "server",
-    "nfs"
+    "nfs",
+    "cifs",
+    "fuse",
+    "zeroconf",
+    "udisks"
+  ],
+  "package_use": [
+    "net-fs/samba client server winbind ads",
+    "gnome-extra/gvfs samba cifs nfs fuse udisks http archive"
   ],
   "services": [
     "samba",
-    "nfs"
+    "smb",
+    "nfs",
+    "avahi-daemon"
   ]
 }

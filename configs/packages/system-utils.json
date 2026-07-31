@@ -1,13 +1,21 @@
 {
   "name": "system-utils",
-  "description": "System monitoring, hardware info, power management, and administration utilities",
+  "description": "Complete hardware firmware, CPU microcode, system monitoring, and administration suite",
   "packages": [
+    "sys-kernel/linux-firmware",
+    "sys-firmware/intel-microcode",
+    "net-wireless/wireless-regdb",
+    "sys-firmware/alsa-firmware",
+    "sys-apps/pciutils",
+    "sys-apps/usbutils",
+    "sys-apps/hwinfo",
+    "sys-apps/inxi",
+    "sys-apps/lm-sensors",
     "app-admin/htop",
     "app-admin/iotop",
     "app-admin/sysstat",
     "app-editors/neovim",
     "app-editors/nano",
-    "app-misc/neofetch",
     "app-misc/fastfetch",
     "app-shells/zsh",
     "app-shells/zsh-completions",
@@ -16,13 +24,7 @@
     "net-misc/wget",
     "sys-apps/bat",
     "sys-apps/fd",
-    "sys-apps/hwinfo",
-    "sys-apps/inxi",
-    "sys-apps/lm-sensors",
-    "sys-process/lsof",
-    "sys-apps/pciutils",
     "sys-apps/ripgrep",
-    "sys-apps/usbutils",
     "app-arch/7zip",
     "sys-power/cpupower",
     "sys-power/upower"
@@ -34,6 +36,7 @@
   "use_flags": [
     "ncurses",
     "python",
-    "perl"
+    "perl",
+    "savedconfig"
   ]
 }

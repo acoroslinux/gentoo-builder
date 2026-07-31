@@ -1,23 +1,21 @@
 {
   "name": "audio",
-  "description": "Complete audio stack: PipeWire/PulseAudio, ALSA, mixers and music players",
+  "description": "Modern PipeWire/WirePlumber audio stack with PulseAudio and ALSA compatibility",
   "packages": [
     "media-sound/alsa-utils",
-    "media-sound/pavucontrol",
-    "media-sound/pulseaudio-daemon",
-    "media-video/pipewire",
-    "media-video/wireplumber",
-    "media-sound/rhythmbox",
-    "media-sound/deadbeef",
-    "media-sound/qmmp",
-    "media-sound/mp3gain",
-    "media-sound/sox",
     "media-libs/alsa-lib",
     "media-libs/alsa-plugins",
-    "media-plugins/alsa-plugins"
+    "media-plugins/alsa-plugins",
+    "media-video/pipewire",
+    "media-video/wireplumber",
+    "media-sound/pavucontrol",
+    "media-sound/pavucontrol-qt",
+    "media-sound/pasystray",
+    "media-sound/rhythmbox",
+    "media-sound/deadbeef",
+    "media-sound/qmmp"
   ],
   "services": [
-    "alsasound",
     "pipewire",
     "wireplumber"
   ],
@@ -25,17 +23,20 @@
     "alsa",
     "pulseaudio",
     "pipewire",
+    "sound-server",
     "sound",
     "bluetooth",
     "jack",
     "ogg",
     "flac",
     "mp3",
-    "aac"
+    "aac",
+    "ffmpeg",
+    "gstreamer"
   ],
   "package_use": [
-    "media-plugins/alsa-plugins pulseaudio",
-    "media-sound/pulseaudio-daemon alsa bluetooth",
-    "media-sound/pipewire alsa bluetooth jack sound-server"
+    "media-video/pipewire alsa bluetooth jack sound-server gstreamer ffmpeg extra",
+    "media-video/wireplumber system-service",
+    "media-plugins/alsa-plugins pulseaudio"
   ]
 }

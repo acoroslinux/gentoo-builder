@@ -1,6 +1,6 @@
 {
   "name": "bluetooth",
-  "description": "Bluetooth support and management tools",
+  "description": "Complete out-of-the-box Bluetooth stack for audio, mice, keyboards, and file transfer",
   "packages": [
     "net-wireless/bluez",
     "net-wireless/bluez-utils",
@@ -10,6 +10,11 @@
     "bluetooth"
   ],
   "use_flags": [
-    "bluetooth"
+    "bluetooth",
+    "obex",
+    "cups"
+  ],
+  "package_use": [
+    "net-wireless/bluez obex cups extra-tools"
   ]
 }
