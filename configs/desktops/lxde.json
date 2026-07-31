@@ -2,9 +2,17 @@
   "packages": [
     "lxde-base/lxde-meta",
     "lxde-base/lxterminal",
+    "x11-misc/pcmanfm",
+    "lxde-base/lxappearance",
+    "lxde-base/lxrandr",
+    "lxde-base/lxtask",
+    "lxde-base/lxinput",
+    "app-arch/engrampa",
+    "app-editors/mousepad",
+    "gnome-extra/nm-applet",
+    "media-sound/pavucontrol",
     "x11-misc/lightdm",
-    "x11-misc/lightdm-gtk-greeter",
-    "x11-misc/pcmanfm"
+    "x11-misc/lightdm-gtk-greeter"
   ],
   "services": [
     "lightdm"

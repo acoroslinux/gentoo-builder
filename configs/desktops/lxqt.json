@@ -4,6 +4,12 @@
     "x11-terms/qterminal",
     "app-arch/lxqt-archiver",
     "media-gfx/lximage-qt",
+    "lxqt-extra/lxqt-admin",
+    "lxqt-extra/lxqt-powermanagement",
+    "lxqt-extra/lxqt-sudo",
+    "x11-misc/pcmanfm-qt",
+    "x11-misc/screengrab",
+    "media-sound/pavucontrol-qt",
     "x11-misc/sddm"
   ],
   "services": [

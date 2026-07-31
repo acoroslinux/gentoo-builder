@@ -2,12 +2,23 @@
   "packages": [
     "xfce-base/xfce4-meta",
     "x11-terms/xfce4-terminal",
+    "app-editors/mousepad",
+    "media-gfx/ristretto",
+    "app-arch/xarchiver",
+    "xfce-extra/xfce4-notifyd",
+    "xfce-extra/tumbler",
+    "xfce-extra/thunar-archive-plugin",
+    "xfce-extra/thunar-volman",
+    "xfce-extra/xfce4-power-manager",
+    "xfce-extra/xfce4-screenshooter",
+    "xfce-extra/xfce4-taskmanager",
+    "xfce-extra/xfce4-pulseaudio-plugin",
+    "xfce-extra/xfce4-whiskermenu-plugin",
+    "gnome-extra/nm-applet",
+    "media-sound/pavucontrol",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter",
-    "gui-libs/display-manager-init",
-    "gnome-extra/nm-applet",
-    "xfce-extra/xfce4-pulseaudio-plugin",
-    "xfce-extra/xfce4-whiskermenu-plugin"
+    "gui-libs/display-manager-init"
   ],
   "services": [
     "lightdm"
