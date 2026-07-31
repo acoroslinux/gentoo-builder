@@ -2,7 +2,17 @@
   "packages": [
     "x11-wm/awesome",
     "x11-terms/alacritty",
+    "x11-misc/rofi",
     "x11-misc/dmenu",
+    "x11-misc/picom",
+    "x11-misc/feh",
+    "x11-fm/thunar",
+    "app-editors/mousepad",
+    "media-gfx/viewnior",
+    "app-arch/xarchiver",
+    "gnome-extra/nm-applet",
+    "media-sound/pavucontrol",
+    "x11-misc/scrot",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter"
   ],

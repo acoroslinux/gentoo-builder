@@ -5,6 +5,14 @@
     "gui-apps/waybar",
     "gui-apps/wofi",
     "gui-libs/wlroots",
+    "gui-apps/grim",
+    "gui-apps/slurp",
+    "media-gfx/imv",
+    "x11-fm/thunar",
+    "app-editors/mousepad",
+    "app-arch/xarchiver",
+    "gnome-extra/nm-applet",
+    "media-sound/pavucontrol",
     "x11-misc/sddm"
   ],
   "services": [

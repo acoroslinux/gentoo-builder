@@ -3,6 +3,12 @@
     "x11-wm/enlightenment",
     "dev-libs/efl",
     "x11-terms/terminology",
+    "x11-fm/thunar",
+    "app-editors/mousepad",
+    "media-gfx/viewnior",
+    "app-arch/xarchiver",
+    "gnome-extra/nm-applet",
+    "media-sound/pavucontrol",
     "x11-misc/lightdm",
     "x11-misc/lightdm-gtk-greeter"
   ],
