@@ -1,13 +1,14 @@
 {
   "name": "network-shares",
-  "description": "Complete out-of-the-box Windows/Linux network file sharing stack (Samba, CIFS, NFS, SSHFS, GVFS)",
+  "description": "Complete out-of-the-box Windows/Linux network file sharing stack (Samba, CIFS, NFS, SSHFS, GVFS, NSS-mDNS)",
   "packages": [
     "net-fs/samba",
     "net-fs/cifs-utils",
     "net-fs/nfs-utils",
     "net-fs/sshfs",
     "gnome-extra/gvfs",
-    "net-dns/avahi"
+    "net-dns/avahi",
+    "sys-auth/nss-mdns"
   ],
   "use_flags": [
     "samba",
@@ -20,8 +21,9 @@
     "udisks"
   ],
   "package_use": [
-    "net-fs/samba client server winbind ads",
-    "gnome-extra/gvfs samba cifs nfs fuse udisks http archive"
+    "net-fs/samba client server winbind -ads -ldap",
+    "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive",
+    "net-dns/avahi dbus gtk gtk3 python"
   ],
   "services": [
     "samba",

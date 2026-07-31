@@ -58,6 +58,7 @@
     "net-misc/dhcpcd",
     "net-misc/networkmanager",
     "net-dns/avahi",
+    "sys-auth/nss-mdns",
     "x11-misc/xdg-user-dirs",
     "x11-misc/xdg-user-dirs-gtk",
     "sys-apps/util-linux",

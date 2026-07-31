@@ -341,6 +341,15 @@ class SystemCustomizer:
             "tmpfs / tmpfs defaults 0 0\n"
         )
 
+        # Configure /etc/nsswitch.conf for mDNS local network hostname resolution (sys-auth/nss-mdns)
+        nsswitch_path = self.target_root / "etc" / "nsswitch.conf"
+        if nsswitch_path.exists():
+            nss_content = nsswitch_path.read_text()
+            if "mdns4_minimal" not in nss_content:
+                nss_content = nss_content.replace("hosts: files dns", "hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4")
+                nss_content = nss_content.replace("hosts:      files dns", "hosts:      files mdns4_minimal [NOTFOUND=return] dns mdns4")
+                nsswitch_path.write_text(nss_content)
+
         # SSHD PermitRootLogin if sshd_config exists
         sshd_cfg = self.target_root / "etc" / "ssh" / "sshd_config"
         if sshd_cfg.exists():
