@@ -143,7 +143,7 @@ class PortageManager:
                     "sys-libs/zlib minizip\n"
                     "media-gfx/imagemagick svg xml\n"
                     "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive\n"
-                    "net-fs/samba client server winbind ads\n"
+                    "net-fs/samba client server winbind ads ldap\n"
                     "x11-misc/xdg-user-dirs gtk\n"
                 )
 
