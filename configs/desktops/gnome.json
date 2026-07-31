@@ -2,7 +2,16 @@
   "packages": [
     "gnome-base/gnome",
     "gnome-extra/gnome-tweaks",
-    "gnome-extra/gnome-backgrounds"
+    "gnome-extra/gnome-backgrounds",
+    "gnome-base/nautilus",
+    "x11-terms/gnome-terminal",
+    "gnome-extra/eog",
+    "gnome-extra/gedit",
+    "gnome-extra/gnome-calculator",
+    "gnome-extra/gnome-system-monitor",
+    "gnome-extra/evince",
+    "app-arch/file-roller",
+    "media-sound/pavucontrol"
   ],
   "services": [
     "gdm"
