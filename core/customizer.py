@@ -178,6 +178,7 @@ class SystemCustomizer:
                     logger.info(f"Enabled Runit service: {srv} ({target_src})")
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv} 2>/dev/null || true")
+                self.chroot.run_in_chroot(f"rc-update add {srv} default 2>/dev/null || true")
                 if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                     self.configure_autologin(srv, username, session)
 
@@ -189,6 +190,9 @@ class SystemCustomizer:
         logger.info(f"Configuring autologin for display manager '{dm}' (user: {username}, session: {session})...")
 
         if dm == "lightdm":
+            self.chroot.run_in_chroot("groupadd -r autologin 2>/dev/null || true")
+            self.chroot.run_in_chroot(f"gpasswd -a {username} autologin 2>/dev/null || true")
+            self.chroot.run_in_chroot(f"usermod -aG autologin {username} 2>/dev/null || true")
             lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
             if lconf.exists():
                 content = lconf.read_text()
