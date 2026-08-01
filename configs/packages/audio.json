@@ -31,7 +31,8 @@
     "mp3",
     "aac",
     "ffmpeg",
-    "gstreamer"
+    "gstreamer",
+    "extra"
   ],
   "package_use": [
     "media-video/pipewire alsa bluetooth jack sound-server gstreamer ffmpeg extra",
