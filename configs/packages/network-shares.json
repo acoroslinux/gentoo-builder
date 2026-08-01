@@ -22,8 +22,8 @@
   ],
   "package_use": [
     "net-fs/samba client server winbind -ads -ldap",
-    "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf google archive",
-    "net-dns/avahi dbus gtk gtk3 python"
+    "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf -google archive",
+    "net-dns/avahi dbus python -gtk -gtk3 -qt5 -qt6"
   ],
   "services": [
     "samba",
