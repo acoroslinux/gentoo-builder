@@ -3,7 +3,7 @@
   "description": "Complete out-of-the-box Bluetooth stack for audio, mice, keyboards, and file transfer",
   "packages": [
     "net-wireless/bluez",
-    "net-wireless/bluez-utils",
+    "net-wireless/bluez-tools",
     "net-wireless/blueman"
   ],
   "services": [
