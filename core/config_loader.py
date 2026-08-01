@@ -156,10 +156,19 @@ class ConfigLoader:
             merged["services"].extend(p_cfg.get("services", []))
             merged["custom_files"].extend(p_cfg.get("custom_files", []))
 
-        # Service profiles
-        for srv_p in (service_profiles or []):
-            s_cfg = self.load_profile("services", srv_p)
-            merged["services"].extend(s_cfg.get("services", []))
+        # Service profiles — auto-added default service profiles when a desktop is selected
+        resolved_srv_profiles = list(service_profiles) if service_profiles is not None else []
+        if desktop:
+            for default_srv in ["base", "desktop-services", "hardware-services", "network-services", "sharing-services", "printing-services", "system-monitoring"]:
+                if default_srv not in resolved_srv_profiles:
+                    resolved_srv_profiles.append(default_srv)
+
+        for srv_p in resolved_srv_profiles:
+            try:
+                s_cfg = self.load_profile("services", srv_p)
+                merged["services"].extend(s_cfg.get("services", []))
+            except ConfigLoaderError as e:
+                logger.warning(f"Service profile '{srv_p}' not found, skipping: {e}")
 
         # Live user profile
         if live_profile:
