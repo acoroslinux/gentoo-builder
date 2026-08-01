@@ -65,6 +65,7 @@
     "sys-fs/lvm2",
     "sys-fs/cryptsetup",
     "media-libs/vulkan-loader",
+    "dev-util/vulkan-headers",
     "sys-kernel/gentoo-kernel-bin"
   ],
   "services": [
