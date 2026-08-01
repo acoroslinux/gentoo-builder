@@ -127,6 +127,11 @@ class SystemCustomizer:
                     if dm_script.exists():
                         self.chroot.run_in_chroot("rc-update add display-manager default 2>/dev/null || true")
 
+                if srv in ["samba", "smb"]:
+                    for smb_srv in ["samba", "smbd", "nmbd"]:
+                        if (self.target_root / "etc" / "init.d" / smb_srv).exists():
+                            self.chroot.run_in_chroot(f"rc-update add {smb_srv} default 2>/dev/null || true")
+
                 if target_srv:
                     self.chroot.run_in_chroot(f"rc-update add {target_srv} default 2>/dev/null || true")
                 elif srv not in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
