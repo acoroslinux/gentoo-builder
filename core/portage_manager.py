@@ -145,7 +145,7 @@ class PortageManager:
                     "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive\n"
                     "net-fs/samba client server winbind -ads -ldap\n"
                     "net-dns/bind gssapi\n"
-                    "net-dns/avahi dbus gtk gtk3 python -qt5 -qt6\n"
+                    "net-dns/avahi dbus python -gtk -gtk3 -qt5 -qt6\n"
                     "x11-misc/xdg-user-dirs gtk\n"
                 )
 
