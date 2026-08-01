@@ -4,7 +4,6 @@
   "packages": [
     "media-sound/alsa-utils",
     "media-libs/alsa-lib",
-    "media-libs/alsa-plugins",
     "media-plugins/alsa-plugins",
     "media-video/pipewire",
     "media-video/wireplumber",
