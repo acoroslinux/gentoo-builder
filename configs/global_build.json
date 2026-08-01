@@ -68,7 +68,12 @@
   ],
   "services": [
     "dbus",
-    "NetworkManager"
+    "NetworkManager",
+    "elogind",
+    "avahi-daemon",
+    "bluetooth",
+    "cupsd",
+    "samba"
   ],
   "live_user": {
     "username": "live",
