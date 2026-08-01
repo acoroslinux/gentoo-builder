@@ -142,7 +142,7 @@ class PortageManager:
                     "dev-qt/qtdeclarative vulkan\n"
                     "sys-libs/zlib minizip\n"
                     "media-gfx/imagemagick svg xml\n"
-                    "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive\n"
+                    "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf google archive\n"
                     "net-fs/samba client server winbind -ads -ldap\n"
                     "net-dns/bind gssapi\n"
                     "net-dns/avahi dbus python -gtk -gtk3 -qt5 -qt6\n"

@@ -6,7 +6,7 @@
     "net-fs/cifs-utils",
     "net-fs/nfs-utils",
     "net-fs/sshfs",
-    "gnome-extra/gvfs",
+    "gnome-base/gvfs",
     "net-dns/avahi",
     "sys-auth/nss-mdns"
   ],
@@ -22,7 +22,7 @@
   ],
   "package_use": [
     "net-fs/samba client server winbind -ads -ldap",
-    "gnome-extra/gvfs samba cifs nfs fuse udisks http zeroconf google archive",
+    "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf google archive",
     "net-dns/avahi dbus gtk gtk3 python"
   ],
   "services": [
