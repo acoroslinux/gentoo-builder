@@ -149,6 +149,7 @@ class PortageManager:
                     "x11-misc/xdg-user-dirs gtk\n"
                     "media-sound/qmmp soxr\n"
                     "media-video/pipewire alsa bluetooth sound-server gstreamer ffmpeg extra\n"
+                    "gui-libs/gtk -vulkan\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
