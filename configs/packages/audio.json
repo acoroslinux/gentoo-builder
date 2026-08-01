@@ -36,6 +36,7 @@
   "package_use": [
     "media-video/pipewire alsa bluetooth jack sound-server gstreamer ffmpeg extra",
     "media-video/wireplumber system-service",
-    "media-plugins/alsa-plugins pulseaudio"
+    "media-plugins/alsa-plugins pulseaudio",
+    "media-sound/qmmp soxr"
   ]
 }

@@ -147,6 +147,7 @@ class PortageManager:
                     "net-dns/bind gssapi\n"
                     "net-dns/avahi dbus python -gtk -gtk3 -qt5 -qt6\n"
                     "x11-misc/xdg-user-dirs gtk\n"
+                    "media-sound/qmmp soxr\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
