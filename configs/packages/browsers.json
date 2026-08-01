@@ -1,12 +1,8 @@
 {
   "name": "browsers",
-  "description": "Web browsers — mainstream and privacy-focused alternatives",
+  "description": "Pre-compiled binary web browsers (Firefox-bin, Google-Chrome) for instant installation without compiling",
   "packages": [
-    "www-client/firefox-bin",
-    "www-client/chromium",
-    "www-client/falkon",
-    "www-client/lynx",
-    "www-client/w3m"
+    "www-client/firefox-bin"
   ],
   "use_flags": [
     "hwaccel",
@@ -15,10 +11,10 @@
     "alsa",
     "dbus",
     "gtk",
-    "spell"
+    "ffmpeg",
+    "gecko"
   ],
   "package_use": [
-    "www-client/firefox-bin pulseaudio wayland hwaccel",
-    "www-client/chromium pulseaudio vaapi hangouts"
+    "www-client/firefox-bin pulseaudio wayland hwaccel ffmpeg ffmpeg-full"
   ]
 }
