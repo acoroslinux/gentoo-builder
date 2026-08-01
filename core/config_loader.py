@@ -138,10 +138,10 @@ class ConfigLoader:
             merged["bootloader"] = b_cfg.get("bootloader", b_cfg)
             merged["packages"].extend(b_cfg.get("packages", []))
 
-        # Package profiles — xorg/wayland are auto-added only when a desktop is selected
+        # Package profiles — auto-added essential profiles when a desktop is selected
         resolved_pkg_profiles = list(package_profiles) if package_profiles is not None else []
         if desktop:
-            for default_profile in ["xorg", "wayland"]:
+            for default_profile in ["xorg", "wayland", "audio", "bluetooth", "printing", "network-shares", "desktop-apps", "system-utils"]:
                 if default_profile not in resolved_pkg_profiles:
                     resolved_pkg_profiles.append(default_profile)
 
@@ -153,6 +153,7 @@ class ConfigLoader:
                 continue
             merged["packages"].extend(p_cfg.get("packages", []))
             merged["use_flags"].extend(p_cfg.get("use_flags", []))
+            merged["services"].extend(p_cfg.get("services", []))
             merged["custom_files"].extend(p_cfg.get("custom_files", []))
 
         # Service profiles
