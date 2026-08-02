@@ -4,7 +4,7 @@
   "_comment": "Note: Firefox, Transmission, Discord, and Thunderbird are default active packages. Alternative browsers & communication tools (Chromium, Telegram, Signal, Element, qBittorrent, HexChat) are listed under 'optional_packages' for easy enablement.",
   "packages": [
     "www-client/firefox-bin",
-    "net-p2p/transmission-gtk",
+    "net-p2p/transmission",
     "net-im/discord",
     "mail-client/thunderbird-bin"
   ],
@@ -31,6 +31,7 @@
   ],
   "package_use": [
     "www-client/firefox-bin pulseaudio wayland hwaccel ffmpeg ffmpeg-full",
-    "mail-client/thunderbird-bin pulseaudio wayland"
+    "mail-client/thunderbird-bin pulseaudio wayland",
+    "net-p2p/transmission gtk"
   ]
 }
