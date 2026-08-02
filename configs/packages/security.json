@@ -1,9 +1,9 @@
 {
   "name": "security",
-  "description": "Essential security tools: Timeshift backups, KeePassXC password manager, GUFW firewall, GnuPG",
-  "_comment": "Note: Timeshift, KeePassXC, GUFW/UFW firewall, rsync, and GnuPG are active defaults. Advanced tools (VeraCrypt, WireGuard, OpenVPN, Wireshark, Nmap, BorgBackup, AppArmor) are in 'optional_packages'.",
+  "description": "Essential security tools: Snapper system snapshots, KeePassXC password manager, GUFW firewall, GnuPG",
+  "_comment": "Note: Snapper snapshots, KeePassXC, GUFW/UFW firewall, rsync, and GnuPG are active defaults. Advanced tools (VeraCrypt, WireGuard, OpenVPN, Wireshark, Nmap, BorgBackup, AppArmor) are in 'optional_packages'.",
   "packages": [
-    "app-misc/timeshift",
+    "app-backup/snapper",
     "app-admin/keepassxc",
     "net-firewall/ufw",
     "net-firewall/gufw",
