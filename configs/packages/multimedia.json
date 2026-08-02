@@ -1,8 +1,7 @@
 {
   "name": "multimedia",
-  "description": "Multimedia codecs, video/audio playback and streaming — common in all desktop distros",
+  "description": "Multimedia codecs, video/audio playback (VLC default). Includes optional extra multimedia packages.",
   "packages": [
-    "media-video/mpv",
     "media-video/vlc",
     "media-libs/ffmpeg",
     "media-libs/libvpx",
@@ -17,6 +16,13 @@
     "media-libs/gst-plugins-bad",
     "media-libs/gst-plugins-ugly",
     "media-libs/gst-libav"
+  ],
+  "optional_packages": [
+    "media-video/mpv",
+    "media-sound/audacious",
+    "media-video/obs-studio",
+    "media-video/handbrake",
+    "media-sound/k3b"
   ],
   "use_flags": [
     "ffmpeg",
