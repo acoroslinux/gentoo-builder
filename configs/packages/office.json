@@ -12,7 +12,7 @@
     "app-text/hunspell",
     "app-dicts/myspell-en",
     "app-dicts/myspell-pt",
-    "app-office/gnome-calendar"
+    "gnome-extra/gnome-calendar"
   ],
   "optional_packages": [
     "app-text/cherrytree",
