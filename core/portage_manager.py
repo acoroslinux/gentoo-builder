@@ -151,6 +151,7 @@ class PortageManager:
                     "media-video/pipewire alsa bluetooth sound-server gstreamer ffmpeg extra\n"
                     "gui-libs/gtk -vulkan\n"
                     "dev-cpp/gtkmm -vulkan\n"
+                    "app-text/poppler nss qt6 cairo jpeg tiff\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
