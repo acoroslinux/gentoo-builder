@@ -141,7 +141,7 @@ class ConfigLoader:
         # Package profiles — auto-added essential profiles when a desktop is selected
         resolved_pkg_profiles = list(package_profiles) if package_profiles is not None else []
         if desktop:
-            for default_profile in ["xorg", "wayland", "audio", "bluetooth", "printing", "network-shares", "desktop-apps", "system-utils", "internet"]:
+            for default_profile in ["xorg", "wayland", "audio", "bluetooth", "printing", "network-shares", "desktop-apps", "system-utils", "security"]:
                 if default_profile not in resolved_pkg_profiles:
                     resolved_pkg_profiles.append(default_profile)
 
