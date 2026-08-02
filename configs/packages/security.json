@@ -1,29 +1,30 @@
 {
   "name": "security",
-  "description": "Firewalls, VPN, encryption, password managers, audit and backup tools",
+  "description": "Essential security tools: Timeshift backups, KeePassXC password manager, GUFW firewall, GnuPG",
+  "_comment": "Note: Timeshift, KeePassXC, GUFW/UFW firewall, and GnuPG are active defaults. Advanced tools (VeraCrypt, WireGuard, OpenVPN, Wireshark, Nmap, BorgBackup, AppArmor) are in 'optional_packages'.",
   "packages": [
-    "net-firewall/ufw",
-    "net-firewall/nftables",
-    "net-firewall/iptables",
-    "app-admin/keepassxc",
     "app-backup/timeshift",
-    "app-backup/rsync",
-    "app-backup/borgbackup",
+    "app-admin/keepassxc",
+    "net-firewall/ufw",
+    "net-firewall/gufw",
     "app-crypt/gnupg",
-    "app-crypt/pinentry",
+    "app-crypt/pinentry"
+  ],
+  "optional_packages": [
     "app-crypt/veracrypt",
-    "net-vpn/openvpn",
     "net-vpn/wireguard-tools",
+    "net-vpn/openvpn",
     "net-vpn/networkmanager-openvpn",
     "net-analyzer/wireshark",
     "net-analyzer/nmap",
+    "app-backup/rsync",
+    "app-backup/borgbackup",
+    "net-firewall/nftables",
     "sys-apps/apparmor",
     "app-forensics/lynis"
   ],
   "services": [
-    "ufw",
-    "nftables",
-    "apparmor"
+    "ufw"
   ],
   "use_flags": [
     "gpg",
