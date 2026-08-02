@@ -6,7 +6,7 @@
     "media-gfx/ristretto",
     "app-arch/xarchiver",
     "xfce-extra/xfce4-notifyd",
-    "xfce-extra/tumbler",
+    "xfce-base/tumbler",
     "xfce-extra/thunar-archive-plugin",
     "xfce-base/thunar-volman",
     "xfce-extra/xfce4-power-manager",
