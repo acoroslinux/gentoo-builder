@@ -2,6 +2,7 @@
   "packages": [
     "mate-base/mate",
     "mate-base/caja",
+    "mate-extra/caja-extensions",
     "x11-terms/mate-terminal",
     "mate-extra/mate-power-manager",
     "mate-extra/mate-screensaver",
