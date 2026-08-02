@@ -152,6 +152,7 @@ class PortageManager:
                     "gui-libs/gtk -vulkan\n"
                     "dev-cpp/gtkmm -vulkan\n"
                     "app-text/poppler nss qt6 cairo jpeg tiff\n"
+                    "media-libs/opus custom-modes\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
