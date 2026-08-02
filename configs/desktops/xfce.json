@@ -46,7 +46,7 @@
     "copy_files": [
       {
         "source": "desktops/xfce",
-        "destination": "/etc/skel/.config/xfce4"
+        "destination": "/etc/skel/.config"
       }
     ]
   }
