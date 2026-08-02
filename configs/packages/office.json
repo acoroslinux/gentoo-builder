@@ -1,7 +1,7 @@
 {
   "name": "office",
   "description": "Essential office suite (LibreOffice), PDF reader (Evince), dictionaries and calendar",
-  "_comment": "Note: LibreOffice, Evince PDF, aspell dictionaries, and GNOME Calendar are default. Extra tools (AbiWord, Gnumeric, Scribus, Okular, MuPDF, Calcurse) are listed under 'optional_packages' for easy user enablement.",
+  "_comment": "Note: LibreOffice, Evince PDF, aspell & hunspell dictionaries, and GNOME Calendar are default. Extra productivity & office tools (CherryTree, Obsidian, Pandoc, GnuCash, Homebank, Recoll, AbiWord, Gnumeric, Scribus, Okular) are listed under 'optional_packages' for easy user enablement.",
   "packages": [
     "app-office/libreoffice-bin",
     "app-text/evince",
@@ -9,9 +9,18 @@
     "app-text/aspell",
     "app-dicts/aspell-en",
     "app-dicts/aspell-pt",
+    "app-text/hunspell",
+    "app-dicts/hunspell-en",
+    "app-dicts/hunspell-pt",
     "app-office/gnome-calendar"
   ],
   "optional_packages": [
+    "app-text/cherrytree",
+    "app-text/obsidian",
+    "app-text/pandoc",
+    "app-office/gnucash",
+    "app-office/homebank",
+    "app-misc/recoll",
     "app-office/abiword",
     "app-office/gnumeric",
     "app-office/scribus",
