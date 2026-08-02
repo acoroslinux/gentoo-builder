@@ -16,9 +16,7 @@
     "media-libs/gst-plugins-good",
     "media-libs/gst-plugins-bad",
     "media-libs/gst-plugins-ugly",
-    "media-libs/gst-libav",
-    "media-sound/alsa-utils",
-    "media-sound/pavucontrol"
+    "media-libs/gst-libav"
   ],
   "use_flags": [
     "ffmpeg",

@@ -45,7 +45,9 @@
     "sys-apps/util-linux",
     "sys-apps/which",
     "sys-process/cronie",
-    "sys-process/at"
+    "sys-process/at",
+    "dev-vcs/git"
+
   ],
   "services": [
     "cronie"
