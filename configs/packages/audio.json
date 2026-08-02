@@ -1,18 +1,12 @@
 {
   "name": "audio",
-  "description": "Modern PipeWire/WirePlumber audio stack with PulseAudio and ALSA compatibility",
+  "description": "Core PipeWire/WirePlumber audio architecture with PulseAudio and ALSA compatibility",
   "packages": [
     "media-sound/alsa-utils",
     "media-libs/alsa-lib",
     "media-plugins/alsa-plugins",
     "media-video/pipewire",
-    "media-video/wireplumber",
-    "media-sound/pavucontrol",
-    "media-sound/pavucontrol-qt",
-    "media-sound/pasystray",
-    "media-sound/rhythmbox",
-    "media-sound/deadbeef",
-    "media-sound/qmmp"
+    "media-video/wireplumber"
   ],
   "services": [
     "pipewire",
@@ -37,7 +31,6 @@
   "package_use": [
     "media-video/pipewire alsa bluetooth jack sound-server gstreamer ffmpeg extra",
     "media-video/wireplumber system-service",
-    "media-plugins/alsa-plugins pulseaudio",
-    "media-sound/qmmp soxr"
+    "media-plugins/alsa-plugins pulseaudio"
   ]
 }
