@@ -11,11 +11,11 @@
     "sys-fs/xfsprogs",
     "sys-fs/dosfstools",
     "sys-fs/ntfs3g",
+    "sys-fs/exfatprogs",
     "sys-fs/f2fs-tools",
     "sys-fs/squashfs-tools"
   ],
   "services": [
     "lvm"
   ]
-}
 }

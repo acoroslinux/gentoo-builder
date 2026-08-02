@@ -6,6 +6,8 @@
     "gnome-extra/cinnamon-control-center",
     "gnome-extra/cinnamon-settings-daemon",
     "gnome-extra/nemo",
+    "gnome-extra/nemo-fileroller",
+    "app-arch/file-roller",
     "x11-terms/gnome-terminal",
     "app-editors/gedit",
     "media-gfx/eog",
