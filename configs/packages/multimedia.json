@@ -1,6 +1,7 @@
 {
   "name": "multimedia",
   "description": "Multimedia codecs, video/audio playback (VLC default). Includes optional extra multimedia packages.",
+  "_comment": "Note: VLC is the default media player. To enable extra multimedia software (such as MPV, Audacious, OBS Studio, Handbrake, or K3b), simply copy desired items from 'optional_packages' into the 'packages' array above.",
   "packages": [
     "media-video/vlc",
     "media-libs/ffmpeg",
