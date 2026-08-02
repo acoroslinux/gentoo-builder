@@ -21,7 +21,7 @@
     "udisks"
   ],
   "package_use": [
-    "net-fs/samba client server winbind -ads -ldap",
+    "net-fs/samba client server winbind -gpg -ads -ldap",
     "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf -google archive",
     "net-dns/avahi dbus python mdnsresponder-compat -gtk -gtk3 -qt5 -qt6"
   ],
