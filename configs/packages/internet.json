@@ -1,0 +1,36 @@
+{
+  "name": "internet",
+  "description": "Web browsers, torrent clients, instant messaging and email communication suite",
+  "_comment": "Note: Firefox, Transmission, Discord, and Thunderbird are default active packages. Alternative browsers & communication tools (Chromium, Telegram, Signal, Element, qBittorrent, HexChat) are listed under 'optional_packages' for easy enablement.",
+  "packages": [
+    "www-client/firefox-bin",
+    "net-p2p/transmission-gtk",
+    "net-im/discord",
+    "mail-client/thunderbird-bin"
+  ],
+  "optional_packages": [
+    "www-client/chromium-bin",
+    "net-im/telegram-desktop",
+    "net-im/signal-desktop-bin",
+    "net-im/element-desktop",
+    "net-p2p/qbittorrent",
+    "net-irc/hexchat",
+    "mail-client/claws-mail",
+    "net-news/newsflash"
+  ],
+  "use_flags": [
+    "hwaccel",
+    "vaapi",
+    "pulseaudio",
+    "alsa",
+    "dbus",
+    "gtk",
+    "ffmpeg",
+    "gecko",
+    "ssl"
+  ],
+  "package_use": [
+    "www-client/firefox-bin pulseaudio wayland hwaccel ffmpeg ffmpeg-full",
+    "mail-client/thunderbird-bin pulseaudio wayland"
+  ]
+}
