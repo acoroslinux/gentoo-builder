@@ -13,10 +13,7 @@
     "media-libs/libvorbis",
     "media-libs/gstreamer",
     "media-libs/gst-plugins-base",
-    "media-libs/gst-plugins-good",
-    "media-libs/gst-plugins-bad",
-    "media-libs/gst-plugins-ugly",
-    "media-libs/gst-libav"
+    "media-plugins/gst-plugins-meta"
   ],
   "optional_packages": [
     "media-video/mpv",
@@ -47,6 +44,7 @@
   "package_use": [
     "media-video/ffmpeg mp3 x264 x265 opus vorbis ogg vaapi vdpau",
     "media-video/vlc mp3 dvd bluray vcd live matroska opus ogg flac alsa pulseaudio vaapi",
-    "media-video/mpv alsa pulseaudio vaapi vdpau opengl"
+    "media-video/mpv alsa pulseaudio vaapi vdpau opengl",
+    "media-plugins/gst-plugins-meta ffmpeg alsa pulseaudio flac mp3 ogg aac vaapi"
   ]
 }
