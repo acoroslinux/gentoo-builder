@@ -8,7 +8,7 @@
     "xfce-extra/xfce4-notifyd",
     "xfce-extra/tumbler",
     "xfce-extra/thunar-archive-plugin",
-    "xfce-extra/thunar-volman",
+    "xfce-base/thunar-volman",
     "xfce-extra/xfce4-power-manager",
     "xfce-extra/xfce4-screenshooter",
     "xfce-extra/xfce4-taskmanager",
