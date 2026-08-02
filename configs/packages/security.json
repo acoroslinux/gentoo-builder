@@ -3,7 +3,7 @@
   "description": "Essential security tools: Timeshift backups, KeePassXC password manager, GUFW firewall, GnuPG",
   "_comment": "Note: Timeshift, KeePassXC, GUFW/UFW firewall, rsync, and GnuPG are active defaults. Advanced tools (VeraCrypt, WireGuard, OpenVPN, Wireshark, Nmap, BorgBackup, AppArmor) are in 'optional_packages'.",
   "packages": [
-    "app-backup/timeshift",
+    "app-misc/timeshift",
     "app-admin/keepassxc",
     "net-firewall/ufw",
     "net-firewall/gufw",
