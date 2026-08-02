@@ -145,7 +145,7 @@ class PortageManager:
                     "gnome-base/gvfs samba cifs nfs fuse udisks http zeroconf -google archive\n"
                     "net-fs/samba client server winbind -ads -ldap\n"
                     "net-dns/bind gssapi\n"
-                    "net-dns/avahi dbus python -gtk -gtk3 -qt5 -qt6\n"
+                    "net-dns/avahi dbus python mdnsresponder-compat -gtk -gtk3 -qt5 -qt6\n"
                     "x11-misc/xdg-user-dirs gtk\n"
                     "media-sound/qmmp soxr\n"
                     "media-video/pipewire alsa bluetooth sound-server gstreamer ffmpeg extra\n"
