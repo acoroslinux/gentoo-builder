@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Set XFCE Universal Wallpaper
+Exec=sh -c "sleep 1 && WALLPAPER=/usr/share/backgrounds/default-wallpaper.png; if [ -f \"$WALLPAPER\" ] && command -v xfconf-query &>/dev/null; then for prop in $(xfconf-query -c xfce4-desktop -l | grep 'last-image'); do xfconf-query -c xfce4-desktop -p \"$prop\" -s \"$WALLPAPER\" 2>/dev/null || true; done; fi"
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
