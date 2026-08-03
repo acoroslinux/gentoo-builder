@@ -15,7 +15,7 @@
     "x11-misc/plank",
     "x11-terms/tilda",
     "x11-wm/compiz",
-    "x11-apps/ccsm",
+    "x11-plugins/ccsm",
     "media-gfx/eom",
     "app-text/atril",
     "app-editors/pluma",
