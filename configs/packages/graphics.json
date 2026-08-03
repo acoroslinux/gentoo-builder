@@ -1,14 +1,14 @@
 {
   "name": "graphics",
-  "description": "Raster & vector graphic design (GIMP, Inkscape), image viewing (Viewnior) and screenshots (Flameshot)",
-  "_comment": "Note: GIMP, Inkscape, Viewnior, and Flameshot are active defaults. Advanced graphics tools (Krita, Blender, Darktable, RawTherapee, Shotwell, DigiKam, ImageMagick) are listed in 'optional_packages' for easy enablement.",
+  "description": "Raster & vector graphic design suite (GIMP, Inkscape)",
+  "_comment": "Note: GIMP and Inkscape are active defaults. Standalone image viewers/screenshot tools (Viewnior, Flameshot, Krita, Blender, Darktable, RawTherapee, Shotwell, DigiKam, ImageMagick) are listed in 'optional_packages' to avoid duplicate apps with desktop-native tools (Gwenview/Spectacle, EOM, Ristretto).",
   "packages": [
     "media-gfx/gimp",
-    "media-gfx/inkscape",
-    "media-gfx/viewnior",
-    "media-gfx/flameshot"
+    "media-gfx/inkscape"
   ],
   "optional_packages": [
+    "media-gfx/viewnior",
+    "media-gfx/flameshot",
     "media-gfx/krita",
     "media-gfx/blender",
     "media-gfx/darktable",

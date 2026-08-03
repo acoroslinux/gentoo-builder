@@ -1,10 +1,9 @@
 {
   "name": "office",
-  "description": "Essential office suite (LibreOffice), PDF reader (Evince), dictionaries and calendar",
-  "_comment": "Note: LibreOffice, Evince PDF, aspell & myspell dictionaries, and GNOME Calendar are default. Extra productivity & office tools (CherryTree, Obsidian, Pandoc, GnuCash, Homebank, Recoll, AbiWord, Gnumeric, Scribus, Okular) are listed under 'optional_packages' for easy user enablement.",
+  "description": "Essential office suite (LibreOffice), dictionaries and calendar",
+  "_comment": "Note: LibreOffice, aspell & myspell dictionaries, and GNOME Calendar are default. Extra PDF readers (Evince, Okular, MuPDF) and office tools (CherryTree, Obsidian, Pandoc, GnuCash, Homebank, Recoll, AbiWord, Gnumeric, Scribus) are listed under 'optional_packages' to avoid duplications with desktop-native PDF readers (Okular in KDE, Atril in MATE).",
   "packages": [
     "app-office/libreoffice-bin",
-    "app-text/evince",
     "app-text/poppler",
     "app-text/aspell",
     "app-dicts/aspell-en",
@@ -15,6 +14,9 @@
     "gnome-extra/gnome-calendar"
   ],
   "optional_packages": [
+    "app-text/evince",
+    "app-text/okular",
+    "app-text/mupdf",
     "app-text/cherrytree",
     "app-text/obsidian",
     "app-text/pandoc",
@@ -24,8 +26,6 @@
     "app-office/abiword",
     "app-office/gnumeric",
     "app-office/scribus",
-    "app-text/okular",
-    "app-text/mupdf",
     "app-text/ghostscript-gpl",
     "app-office/calcurse"
   ],
