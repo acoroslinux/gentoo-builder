@@ -1,10 +1,14 @@
 {
   "packages": [
     "gnome-extra/cinnamon",
+    "gnome-extra/cinnamon-desktop",
+    "gnome-extra/cinnamon-session",
+    "gnome-extra/cinnamon-menus",
     "gnome-extra/cinnamon-translations",
     "gnome-extra/cinnamon-screensaver",
     "gnome-extra/cinnamon-control-center",
     "gnome-extra/cinnamon-settings-daemon",
+    "x11-wm/muffin",
     "gnome-extra/nemo",
     "gnome-extra/nemo-fileroller",
     "app-arch/file-roller",

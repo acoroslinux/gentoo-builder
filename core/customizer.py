@@ -373,11 +373,10 @@ class SystemCustomizer:
                     logger.info(f"Creating /usr/src/linux symlink -> {latest_kernel_dir.name}")
                     linux_symlink.symlink_to(latest_kernel_dir.name)
 
-        # Compile dconf system database for GNOME desktop background and system defaults
-        dconf_dir = self.target_root / "etc" / "dconf" / "db"
-        if dconf_dir.exists():
-            logger.info("Compiling dconf system database (dconf update)...")
-            self.chroot.run_in_chroot("dconf update 2>/dev/null || true")
+        # Compile dconf system database and GLib schemas for desktop environments
+        logger.info("Compiling GLib schemas and updating dconf database...")
+        self.chroot.run_in_chroot("glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true")
+        self.chroot.run_in_chroot("dconf update 2>/dev/null || true")
 
         # Enforce exact Gentoo system permissions for PAM, shadow, sudoers, and SUID binaries
         self.fix_system_permissions()
