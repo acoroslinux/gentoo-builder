@@ -289,7 +289,7 @@ class SystemCustomizer:
 
             dest_path.parent.mkdir(parents=True, exist_ok=True)
             if src_path.is_dir():
-                shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
+                shutil.copytree(src_path, dest_path, dirs_exist_ok=True, symlinks=True, ignore_dangling_symlinks=True)
             else:
                 shutil.copy2(src_path, dest_path)
 
