@@ -12,7 +12,7 @@
     "mate-extra/mate-system-monitor",
     "mate-extra/mate-tweak",
     "mate-extra/mate-indicator-applet",
-    "x11-misc/plank",
+    "x11-dock/plank",
     "x11-terms/tilda",
     "x11-wm/compiz",
     "x11-plugins/ccsm",
