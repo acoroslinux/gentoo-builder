@@ -12,7 +12,6 @@
     "mate-extra/mate-system-monitor",
     "mate-extra/mate-tweak",
     "mate-extra/mate-hud",
-    "mate-extra/mate-dock-applet",
     "mate-extra/mate-indicator-applet",
     "x11-misc/plank",
     "x11-terms/tilda",
