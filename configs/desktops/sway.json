@@ -9,7 +9,7 @@
     "gui-apps/grim",
     "gui-apps/slurp",
     "media-gfx/imv",
-    "x11-fm/thunar",
+    "xfce-base/thunar",
     "app-editors/mousepad",
     "sci-calculators/galculator",
     "app-arch/xarchiver",

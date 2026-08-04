@@ -8,7 +8,7 @@
     "x11-misc/picom",
     "x11-misc/feh",
     "x11-terms/alacritty",
-    "x11-fm/thunar",
+    "xfce-base/thunar",
     "app-editors/mousepad",
     "sci-calculators/galculator",
     "media-gfx/viewnior",

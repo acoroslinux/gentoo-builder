@@ -3,7 +3,7 @@
     "x11-wm/enlightenment",
     "dev-libs/efl",
     "x11-terms/terminology",
-    "x11-fm/thunar",
+    "xfce-base/thunar",
     "app-editors/mousepad",
     "sci-calculators/galculator",
     "media-gfx/viewnior",
