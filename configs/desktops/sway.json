@@ -1,6 +1,7 @@
 {
   "packages": [
     "gui-wm/sway",
+    "gui-apps/swaybg",
     "x11-terms/foot",
     "gui-apps/waybar",
     "gui-apps/wofi",
@@ -10,6 +11,7 @@
     "media-gfx/imv",
     "x11-fm/thunar",
     "app-editors/mousepad",
+    "sci-calculators/galculator",
     "app-arch/xarchiver",
     "gnome-extra/nm-applet",
     "media-sound/pavucontrol",
