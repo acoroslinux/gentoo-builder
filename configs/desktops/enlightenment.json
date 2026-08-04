@@ -5,12 +5,14 @@
     "x11-terms/terminology",
     "x11-fm/thunar",
     "app-editors/mousepad",
+    "sci-calculators/galculator",
     "media-gfx/viewnior",
     "app-arch/xarchiver",
     "gnome-extra/nm-applet",
     "media-sound/pavucontrol",
     "x11-misc/lightdm",
-    "x11-misc/lightdm-gtk-greeter"
+    "x11-misc/lightdm-gtk-greeter",
+    "gui-libs/display-manager-init"
   ],
   "services": [
     "lightdm"
