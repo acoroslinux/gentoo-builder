@@ -4,7 +4,7 @@
     "gnome-extra/gnome-tweaks",
     "gnome-extra/gnome-shell-extensions",
     "gnome-extra/gnome-shell-extension-appindicator",
-    "gnome-extra/gnome-shell-extension-dash-to-dock",
+    "gnome-extra/gnome-shell-extension-dash-to-panel",
     "x11-themes/gnome-backgrounds",
     "gnome-base/nautilus",
     "x11-terms/gnome-terminal",
