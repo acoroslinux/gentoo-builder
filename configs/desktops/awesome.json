@@ -5,7 +5,7 @@
     "x11-misc/rofi",
     "x11-misc/dmenu",
     "x11-misc/picom",
-    "x11-misc/feh",
+    "media-gfx/feh",
     "xfce-base/thunar",
     "app-editors/mousepad",
     "sci-calculators/galculator",
