@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open terminal here</name>
+	<submenu></submenu>
+	<unique-id>1615372407408747-1</unique-id>
+	<command>exo-open --working-directory %f --launch TerminalEmulator</command>
+	<description>Example of a custom action</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+<action>
+	<icon>org.xfce.thunar</icon>
+	<name>Open as root</name>
+	<submenu></submenu>
+	<unique-id>1616353956436746-1</unique-id>
+	<command>pkexec thunar %f</command>
+	<description>Open as root</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>preferences-system-search</icon>
+	<name>Search for files</name>
+	<submenu></submenu>
+	<unique-id>1616359736871731-4</unique-id>
+	<command>catfish  --path=%f</command>
+	<description>Find files and folders</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>application-x-iso</icon>
+	<name>Mount image files</name>
+	<submenu></submenu>
+	<unique-id>1616360728478102-7</unique-id>
+	<command>fuseiso -n -p %f %f.mount ; thunar %f.mount</command>
+	<description>Mount image files</description>
+	<range></range>
+	<patterns>*</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-iso</icon>
+	<name>Desmontar Imagem</name>
+	<submenu></submenu>
+	<unique-id>1616361698703082-8</unique-id>
+	<command>fusermount -u -z %f</command>
+	<description>Unmount Image</description>
+	<range></range>
+	<patterns>*</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>accessories-text-editor</icon>
+	<name>Edit as root</name>
+	<submenu></submenu>
+	<unique-id>1687651355823916-1</unique-id>
+	<command>pkexec mousepad %f</command>
+	<description>Edit as root</description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<text-files/>
+</action>
+<action>
+	<icon>drive-harddisk</icon>
+	<name>Disk Usage</name>
+	<submenu></submenu>
+	<unique-id>1687651694643352-3</unique-id>
+	<command>baobab %d</command>
+	<description>Disk Usage</description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>application-vnd.oasis.opendocument.text-template</icon>
+	<name> Open in Terminal</name>
+	<submenu></submenu>
+	<unique-id>1687651793865147-4</unique-id>
+	<command>xfce4-terminal -x nano %f</command>
+	<description> Open in Terminal</description>
+	<range>*</range>
+	<patterns>*</patterns>
+	<text-files/>
+</action>
+</actions>

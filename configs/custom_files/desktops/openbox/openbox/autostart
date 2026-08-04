@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Gentoo Modern Openbox Autostart
+
+## Set wallpaper
+feh --bg-fill /usr/share/backgrounds/default-wallpaper.png &
+
+## Compositor manager (Picom)
+picom -b &
+
+## Tint2 panel
+tint2 &
+
+## Network Manager Applet
+nm-applet &
+
+## Update user directories
+xdg-user-dirs-update &
+
+## Dunst Notification daemon
+dunst &

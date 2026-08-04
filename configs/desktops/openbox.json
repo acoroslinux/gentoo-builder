@@ -39,7 +39,7 @@
     "copy_files": [
       {
         "source": "desktops/openbox",
-        "destination": "/etc/skel/.config/openbox"
+        "destination": "/etc/skel/.config"
       }
     ]
   }

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Welcome to Peppermint
+Exec=welcome
+Icon=/usr/share/pixmaps/peppermint.png
+Terminal=false
+StartupNotify=True
+Name[en_US]=Welcome to Peppermint
+Path=
