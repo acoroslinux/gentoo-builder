@@ -160,6 +160,22 @@ class PortageManager:
                     "media-libs/libglvnd X\n"
                 )
 
+                init_sys = self.config.get("init_system", "openrc")
+                if init_sys == "systemd":
+                    f.write(
+                        "sys-auth/polkit systemd -elogind\n"
+                        "sys-apps/systemd policykit -elogind\n"
+                        "sys-apps/dbus systemd\n"
+                        "net-misc/networkmanager systemd -elogind\n"
+                        "net-misc/modemmanager systemd -elogind\n"
+                    )
+                else:
+                    f.write(
+                        "sys-auth/polkit elogind -systemd\n"
+                        "sys-apps/dbus -systemd\n"
+                        "net-misc/networkmanager elogind -systemd\n"
+                    )
+
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
             # to restrict compilation threads for memory-heavy packages (nodejs, rust, webkit-gtk, gcc, spidermonkey)
             env_dir = self.target_root / "etc" / "portage" / "env"
