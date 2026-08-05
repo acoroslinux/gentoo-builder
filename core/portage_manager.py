@@ -155,6 +155,7 @@ class PortageManager:
                     "media-libs/opus custom-modes\n"
                     "media-libs/gegl cairo png jpeg svg tiff lcms introspection\n"
                     "dev-libs/libdbusmenu gtk3\n"
+                    "app-admin/conky X xft lua lua-cairo lua-imlib2 -wayland\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
