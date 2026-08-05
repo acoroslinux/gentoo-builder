@@ -156,6 +156,7 @@ class PortageManager:
                     "media-libs/gegl cairo png jpeg svg tiff lcms introspection\n"
                     "dev-libs/libdbusmenu gtk3\n"
                     "app-admin/conky X xft truetype lua-cairo bundled-toluapp -wayland\n"
+                    "x11-libs/cairo X glib svg cairo-xlib\n"
                 )
 
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
