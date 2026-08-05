@@ -222,8 +222,15 @@ class PortageManager:
         logger.info("Updating base packages and slot dependencies (emerge --ask=n --update --deep --newuse @world)...")
         self.chroot.run_in_chroot("env-update")
 
-        # Resolve init system package conflicts (sysvinit vs s6-linux-init vs systemd)
+        # Resolve init system package conflicts (sysvinit vs s6-linux-init vs systemd vs elogind)
         init_sys = self.config.get("init_system", "openrc")
+        if init_sys == "systemd":
+            self.chroot.run_in_chroot("emerge --ask=n --deselect sys-auth/elogind 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge --ask=n --unmerge sys-auth/elogind 2>/dev/null || true")
+        else:
+            self.chroot.run_in_chroot("emerge --ask=n --deselect sys-apps/systemd 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge --ask=n --unmerge sys-apps/systemd 2>/dev/null || true")
+
         if init_sys == "s6":
             self.chroot.run_in_chroot("emerge --deselect sys-apps/sysvinit 2>/dev/null || true")
             self.chroot.run_in_chroot("emerge -C sys-apps/sysvinit 2>/dev/null || true")
