@@ -69,8 +69,25 @@ class SystemCustomizer:
 
         sudoers_file = self.target_root / "etc" / "sudoers.d" / "live_user"
         sudoers_file.parent.mkdir(parents=True, exist_ok=True)
-        sudoers_file.write_text(f"{username} ALL=(ALL) NOPASSWD: ALL\n")
+        sudoers_file.write_text(
+            f"Defaults !requiretty\n"
+            f"{username} ALL=(ALL) NOPASSWD: ALL\n"
+            f"%wheel ALL=(ALL) NOPASSWD: ALL\n"
+        )
         os.chmod(sudoers_file, 0o440)
+
+        # PolKit rules for passwordless administrative actions & Calamares execution in LXDE/LightDM/PolKit
+        polkit_dir = self.target_root / "etc" / "polkit-1" / "rules.d"
+        polkit_dir.mkdir(parents=True, exist_ok=True)
+        polkit_rule = polkit_dir / "49-nopasswd-live.rules"
+        polkit_rule.write_text(
+            '/* Allow live user and wheel group to perform administrative actions without password */\n'
+            'polkit.addRule(function(action, subject) {\n'
+            '    if (subject.isInGroup("wheel") || subject.user == "' + username + '") {\n'
+            '        return polkit.Result.YES;\n'
+            '    }\n'
+            '});\n'
+        )
 
     def setup_services(self):
         services = self.config.get("services", [])
@@ -180,10 +197,9 @@ class SystemCustomizer:
                     logger.info(f"Auto-created minimal Runit service script for '{srv}' -> {target_src}/run")
 
                 if target_src:
-                    target_name = Path(target_src).name
-                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/etc/runit/runsvdir/default/{target_name}'")
-                    self.chroot.run_in_chroot(f"ln -sf '{target_src}' '/var/service/{target_name}' 2>/dev/null || true")
-                    logger.info(f"Enabled Runit service: {srv} ({target_src})")
+                    dest_link = f"/var/service/{srv_lower}"
+                    self.chroot.run_in_chroot(f"ln -sf {target_src} {dest_link} 2>/dev/null || true")
+                    logger.info(f"Enabled Runit service: {target_src} -> {dest_link}")
             elif self.init_system == "s6":
                 self.chroot.run_in_chroot(f"s6-rc-bundle add default {srv} 2>/dev/null || true")
                 self.chroot.run_in_chroot(f"rc-update add {srv} default 2>/dev/null || true")
@@ -191,11 +207,31 @@ class SystemCustomizer:
                     self.configure_autologin(srv, username, session)
 
     def configure_autologin(self, dm: str, username: str, session: str):
-        """Configures automatic login for LightDM, SDDM, GDM, LXDM, and TTY1 console."""
         if self.chroot.mode == "mock":
             return
 
-        logger.info(f"Configuring autologin for display manager '{dm}' (user: {username}, session: {session})...")
+        session_map = {
+            "lxde": "LXDE",
+            "lxqt": "lxqt",
+            "xfce": "xfce",
+            "mate": "mate",
+            "cinnamon": "cinnamon",
+            "gnome": "gnome",
+            "kde": "plasma",
+            "plasma": "plasma",
+            "sway": "sway",
+            "hyprland": "hyprland",
+            "i3": "i3",
+            "openbox": "openbox",
+            "awesome": "awesome",
+            "bspwm": "bspwm",
+            "qtile": "qtile",
+            "fluxbox": "fluxbox",
+            "enlightenment": "enlightenment"
+        }
+        session_name = session_map.get(session.lower(), session)
+
+        logger.info(f"Configuring autologin for display manager '{dm}' (user: {username}, session: {session_name})...")
 
         if dm == "lightdm":
             self.chroot.run_in_chroot("groupadd -r autologin 2>/dev/null || true")
@@ -204,14 +240,14 @@ class SystemCustomizer:
             lconf = self.target_root / "etc" / "lightdm" / "lightdm.conf"
             if lconf.exists():
                 content = lconf.read_text()
-                lines = [line for line in content.splitlines() if not line.startswith("autologin-user=")]
+                lines = [line for line in content.splitlines() if not line.startswith("autologin-user=") and not line.startswith("autologin-session=")]
                 clean_content = "\n".join(lines)
                 autologin_block = (
                     f"\n\n[Seat:*]\n"
                     f"autologin-user={username}\n"
                     f"autologin-user-timeout=0\n"
-                    f"autologin-session={session}\n"
-                    f"user-session={session}\n"
+                    f"autologin-session={session_name}\n"
+                    f"user-session={session_name}\n"
                     f"pam-service=lightdm-autologin\n"
                     f"pam-autologin-service=lightdm-autologin\n"
                 )
