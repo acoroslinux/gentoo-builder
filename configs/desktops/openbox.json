@@ -8,7 +8,7 @@
     "x11-misc/rofi",
     "x11-misc/picom",
     "media-gfx/feh",
-    "media-gfx/nitrogen",
+    "x11-misc/nitrogen",
     "app-admin/conky",
     "xfce-extra/xfce4-power-manager",
     "x11-terms/alacritty",
