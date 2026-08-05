@@ -195,8 +195,9 @@ class ConfigLoader:
         # Interpolate variables in stage3 URL if present
         if "stage3" in merged and "url" in merged["stage3"]:
             url_str = merged["stage3"]["url"]
+            stage3_init = init_system if init_system in ["openrc", "systemd"] else "openrc"
             merged["stage3"]["url"] = url_str.format(
-                init_system=init_system or "openrc",
+                init_system=stage3_init,
                 arch=architecture or "x86_64"
             )
 
