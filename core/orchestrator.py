@@ -307,10 +307,27 @@ class BuildOrchestrator:
                 # Unmount chroot virtual filesystems before creating ISO / tarball / disk image
                 chroot.umount_virtual_fs()
 
-                if self.output_format == "tarball":
+                if self.output_format in ["tarball", "stage3"]:
                     tarball_file = iso_engine.build_tarball()
-                    logger.info(f"Tarball build completed successfully! Output: {tarball_file}")
-                    return tarball_file
+                    target_subfolder = "output/stage3_seeds" if self.output_format == "stage3" else "output"
+                    project_output_dir = resolve_from_project(target_subfolder)
+                    project_output_dir.mkdir(parents=True, exist_ok=True)
+                    final_output_file = project_output_dir / tarball_file.name
+                    if tarball_file != final_output_file:
+                        try:
+                            shutil.copy2(tarball_file, final_output_file)
+                            md5_file = tarball_file.parent / f"{tarball_file.name}.md5"
+                            sha256_file = tarball_file.parent / f"{tarball_file.name}.sha256"
+                            if md5_file.exists():
+                                shutil.copy2(md5_file, project_output_dir / md5_file.name)
+                            if sha256_file.exists():
+                                shutil.copy2(sha256_file, project_output_dir / sha256_file.name)
+                            logger.info(f"Copied final tarball to: {final_output_file}")
+                        except OSError as e:
+                            logger.warning(f"Could not copy tarball to output directory: {e}")
+
+                    logger.info(f"Tarball build completed successfully! Output: {final_output_file}")
+                    return final_output_file
 
                 if self.output_format == "img" or self.target == "diskimage-stage2":
                     # 8. Build disk image via DiskEngine
