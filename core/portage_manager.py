@@ -228,8 +228,8 @@ class PortageManager:
             self.chroot.run_in_chroot("emerge --ask=n --deselect sys-auth/elogind 2>/dev/null || true")
             self.chroot.run_in_chroot("emerge --ask=n --unmerge sys-auth/elogind 2>/dev/null || true")
         else:
-            self.chroot.run_in_chroot("emerge --ask=n --deselect sys-apps/systemd 2>/dev/null || true")
-            self.chroot.run_in_chroot("emerge --ask=n --unmerge sys-apps/systemd 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge --ask=n --deselect sys-apps/systemd sys-apps/systemd-initctl 2>/dev/null || true")
+            self.chroot.run_in_chroot("emerge --ask=n --unmerge sys-apps/systemd sys-apps/systemd-initctl 2>/dev/null || true")
 
         if init_sys == "s6":
             self.chroot.run_in_chroot("emerge --deselect sys-apps/sysvinit 2>/dev/null || true")
