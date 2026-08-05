@@ -11,7 +11,7 @@
     "media-gfx/feh",
     "x11-misc/nitrogen",
     "app-admin/conky",
-    "xfce-extra/xfce4-power-manager",
+    "xfce-base/xfce4-power-manager",
     "x11-terms/alacritty",
     "xfce-base/thunar",
     "app-editors/mousepad",
