@@ -77,8 +77,20 @@ class ConfigLoader:
 
         # Apply Architecture profile
         if architecture:
+            arch_aliases = {
+                "i686": "i686",
+                "i386": "x86",
+                "x86": "x86",
+                "x86_64": "x86_64",
+                "amd64": "x86_64",
+                "aarch64": "arm64",
+                "armv7a": "arm",
+                "armv7": "arm",
+                "riscv64": "riscv64"
+            }
+            resolved_arch = arch_aliases.get(architecture.lower(), architecture)
             try:
-                arch_cfg = self.load_profile("architectures", architecture)
+                arch_cfg = self.load_profile("architectures", resolved_arch)
                 if "stage3" in arch_cfg:
                     merged["stage3"].update(arch_cfg["stage3"])
                 if "make_conf" in arch_cfg:
