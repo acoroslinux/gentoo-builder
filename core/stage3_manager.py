@@ -41,6 +41,14 @@ class Stage3Manager:
                         return full_url
         except Exception as e:
             logger.warning(f"Could not resolve dynamic stage3 URL from {txt_url}: {e}")
+            for alt_init in ["runit", "s6", "sysvinit"]:
+                if f"-{alt_init}.txt" in txt_url:
+                    fallback_txt = txt_url.replace(f"-{alt_init}.txt", "-openrc.txt")
+                    logger.info(f"Retrying Stage3 URL resolution using OpenRC seed fallback: {fallback_txt}")
+                    try:
+                        return self._resolve_latest_stage3_url(fallback_txt)
+                    except Exception:
+                        pass
 
         # Construct a sensible fallback based on the txt_url or pattern
         base_path_url = txt_url.rsplit("/", 1)[0] + "/" if "/" in txt_url else "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
