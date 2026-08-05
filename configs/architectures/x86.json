@@ -1,6 +1,7 @@
 {
   "make_conf": {
     "CFLAGS": "-O2 -pipe -march=i686",
+    "CPU_FLAGS_X86": "mmx mmxext sse sse2 sse3",
     "ACCEPT_KEYWORDS": "~x86"
   },
   "stage3": {
