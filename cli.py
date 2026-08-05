@@ -110,32 +110,37 @@ def main():
     raw_pkgs = [item for sublist in args.packages for item in sublist] if args.packages else []
     raw_srvs = [item for sublist in args.services for item in sublist] if args.services else []
 
-    try:
-        orchestrator = BuildOrchestrator(
-            arch=args.architecture,
-            config_path=args.config,
-            mode=args.mode,
-            clean=args.clean,
-            init_system=args.init,
-            desktop=args.desktop,
-            kernel=args.kernel,
-            bootloader=args.bootloader,
-            package_profiles=_parse_list_arg(raw_pkgs),
-            service_profiles=_parse_list_arg(raw_srvs),
-            live_profile=getattr(args, "live_profile", None),
-            output_name=args.output,
-            force_isolated_toolchain=args.force_isolated_toolchain,
-            target=args.target,
-            output_format=args.format,
-            stage3_url=args.stage3
-        )
-        orchestrator.build()
-    except (BuildOrchestratorError, ISOEngineError, PortageManagerError, Stage3ManagerError) as e:
-        print(f"Build error: {e}", file=sys.stderr)
-        sys.exit(1)
-    except KeyboardInterrupt:
-        print("\nBuild interrupted by user.", file=sys.stderr)
-        sys.exit(130)
+    inits = _parse_list_arg(args.init) if args.init else ["openrc"]
+    if not inits:
+        inits = ["openrc"]
+
+    for current_init in inits:
+        try:
+            orchestrator = BuildOrchestrator(
+                arch=args.architecture,
+                config_path=args.config,
+                mode=args.mode,
+                clean=args.clean,
+                init_system=current_init,
+                desktop=args.desktop,
+                kernel=args.kernel,
+                bootloader=args.bootloader,
+                package_profiles=_parse_list_arg(raw_pkgs),
+                service_profiles=_parse_list_arg(raw_srvs),
+                live_profile=getattr(args, "live_profile", None),
+                output_name=args.output,
+                force_isolated_toolchain=args.force_isolated_toolchain,
+                target=args.target,
+                output_format=args.format,
+                stage3_url=args.stage3
+            )
+            orchestrator.build()
+        except (BuildOrchestratorError, ISOEngineError, PortageManagerError, Stage3ManagerError) as e:
+            print(f"Build error [{current_init}]: {e}", file=sys.stderr)
+            sys.exit(1)
+        except KeyboardInterrupt:
+            print("\nBuild interrupted by user.", file=sys.stderr)
+            sys.exit(130)
 
 if __name__ == "__main__":
     main()
