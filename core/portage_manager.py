@@ -231,6 +231,16 @@ class PortageManager:
                         "net-misc/networkmanager elogind -systemd\n"
                     )
 
+            # Write package.accept_keywords to unmask Calamares & key installer tools on architectures where keywords are missing (e.g. x86/i686)
+            package_keywords_dir = self.target_root / "etc" / "portage" / "package.accept_keywords"
+            package_keywords_dir.mkdir(parents=True, exist_ok=True)
+            with open(package_keywords_dir / "00-builder-keywords", "w", encoding="utf-8") as f_kw:
+                f_kw.write(
+                    "# Unmask Calamares installer for architectures without explicit keywords (e.g. x86/i686)\n"
+                    "app-admin/calamares ** ~x86 ~amd64 ~arm64 ~riscv\n"
+                    "sys-libs/kpmcore ** ~x86 ~amd64 ~arm64\n"
+                )
+
             # Create /etc/portage/env/low-ram.conf and /etc/portage/package.env/00-builder-ram-limits
             # to restrict compilation threads for memory-heavy packages (nodejs, rust, webkit-gtk, gcc, spidermonkey)
             env_dir = self.target_root / "etc" / "portage" / "env"
