@@ -1,5 +1,6 @@
 import argparse
 import json
+import platform
 import sys
 from pathlib import Path
 
@@ -34,11 +35,12 @@ def main():
         epilog="Use --help to see available arguments."
     )
 
+    host_machine = platform.machine().lower()
     parser.add_argument(
         "architecture",
         nargs="?",
-        default="x86_64",
-        help="Target architecture (e.g. x86_64). Default: x86_64",
+        default=host_machine,
+        help=f"Target architecture (e.g. x86_64, aarch64, i686). Default: native host ({host_machine})",
     )
 
     parser.add_argument(

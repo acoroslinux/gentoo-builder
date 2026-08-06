@@ -10,7 +10,7 @@ class ChrootSetup:
     def __init__(self, target_root: Path, mode: str = "mock", default_profile: Optional[str] = None):
         self.target_root = Path(target_root).resolve()
         self.mode = mode.lower()
-        self.default_profile = default_profile or "default/linux/amd64/23.0/split-usr"
+        self.default_profile = default_profile
 
     def prepare_resolv_conf(self):
         """Copy host's /etc/resolv.conf into chroot for network connectivity."""
@@ -36,6 +36,9 @@ class ChrootSetup:
 
         profile_link = self.target_root / "etc" / "portage" / "make.profile"
         default_profile_target = self.default_profile
+        if not default_profile_target:
+            return
+
         if not default_profile_target.startswith(".."):
             default_profile_target = f"../var/db/repos/gentoo/profiles/{default_profile_target}"
 

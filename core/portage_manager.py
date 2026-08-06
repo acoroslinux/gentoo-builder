@@ -89,8 +89,22 @@ class PortageManager:
             emerge_opts = f"--jobs={safe_jobs} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
             features_val = "binpkg-logs parallel-install parallel-fetch buildpkg"
 
-        # Allow explicit override from config if provided
-        cflags = make_conf_data.get("CFLAGS", "-O2 -pipe -march=x86-64")
+        # CFLAGS: always comes from arch JSON (e.g. arm64.json has -march=armv8-a).
+        # Fall back to a generic safe value if somehow missing.
+        cflags = make_conf_data.get("CFLAGS", "-O2 -pipe")
+        # ACCEPT_KEYWORDS: comes from arch JSON (e.g. ~arm64, ~amd64, ~riscv).
+        # Derive from arch if missing from config.
+        target_arch = self.config.get("arch", platform.machine().lower())
+        _arch_keyword_map = {
+            "x86_64": "~amd64", "amd64": "~amd64",
+            "aarch64": "~arm64", "arm64": "~arm64",
+            "riscv64": "~riscv",
+            "i686": "~x86", "i386": "~x86",
+            "ppc64le": "~ppc64", "ppc64": "~ppc64",
+        }
+        default_keywords = _arch_keyword_map.get(target_arch, f"~{target_arch}")
+        accept_keywords = make_conf_data.get("ACCEPT_KEYWORDS", default_keywords)
+
         makeopts_val = make_conf_data.get("MAKEOPTS") if "MAKEOPTS" in make_conf_data and make_conf_data["MAKEOPTS"] != "-j2" else safe_makeopts
         # Under QEMU always enforce -j1 regardless of config override
         if using_qemu:
@@ -104,7 +118,7 @@ class PortageManager:
             'FCFLAGS="${COMMON_FLAGS}"',
             'FFLAGS="${COMMON_FLAGS}"',
             'MAKEOPTS="' + makeopts_val + '"',
-            'ACCEPT_KEYWORDS="' + make_conf_data.get("ACCEPT_KEYWORDS", "~amd64") + '"',
+            'ACCEPT_KEYWORDS="' + accept_keywords + '"',
             'ACCEPT_LICENSE="' + make_conf_data.get("ACCEPT_LICENSE", "*") + '"',
             'USE="' + " ".join(use_flags) + '"',
             f'EMERGE_DEFAULT_OPTS="{emerge_opts}"',
@@ -113,7 +127,7 @@ class PortageManager:
             'DISTDIR="/var/cache/distfiles"',
             'PKGDIR="/var/cache/binpkgs"'
         ]
-        
+
         # Append any custom variables (like VIDEO_CARDS, INPUT_DEVICES, etc.)
         for key, val in make_conf_data.items():
             if key not in ["CFLAGS", "CXXFLAGS", "FCFLAGS", "FFLAGS", "COMMON_FLAGS", "MAKEOPTS", "ACCEPT_KEYWORDS", "ACCEPT_LICENSE", "USE", "EMERGE_DEFAULT_OPTS", "FEATURES", "PORTAGE_NICENESS", "DISTDIR", "PKGDIR"]:

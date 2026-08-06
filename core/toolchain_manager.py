@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import subprocess
 import urllib.request
@@ -8,6 +9,17 @@ from core.logger_setup import setup_logger
 from core.command_runner import CommandRunner
 
 logger = setup_logger("toolchain_manager")
+
+# The build_host toolchain is always the NATIVE host architecture (never cross-compiled).
+# We resolve it once at import time from the kernel/CPU.
+_HOST_ARCH = platform.machine().lower()  # e.g. 'x86_64', 'aarch64'
+_HOST_ARCH_GENTOO = {
+    "x86_64": "amd64",
+    "aarch64": "arm64",
+    "riscv64": "riscv64",
+    "i686":    "x86",
+    "i386":    "x86",
+}.get(_HOST_ARCH, _HOST_ARCH)  # fallback: use raw machine string
 
 class ToolchainManagerError(Exception):
     pass
@@ -46,22 +58,30 @@ class ToolchainManager:
         return True
 
     def _resolve_latest_stage3_url(self) -> str:
-        txt_url = "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt"
+        """Resolve the latest native-host Stage3 tarball URL from Gentoo mirrors."""
+        # Build-host is always the NATIVE host architecture (x86_64 on x86_64 machines, etc.)
+        gentoo_arch = _HOST_ARCH_GENTOO  # e.g. 'amd64', 'arm64'
+        stage3_tag = f"stage3-{gentoo_arch}"
+        txt_url = f"https://distfiles.gentoo.org/releases/{gentoo_arch}/autobuilds/latest-{stage3_tag}-openrc.txt"
+        logger.info(f"Resolving build_host Stage3 for native arch={_HOST_ARCH} (Gentoo={gentoo_arch}): {txt_url}")
         try:
             req = urllib.request.Request(txt_url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req) as resp:
                 content = resp.read().decode("utf-8")
+                base_url = f"https://distfiles.gentoo.org/releases/{gentoo_arch}/autobuilds/"
                 for line in content.splitlines():
                     line = line.strip()
-                    if line and not line.startswith("#") and not line.startswith("-----") and "stage3-amd64-openrc" in line:
+                    if line and not line.startswith("#") and not line.startswith("-----") and f"{stage3_tag}-openrc" in line:
                         rel_path = line.split()[0]
-                        full_url = f"https://distfiles.gentoo.org/releases/amd64/autobuilds/{rel_path}"
+                        full_url = f"{base_url}{rel_path}"
                         logger.info(f"Resolved latest build_host Stage3 URL: {full_url}")
                         return full_url
         except Exception as e:
             logger.warning(f"Could not resolve dynamic build_host stage3 URL: {e}")
 
-        return "https://distfiles.gentoo.org/releases/amd64/autobuilds/20260719T170103Z/stage3-amd64-openrc-20260719T170103Z.tar.xz"
+        # Fallback: construct a generic URL using host arch (no hardcoded date)
+        gentoo_arch = _HOST_ARCH_GENTOO
+        return f"https://distfiles.gentoo.org/releases/{gentoo_arch}/autobuilds/current-stage3-{gentoo_arch}-openrc/stage3-{gentoo_arch}-openrc-latest.tar.xz"
 
     def bootstrap_build_host(self):
         """Prepare the isolated build_host environment by extracting a dedicated Stage3."""

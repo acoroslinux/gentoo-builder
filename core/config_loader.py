@@ -40,7 +40,7 @@ class ConfigLoader:
     def assemble_build_config(
         self,
         global_config_path: str | Path,
-        architecture: Optional[str] = "x86_64",
+        architecture: Optional[str] = None,
         init_system: Optional[str] = "openrc",
         desktop: Optional[str] = None,
         kernel: Optional[str] = None,
@@ -49,6 +49,7 @@ class ConfigLoader:
         service_profiles: Optional[List[str]] = None,
         live_profile: Optional[str] = None,
     ) -> Dict[str, Any]:
+        target_arch = architecture or platform.machine().lower()
         base_cfg = self.load_json(global_config_path)
         merged = {
             "global": base_cfg.get("global", {}),
@@ -64,7 +65,7 @@ class ConfigLoader:
             "custom_files": base_cfg.get("custom_files", []),
             "init_system": "openrc",
             "default_profile": None,
-            "arch": architecture or "x86_64",  # Raw arch string for QEMU detection
+            "arch": target_arch,  # Raw arch string for QEMU detection
         }
 
         # Apply Init system profile (openrc, systemd, runit, s6)
@@ -199,7 +200,7 @@ class ConfigLoader:
             stage3_init = init_system if init_system in ["openrc", "systemd"] else "openrc"
             merged["stage3"]["url"] = url_str.format(
                 init_system=stage3_init,
-                arch=architecture or "x86_64"
+                arch=target_arch
             )
 
         return merged

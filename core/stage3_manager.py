@@ -1,4 +1,5 @@
 import urllib.request
+import platform
 import subprocess
 import shutil
 import re
@@ -9,14 +10,32 @@ from core.logger_setup import setup_logger
 
 logger = setup_logger("stage3_manager")
 
+# Map platform.machine() -> Gentoo architecture name used in distfiles URLs
+_MACHINE_TO_GENTOO_ARCH = {
+    "x86_64": "amd64",
+    "aarch64": "arm64",
+    "riscv64": "riscv64",
+    "i686": "x86",
+    "i386": "x86",
+}
+
+def _default_stage3_url_for_arch(arch: str) -> str:
+    """Return a sensible default stage3 .txt URL for the given target arch string."""
+    # arch is the raw CLI/config value e.g. 'x86_64', 'aarch64', 'i686'
+    # Map to Gentoo mirror path segment
+    gentoo_arch = _MACHINE_TO_GENTOO_ARCH.get(arch.lower(), arch.lower())
+    tag = f"stage3-{gentoo_arch}"
+    return f"https://distfiles.gentoo.org/releases/{gentoo_arch}/autobuilds/latest-{tag}-openrc.txt"
+
 class Stage3ManagerError(Exception):
     pass
 
 class Stage3Manager:
-    def __init__(self, workdir: Path, stage3_config: Dict[str, Any], mode: str = "mock"):
+    def __init__(self, workdir: Path, stage3_config: Dict[str, Any], mode: str = "mock", arch: str = ""):
         self.workdir = Path(workdir).resolve()
         self.config = stage3_config
         self.mode = mode.lower()
+        self.arch = arch or platform.machine().lower()  # target arch for URL resolution
         self.cache_dir = self.workdir / "cache"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
@@ -26,7 +45,9 @@ class Stage3Manager:
         else:
             return base_url
 
-        pattern = self.config.get("pattern", "stage3-amd64")
+        # Default pattern: stage3-<gentoo_arch>
+        gentoo_arch = _MACHINE_TO_GENTOO_ARCH.get(self.arch, self.arch)
+        pattern = self.config.get("pattern", f"stage3-{gentoo_arch}")
         try:
             req = urllib.request.Request(txt_url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req) as resp:
@@ -64,7 +85,9 @@ class Stage3Manager:
             logger.info(f"Target chroot already exists at {target_root} and --no-clean specified. Skipping Stage3 extraction.")
             return
 
-        configured_url = self.config.get("url", "https://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage3-amd64-openrc.txt")
+        # Build a sensible default URL from the target arch if config doesn't specify one
+        default_url = _default_stage3_url_for_arch(self.arch)
+        configured_url = self.config.get("url", default_url)
         if configured_url.startswith("file://") or Path(configured_url).exists():
             tarball_path = Path(configured_url.replace("file://", "")).resolve()
             logger.info(f"Using local Stage3 tarball: {tarball_path}")

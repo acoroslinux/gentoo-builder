@@ -172,7 +172,7 @@ class BuildOrchestrator:
 
         try:
             # 3. Target Stage3 Bootstrap
-            stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode)
+            stage3 = Stage3Manager(self.workdir, build_config.get("stage3", {}), mode=self.mode, arch=self.arch)
             stage3.fetch_and_extract(self.target_root, clean=self.clean)
 
             # 4. Setup Host Network and Profile Symlinks inside Chroot
