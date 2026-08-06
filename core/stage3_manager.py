@@ -51,7 +51,12 @@ class Stage3Manager:
                         pass
 
         # Construct a sensible fallback based on the txt_url or pattern
-        base_path_url = txt_url.rsplit("/", 1)[0] + "/" if "/" in txt_url else "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
+        # Use pattern (e.g. 'stage3-arm64', 'stage3-amd64') to derive the correct base URL
+        base_path_url = txt_url.rsplit("/", 1)[0] + "/" if "/" in txt_url else ""
+        if not base_path_url:
+            # Derive base from pattern: stage3-arm64 -> releases/arm64/autobuilds/
+            arch_from_pattern = pattern.replace("stage3-", "").split("-")[0]  # e.g. 'arm64', 'amd64'
+            base_path_url = f"https://distfiles.gentoo.org/releases/{arch_from_pattern}/autobuilds/"
         return f"{base_path_url}current-{pattern}-openrc/{pattern}-openrc-latest.tar.xz"
 
     def fetch_and_extract(self, target_root: Path, clean: bool = False):

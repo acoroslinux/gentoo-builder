@@ -1,4 +1,5 @@
 import os
+import platform
 import subprocess
 import shutil
 import hashlib
@@ -9,6 +10,24 @@ from core.path_utils import resolve_from_project
 
 logger = setup_logger("iso_engine")
 
+# Map target arch string -> (grub EFI format, EFI boot filename)
+_ARCH_EFI_MAP = {
+    "x86_64":  ("x86_64-efi",  "BOOTX64.EFI"),
+    "amd64":   ("x86_64-efi",  "BOOTX64.EFI"),
+    "aarch64": ("arm64-efi",   "BOOTAA64.EFI"),
+    "arm64":   ("arm64-efi",   "BOOTAA64.EFI"),
+    "riscv64": ("riscv64-efi", "BOOTRISCV64.EFI"),
+    "i686":    ("i386-efi",    "BOOTIA32.EFI"),
+    "i386":    ("i386-efi",    "BOOTIA32.EFI"),
+}
+
+# Arches that support BIOS booting (isolinux / syslinux / MBR)
+_BIOS_ARCHES = {"x86_64", "amd64", "i686", "i386", "x86"}
+
+def _arch_from_workdir(workdir: Path) -> str:
+    """Derive target architecture from the workdir path (e.g. workdir/aarch64 -> aarch64)."""
+    return workdir.name.lower() if workdir else platform.machine().lower()
+
 class ISOEngineError(Exception):
     pass
 
@@ -18,6 +37,7 @@ class ISOEngine:
         self.target_root = Path(target_root).resolve()
         self.output_name = output_name
         self.config = config or {}
+        self.arch = _arch_from_workdir(self.workdir)  # e.g. 'aarch64', 'x86_64', 'i686'
         self.mode = mode.lower()
         self.toolchain = toolchain
         self.iso_dir = self.workdir / "iso_root"
@@ -266,7 +286,7 @@ class ISOEngine:
     def _get_template_placeholders(self) -> dict:
         vol_id = self.config.get("vol_id", "gentoo_modern")
         boot_title = self.config.get("title", "Gentoo Modern")
-        arch = self.workdir.name if self.workdir else "x86_64"
+        arch = self.arch  # always use self.arch (set at __init__ time)
         desktop_raw = self.config.get("desktop") or getattr(self, "desktop", None) or "GNOME"
         desktop = desktop_raw.upper() if isinstance(desktop_raw, str) else "GNOME"
 
@@ -392,63 +412,71 @@ class ISOEngine:
             )
 
     def generate_grub_efi_image(self):
-        """Generates EFI bootable efiboot.img and standalone BOOTX64.EFI image."""
+        """Generates EFI bootable efiboot.img and standalone EFI image (arch-aware)."""
         efiboot_img = self.iso_dir / "boot" / "grub" / "efiboot.img"
         efiboot_img.parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info(f"Generating EFI standalone image at {efiboot_img}")
+        # Resolve EFI format and boot filename based on target architecture
+        grub_efi_format, efi_boot_file = _ARCH_EFI_MAP.get(
+            self.arch, ("x86_64-efi", "BOOTX64.EFI")
+        )
+        logger.info(f"Generating EFI image for arch={self.arch}: format={grub_efi_format}, file={efi_boot_file}")
+
         if self.mode == "mock":
             efiboot_img.touch()
             return
 
         efi_tmp = self.workdir / "tmp_efi"
         efi_tmp.mkdir(parents=True, exist_ok=True)
-        bootx64 = efi_tmp / "BOOTX64.EFI"
+        efi_binary = efi_tmp / efi_boot_file
 
         if self.toolchain and getattr(self.toolchain, "is_mounted", False):
             self.toolchain.run_in_build_host(
-                "grub-mkstandalone --format=x86_64-efi --output=/workdir/tmp_efi/BOOTX64.EFI boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg"
+                f"grub-mkstandalone --format={grub_efi_format} "
+                f"--output=/workdir/tmp_efi/{efi_boot_file} "
+                f"boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg"
             )
         elif shutil.which("grub-mkstandalone"):
             grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
             subprocess.run([
-                "grub-mkstandalone", "--format=x86_64-efi",
-                f"-o={bootx64}", f"boot/grub/grub.cfg={grub_cfg}"
+                "grub-mkstandalone", f"--format={grub_efi_format}",
+                f"-o={efi_binary}", f"boot/grub/grub.cfg={grub_cfg}"
             ], capture_output=True)
 
-        if bootx64.exists():
-            # 1. Copy BOOTX64.EFI and grub.cfg directly to /EFI/BOOT/ in iso_root
+        if efi_binary.exists():
+            # 1. Copy EFI binary and grub.cfg directly to /EFI/BOOT/ in iso_root
             # This allows direct UEFI filesystem booting on VirtualBox/QEMU/hardware
             iso_efi_dir = self.iso_dir / "EFI" / "BOOT"
             iso_efi_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(bootx64, iso_efi_dir / "BOOTX64.EFI")
+            shutil.copy2(efi_binary, iso_efi_dir / efi_boot_file)
 
             grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
             if grub_cfg.exists():
                 shutil.copy2(grub_cfg, iso_efi_dir / "grub.cfg")
 
-            # 2. Package BOOTX64.EFI into El Torito FAT image (efiboot.img)
+            # 2. Package EFI binary into El Torito FAT image (efiboot.img)
             subprocess.run(["truncate", "-s", "32M", str(efiboot_img)], check=True)
 
             packed = False
             if self.toolchain and getattr(self.toolchain, "is_mounted", False):
                 res = self.toolchain.run_in_build_host(
-                    "mformat -i /workdir/iso_root/boot/grub/efiboot.img -h 32 -t 32 -n 64 -c 1 :: && "
-                    "mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI && "
-                    "mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI/BOOT && "
-                    "mcopy -i /workdir/iso_root/boot/grub/efiboot.img /workdir/tmp_efi/BOOTX64.EFI ::/EFI/BOOT/BOOTX64.EFI"
+                    f"mformat -i /workdir/iso_root/boot/grub/efiboot.img -h 32 -t 32 -n 64 -c 1 :: && "
+                    f"mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI && "
+                    f"mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI/BOOT && "
+                    f"mcopy -i /workdir/iso_root/boot/grub/efiboot.img "
+                    f"/workdir/tmp_efi/{efi_boot_file} ::/EFI/BOOT/{efi_boot_file}"
                 )
                 if res.returncode == 0:
                     packed = True
-                    logger.info(f"Successfully packaged BOOTX64.EFI into {efiboot_img} via isolated toolchain mtools")
+                    logger.info(f"Successfully packaged {efi_boot_file} into {efiboot_img} via isolated toolchain mtools")
 
             if not packed and shutil.which("mformat") and shutil.which("mcopy"):
                 subprocess.run(["mformat", "-i", str(efiboot_img), "-h", "32", "-t", "32", "-n", "64", "-c", "1", "::"], check=True, capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI"], capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI/BOOT"], capture_output=True)
-                subprocess.run(["mcopy", "-i", str(efiboot_img), str(bootx64), "::/EFI/BOOT/BOOTX64.EFI"], check=True, capture_output=True)
+                subprocess.run(["mcopy", "-i", str(efiboot_img), str(efi_binary), f"::/EFI/BOOT/{efi_boot_file}"], check=True, capture_output=True)
                 packed = True
-                logger.info(f"Successfully packaged BOOTX64.EFI into {efiboot_img} via host mtools")
+                logger.info(f"Successfully packaged {efi_boot_file} into {efiboot_img} via host mtools")
 
             if not packed:
                 mkfs_fat = shutil.which("mkfs.vfat") or shutil.which("mkfs.fat")
@@ -460,13 +488,22 @@ class ISOEngine:
 
     def generate_bootloader_configs(self):
         btype = self.config.get("type", "grub-uefi")
-        logger.info(f"Generating bootloader configurations for type: {btype}")
+        is_bios_arch = self.arch in _BIOS_ARCHES
+        logger.info(f"Generating bootloader configurations for type={btype}, arch={self.arch}, bios_capable={is_bios_arch}")
 
-        if "hybrid" in btype or "dual" in btype:
+        # ARM64 / RISC-V: no BIOS support, force pure GRUB UEFI regardless of requested type
+        if not is_bios_arch and ("hybrid" in btype or "isolinux" in btype or "syslinux" in btype):
+            logger.warning(
+                f"arch={self.arch} does not support BIOS/ISOLINUX. "
+                f"Overriding bootloader type '{btype}' -> 'grub-uefi' (UEFI only)."
+            )
+            btype = "grub-uefi"
+
+        if is_bios_arch and ("hybrid" in btype or "dual" in btype):
             self.generate_syslinux_config()
             self.generate_grub_config()
             self.generate_grub_efi_image()
-        elif "syslinux" in btype or "isolinux" in btype:
+        elif is_bios_arch and ("syslinux" in btype or "isolinux" in btype):
             self.generate_syslinux_config()
         elif "systemd-boot" in btype:
             self.generate_systemd_boot_config()
@@ -490,6 +527,8 @@ class ISOEngine:
         output_iso = self.workdir / self.output_name
         logger.info(f"Building ISO file: {output_iso}")
 
+        is_bios_arch = self.arch in _BIOS_ARCHES
+
         if self.mode == "mock":
             logger.info(f"[MOCK ISO ENGINE] Creating dummy ISO image: {output_iso}")
             try:
@@ -501,7 +540,7 @@ class ISOEngine:
             btype = self.config.get("type", "grub-uefi")
 
             success = False
-            is_hybrid_isolinux = "isolinux" in btype or "hybrid-isolinux" in btype
+            is_hybrid_isolinux = is_bios_arch and ("isolinux" in btype or "hybrid-isolinux" in btype)
 
             if not is_hybrid_isolinux:
                 # Pure GRUB modes: try grub-mkrescue first (embeds GRUB in MBR + EFI)
@@ -547,33 +586,35 @@ class ISOEngine:
                     "-output", str(output_iso)
                 ]
 
-                isohdpfx_paths = [
-                    self.target_root / "usr" / "share" / "syslinux" / "isohdpfx.bin",
-                    self.target_root / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
-                    self.workdir / "build_host" / "usr" / "share" / "syslinux" / "isohdpfx.bin",
-                    self.workdir / "build_host" / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
-                    Path("/usr/share/syslinux/isohdpfx.bin"),
-                    Path("/usr/lib/syslinux/bios/isohdpfx.bin")
-                ]
-                for isohdpfx in isohdpfx_paths:
-                    if isohdpfx.exists():
-                        cmd.extend(["-isohybrid-mbr", str(isohdpfx)])
-                        logger.info(f"Using isohybrid MBR from: {isohdpfx}")
-                        break
+                # BIOS hybrid MBR: only for BIOS-capable architectures
+                if is_bios_arch:
+                    isohdpfx_paths = [
+                        self.target_root / "usr" / "share" / "syslinux" / "isohdpfx.bin",
+                        self.target_root / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
+                        self.workdir / "build_host" / "usr" / "share" / "syslinux" / "isohdpfx.bin",
+                        self.workdir / "build_host" / "usr" / "lib" / "syslinux" / "bios" / "isohdpfx.bin",
+                        Path("/usr/share/syslinux/isohdpfx.bin"),
+                        Path("/usr/lib/syslinux/bios/isohdpfx.bin")
+                    ]
+                    for isohdpfx in isohdpfx_paths:
+                        if isohdpfx.exists():
+                            cmd.extend(["-isohybrid-mbr", str(isohdpfx)])
+                            logger.info(f"Using isohybrid MBR from: {isohdpfx}")
+                            break
 
-                isolinux_bin = self.iso_dir / "isolinux" / "isolinux.bin"
-                if isolinux_bin.exists():
-                    logger.info("Adding El Torito BIOS boot entry (ISOLINUX)...")
-                    cmd.extend([
-                        "-eltorito-boot", "isolinux/isolinux.bin",
-                        "-eltorito-catalog", "isolinux/boot.cat",
-                        "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table"
-                    ])
-                elif is_hybrid_isolinux:
-                    logger.warning(
-                        "isolinux/isolinux.bin not found in iso_root — "
-                        "BIOS boot will NOT work! Ensure syslinux is installed in the chroot."
-                    )
+                    isolinux_bin = self.iso_dir / "isolinux" / "isolinux.bin"
+                    if isolinux_bin.exists():
+                        logger.info("Adding El Torito BIOS boot entry (ISOLINUX)...")
+                        cmd.extend([
+                            "-eltorito-boot", "isolinux/isolinux.bin",
+                            "-eltorito-catalog", "isolinux/boot.cat",
+                            "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table"
+                        ])
+                    elif is_hybrid_isolinux:
+                        logger.warning(
+                            "isolinux/isolinux.bin not found in iso_root — "
+                            "BIOS boot will NOT work! Ensure syslinux is installed in the chroot."
+                        )
 
                 efiboot_img = self.iso_dir / "boot" / "grub" / "efiboot.img"
                 if efiboot_img.exists():
