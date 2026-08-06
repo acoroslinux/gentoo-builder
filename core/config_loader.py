@@ -63,7 +63,8 @@ class ConfigLoader:
             "live_user": base_cfg.get("live_user", {}),
             "custom_files": base_cfg.get("custom_files", []),
             "init_system": "openrc",
-            "default_profile": None
+            "default_profile": None,
+            "arch": architecture or "x86_64",  # Raw arch string for QEMU detection
         }
 
         # Apply Init system profile (openrc, systemd, runit, s6)
