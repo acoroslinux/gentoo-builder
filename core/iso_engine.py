@@ -17,8 +17,8 @@ _ARCH_EFI_MAP = {
     "aarch64": ("arm64-efi",   "BOOTAA64.EFI"),
     "arm64":   ("arm64-efi",   "BOOTAA64.EFI"),
     "riscv64": ("riscv64-efi", "BOOTRISCV64.EFI"),
-    "i686":    ("i386-efi",    "BOOTIA32.EFI"),
-    "i386":    ("i386-efi",    "BOOTIA32.EFI"),
+    "i686":    ("x86_64-efi",  "BOOTX64.EFI"),
+    "i386":    ("x86_64-efi",  "BOOTX64.EFI"),
 }
 
 # Arches that support BIOS booting (isolinux / syslinux / MBR)
@@ -434,7 +434,8 @@ class ISOEngine:
             self.toolchain.run_in_build_host(
                 f"grub-mkstandalone --format={grub_efi_format} "
                 f"--output=/workdir/tmp_efi/{efi_boot_file} "
-                f"boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg"
+                f"boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg",
+                check=False
             )
         elif shutil.which("grub-mkstandalone"):
             grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
