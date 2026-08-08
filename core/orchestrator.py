@@ -315,16 +315,16 @@ class BuildOrchestrator:
                     final_output_file = project_output_dir / tarball_file.name
                     if tarball_file != final_output_file:
                         try:
-                            shutil.copy2(tarball_file, final_output_file)
+                            shutil.move(str(tarball_file), str(final_output_file))
                             md5_file = tarball_file.parent / f"{tarball_file.name}.md5"
                             sha256_file = tarball_file.parent / f"{tarball_file.name}.sha256"
                             if md5_file.exists():
-                                shutil.copy2(md5_file, project_output_dir / md5_file.name)
+                                shutil.move(str(md5_file), str(project_output_dir / md5_file.name))
                             if sha256_file.exists():
-                                shutil.copy2(sha256_file, project_output_dir / sha256_file.name)
-                            logger.info(f"Copied final tarball to: {final_output_file}")
+                                shutil.move(str(sha256_file), str(project_output_dir / sha256_file.name))
+                            logger.info(f"Moved final tarball to: {final_output_file}")
                         except OSError as e:
-                            logger.warning(f"Could not copy tarball to output directory: {e}")
+                            logger.warning(f"Could not move tarball to output directory: {e}")
 
                     logger.info(f"Tarball build completed successfully! Output: {final_output_file}")
                     return final_output_file
@@ -340,23 +340,25 @@ class BuildOrchestrator:
                 # 8. Build ISO with GRUB bootloader options
                 iso_file = iso_engine.build_iso()
                 
-                # Copy final ISO to output/ directory for easy user access
+                # Move final ISO to output/ directory for easy user access (prevents duplication)
                 project_output_dir = resolve_from_project("output")
                 project_output_dir.mkdir(parents=True, exist_ok=True)
                 final_output_file = project_output_dir / iso_file.name
                 if iso_file != final_output_file:
                     try:
-                        shutil.copy2(iso_file, final_output_file)
-                        if iso_file.with_suffix(iso_file.suffix + ".md5").exists():
-                            shutil.copy2(iso_file.with_suffix(iso_file.suffix + ".md5"), final_output_file.with_suffix(final_output_file.suffix + ".md5"))
-                        if iso_file.with_suffix(iso_file.suffix + ".sha256").exists():
-                            shutil.copy2(iso_file.with_suffix(iso_file.suffix + ".sha256"), final_output_file.with_suffix(final_output_file.suffix + ".sha256"))
-                        logger.info(f"Copied final ISO to: {final_output_file}")
+                        shutil.move(str(iso_file), str(final_output_file))
+                        md5_src = iso_file.with_suffix(iso_file.suffix + ".md5")
+                        sha256_src = iso_file.with_suffix(iso_file.suffix + ".sha256")
+                        if md5_src.exists():
+                            shutil.move(str(md5_src), str(final_output_file.with_suffix(final_output_file.suffix + ".md5")))
+                        if sha256_src.exists():
+                            shutil.move(str(sha256_src), str(final_output_file.with_suffix(final_output_file.suffix + ".sha256")))
+                        logger.info(f"Moved final ISO to: {final_output_file}")
                     except OSError as e:
-                        logger.warning(f"Could not copy ISO to output directory: {e}")
+                        logger.warning(f"Could not move ISO to output directory: {e}")
 
-                logger.info(f"Build completed successfully! Output: {iso_file}")
-                return iso_file
+                logger.info(f"Build completed successfully! Output: {final_output_file}")
+                return final_output_file
             finally:
                 chroot.umount_virtual_fs()
         finally:
