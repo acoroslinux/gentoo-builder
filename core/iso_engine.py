@@ -426,30 +426,55 @@ class ISOEngine:
             efiboot_img.touch()
             return
 
+        # Build list of EFI formats to attempt (supports both 64-bit UEFI and 32-bit UEFI)
+        formats_to_build = []
+        if self.arch in ["i686", "i386", "x86"]:
+            formats_to_build = [
+                ("x86_64-efi", "BOOTX64.EFI"),
+                ("i386-efi",   "BOOTIA32.EFI"),
+            ]
+        else:
+            primary_fmt, primary_file = _ARCH_EFI_MAP.get(self.arch, ("x86_64-efi", "BOOTX64.EFI"))
+            formats_to_build = [(primary_fmt, primary_file)]
+
         efi_tmp = self.workdir / "tmp_efi"
         efi_tmp.mkdir(parents=True, exist_ok=True)
-        efi_binary = efi_tmp / efi_boot_file
 
-        if self.toolchain and getattr(self.toolchain, "is_mounted", False):
-            self.toolchain.run_in_build_host(
-                f"grub-mkstandalone --format={grub_efi_format} "
-                f"--output=/workdir/tmp_efi/{efi_boot_file} "
-                f"boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg",
-                check=False
-            )
-        elif shutil.which("grub-mkstandalone"):
-            grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
-            subprocess.run([
-                "grub-mkstandalone", f"--format={grub_efi_format}",
-                f"-o={efi_binary}", f"boot/grub/grub.cfg={grub_cfg}"
-            ], capture_output=True)
+        created_binaries = []
 
-        if efi_binary.exists():
-            # 1. Copy EFI binary and grub.cfg directly to /EFI/BOOT/ in iso_root
-            # This allows direct UEFI filesystem booting on VirtualBox/QEMU/hardware
+        for fmt, boot_filename in formats_to_build:
+            out_binary = efi_tmp / boot_filename
+            built = False
+            if self.toolchain and getattr(self.toolchain, "is_mounted", False):
+                res = self.toolchain.run_in_build_host(
+                    f"grub-mkstandalone --format={fmt} "
+                    f"--output=/workdir/tmp_efi/{boot_filename} "
+                    f"boot/grub/grub.cfg=/workdir/iso_root/boot/grub/grub.cfg",
+                    check=False
+                )
+                if res.returncode == 0 and out_binary.exists():
+                    built = True
+
+            if not built and shutil.which("grub-mkstandalone"):
+                grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
+                res = subprocess.run([
+                    "grub-mkstandalone", f"--format={fmt}",
+                    f"-o={out_binary}", f"boot/grub/grub.cfg={grub_cfg}"
+                ], capture_output=True)
+                if res.returncode == 0 and out_binary.exists():
+                    built = True
+
+            if built or out_binary.exists():
+                created_binaries.append((out_binary, boot_filename))
+
+        if created_binaries:
+            # 1. Copy all built EFI binaries and grub.cfg directly to /EFI/BOOT/ in iso_root
             iso_efi_dir = self.iso_dir / "EFI" / "BOOT"
             iso_efi_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(efi_binary, iso_efi_dir / efi_boot_file)
+
+            for binary_path, filename in created_binaries:
+                shutil.copy2(binary_path, iso_efi_dir / filename)
+                logger.info(f"Copied {filename} to {iso_efi_dir / filename}")
 
             grub_cfg = self.iso_dir / "boot" / "grub" / "grub.cfg"
             if grub_cfg.exists():
@@ -460,24 +485,27 @@ class ISOEngine:
 
             packed = False
             if self.toolchain and getattr(self.toolchain, "is_mounted", False):
-                res = self.toolchain.run_in_build_host(
+                mtools_cmd = (
                     f"mformat -i /workdir/iso_root/boot/grub/efiboot.img -h 32 -t 32 -n 64 -c 1 :: && "
                     f"mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI && "
-                    f"mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI/BOOT && "
-                    f"mcopy -i /workdir/iso_root/boot/grub/efiboot.img "
-                    f"/workdir/tmp_efi/{efi_boot_file} ::/EFI/BOOT/{efi_boot_file}"
+                    f"mmd -i /workdir/iso_root/boot/grub/efiboot.img ::/EFI/BOOT"
                 )
+                for _, filename in created_binaries:
+                    mtools_cmd += f" && mcopy -i /workdir/iso_root/boot/grub/efiboot.img /workdir/tmp_efi/{filename} ::/EFI/BOOT/{filename}"
+
+                res = self.toolchain.run_in_build_host(mtools_cmd, check=False)
                 if res.returncode == 0:
                     packed = True
-                    logger.info(f"Successfully packaged {efi_boot_file} into {efiboot_img} via isolated toolchain mtools")
+                    logger.info(f"Successfully packaged EFI binaries into {efiboot_img} via isolated toolchain mtools")
 
             if not packed and shutil.which("mformat") and shutil.which("mcopy"):
                 subprocess.run(["mformat", "-i", str(efiboot_img), "-h", "32", "-t", "32", "-n", "64", "-c", "1", "::"], check=True, capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI"], capture_output=True)
                 subprocess.run(["mmd", "-i", str(efiboot_img), "::/EFI/BOOT"], capture_output=True)
-                subprocess.run(["mcopy", "-i", str(efiboot_img), str(efi_binary), f"::/EFI/BOOT/{efi_boot_file}"], check=True, capture_output=True)
+                for binary_path, filename in created_binaries:
+                    subprocess.run(["mcopy", "-i", str(efiboot_img), str(binary_path), f"::/EFI/BOOT/{filename}"], check=True, capture_output=True)
                 packed = True
-                logger.info(f"Successfully packaged {efi_boot_file} into {efiboot_img} via host mtools")
+                logger.info(f"Successfully packaged EFI binaries into {efiboot_img} via host mtools")
 
             if not packed:
                 mkfs_fat = shutil.which("mkfs.vfat") or shutil.which("mkfs.fat")
@@ -488,7 +516,7 @@ class ISOEngine:
         shutil.rmtree(efi_tmp, ignore_errors=True)
 
     def generate_bootloader_configs(self):
-        btype = self.config.get("type", "grub-uefi")
+        btype = self.config.get("type", "hybrid-isolinux-grub")
         is_bios_arch = self.arch in _BIOS_ARCHES
         logger.info(f"Generating bootloader configurations for type={btype}, arch={self.arch}, bios_capable={is_bios_arch}")
 
@@ -500,12 +528,11 @@ class ISOEngine:
             )
             btype = "grub-uefi"
 
-        if is_bios_arch and ("hybrid" in btype or "dual" in btype):
+        if is_bios_arch:
+            # Generate ISOLINUX (BIOS) + GRUB (UEFI) configs and EFI binaries for maximum compatibility
             self.generate_syslinux_config()
             self.generate_grub_config()
             self.generate_grub_efi_image()
-        elif is_bios_arch and ("syslinux" in btype or "isolinux" in btype):
-            self.generate_syslinux_config()
         elif "systemd-boot" in btype:
             self.generate_systemd_boot_config()
             self.generate_grub_config()
