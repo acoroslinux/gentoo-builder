@@ -76,7 +76,7 @@ class SystemCustomizer:
         )
         os.chmod(sudoers_file, 0o440)
 
-        # PolKit rules for passwordless administrative actions & Calamares execution in LXDE/LightDM/PolKit
+        # PolKit rules for passwordless administrative actions & Calamares execution
         polkit_dir = self.target_root / "etc" / "polkit-1" / "rules.d"
         polkit_dir.mkdir(parents=True, exist_ok=True)
         polkit_rule = polkit_dir / "49-nopasswd-live.rules"
@@ -84,6 +84,19 @@ class SystemCustomizer:
             '/* Allow live user and wheel group to perform administrative actions without password */\n'
             'polkit.addRule(function(action, subject) {\n'
             '    if (subject.isInGroup("wheel") || subject.user == "' + username + '") {\n'
+            '        return polkit.Result.YES;\n'
+            '    }\n'
+            '});\n'
+        )
+
+        power_rule = polkit_dir / "10-enable-power-actions.rules"
+        power_rule.write_text(
+            '/* Allow all users to perform power off, reboot, suspend, and session logout */\n'
+            'polkit.addRule(function(action, subject) {\n'
+            '    if (action.id.indexOf("org.freedesktop.login1.") === 0 ||\n'
+            '        action.id.indexOf("org.freedesktop.upower.") === 0 ||\n'
+            '        action.id.indexOf("org.gnome.SessionManager.") === 0 ||\n'
+            '        action.id.indexOf("org.freedesktop.consolekit.") === 0) {\n'
             '        return polkit.Result.YES;\n'
             '    }\n'
             '});\n'
@@ -153,6 +166,7 @@ class SystemCustomizer:
                     self.chroot.run_in_chroot(f"rc-update add {target_srv} default 2>/dev/null || true")
                 elif srv not in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                     logger.warning(f"Init script for {srv} not found in /etc/init.d/; skipping service enable.")
+
             elif self.init_system == "runit":
                 self.chroot.run_in_chroot("mkdir -p /etc/runit/runsvdir/default /var/service /etc/sv /etc/runit/sv 2>/dev/null || true")
                 srv_lower = srv.lower()
@@ -205,6 +219,14 @@ class SystemCustomizer:
                 self.chroot.run_in_chroot(f"rc-update add {srv} default 2>/dev/null || true")
                 if srv in ["lightdm", "sddm", "gdm", "gdm3", "xdm", "lxdm"]:
                     self.configure_autologin(srv, username, session)
+
+        # Always enable elogind and dbus in OpenRC boot/default runlevels for power & session management
+        if self.init_system in ["openrc", "sysvinit"]:
+            if (self.target_root / "etc" / "init.d" / "elogind").exists():
+                self.chroot.run_in_chroot("rc-update add elogind boot 2>/dev/null || rc-update add elogind default 2>/dev/null || true")
+            if (self.target_root / "etc" / "init.d" / "dbus").exists():
+                self.chroot.run_in_chroot("rc-update add dbus boot 2>/dev/null || rc-update add dbus default 2>/dev/null || true")
+            self.configure_pam_elogind()
 
     def configure_autologin(self, dm: str, username: str, session: str):
         if self.chroot.mode == "mock":
@@ -397,6 +419,38 @@ class SystemCustomizer:
             content = sshd_cfg.read_text()
             content = content.replace("#PermitRootLogin prohibit-password", "PermitRootLogin yes")
             sshd_cfg.write_text(content)
+
+        # Configure dconf power and lockdown overrides for GNOME Session Manager
+        dconf_dir = self.target_root / "etc" / "dconf" / "db" / "local.d"
+        dconf_dir.mkdir(parents=True, exist_ok=True)
+        (dconf_dir / "00-power-defaults").write_text(
+            "[org/gnome/desktop/lockdown]\n"
+            "disable-log-out=false\n"
+            "disable-user-switching=false\n"
+            "disable-lock-screen=false\n\n"
+            "[org/gnome/settings-daemon/plugins/power]\n"
+            "power-button-action='interactive'\n"
+        )
+        if shutil.which("dconf"):
+            self.chroot.run_in_chroot("dconf update 2>/dev/null || true")
+
+    def configure_pam_elogind(self):
+        """Ensures pam_elogind.so is present in PAM session handlers so logins register active sessions with elogind."""
+        if self.chroot.mode == "mock":
+            return
+        
+        pam_dir = self.target_root / "etc" / "pam.d"
+        if not pam_dir.exists():
+            return
+        
+        logger.info("Configuring PAM pam_elogind.so for session tracking (GNOME/KDE power management)...")
+        pam_targets = ["system-auth", "gdm-autologin", "gdm-launch-environment", "gdm-password", "lightdm-autologin", "sddm"]
+        for pam_file in pam_targets:
+            fpath = pam_dir / pam_file
+            if fpath.exists():
+                content = fpath.read_text()
+                if "pam_elogind.so" not in content:
+                    fpath.write_text(content.rstrip() + "\nsession\toptional\tpam_elogind.so\n")
 
         # Setup /usr/src/linux symlink if kernel sources directory exists
         usr_src = self.target_root / "usr" / "src"
