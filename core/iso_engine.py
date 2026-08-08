@@ -428,7 +428,7 @@ class ISOEngine:
 
         # Build list of EFI formats to attempt (supports both 64-bit UEFI and 32-bit UEFI)
         formats_to_build = []
-        if self.arch in ["i686", "i386", "x86"]:
+        if self.arch in ["i686", "i386", "x86", "x86_64", "amd64"]:
             formats_to_build = [
                 ("x86_64-efi", "BOOTX64.EFI"),
                 ("i386-efi",   "BOOTIA32.EFI"),
