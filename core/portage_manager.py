@@ -8,24 +8,27 @@ from core.logger_setup import setup_logger
 
 logger = setup_logger("portage_manager")
 
-# Architectures that are NOT the native host (x86_64) and thus require QEMU emulation
-_QEMU_ARCHES = {"aarch64", "arm64", "riscv64", "riscv", "i686", "i386", "armv7", "armhf"}
+# Architectures that require QEMU emulation on x86_64 host (note: i686/i386 run NATIVELY on x86_64!)
+_QEMU_ARCHES = {"aarch64", "arm64", "riscv64", "riscv", "armv7", "armhf", "ppc64le", "ppc64"}
 
 def _is_qemu_chroot(config: Dict[str, Any]) -> bool:
     """Return True if the target architecture requires QEMU user-mode emulation."""
-    host_machine = platform.machine()  # e.g. 'x86_64'
+    host_machine = platform.machine().lower()  # e.g. 'x86_64'
     target_arch = config.get("arch", "").lower()  # e.g. 'aarch64', 'riscv64', 'i686'
     if not target_arch:
         return False
-    # Normalise host arch
-    host_norm = host_machine.lower()
-    # If host is x86_64 and target is something else -> QEMU
-    if host_norm in ("x86_64", "amd64"):
+    
+    if host_machine in ("x86_64", "amd64"):
+        # i686, i386, x86, x86_64 run NATIVELY on x86_64 Linux kernels
+        if target_arch in ("i686", "i386", "x86", "x86_64", "amd64"):
+            return False
         return target_arch in _QEMU_ARCHES
-    # If host is aarch64 and target is x86_64 -> QEMU
-    if host_norm == "aarch64" and target_arch in ("x86_64", "amd64"):
+    
+    if host_machine in ("aarch64", "arm64"):
+        if target_arch in ("aarch64", "arm64"):
+            return False
         return True
-    # Same arch -> native
+
     return False
 
 class PortageManagerError(Exception):
@@ -67,27 +70,22 @@ class PortageManager:
         using_qemu = _is_qemu_chroot(self.config)
 
         if using_qemu:
-            # QEMU user-mode cannot handle parallel emerge jobs or parallel make reliably
-            safe_jobs = 1
-            safe_makeopts = "-j1"
-            load_avg = "1"
-            emerge_opts = "--jobs=1 --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
+            # QEMU user-mode emulation: use safe multi-threading
+            safe_jobs = max(1, min(cpu_count // 2, 4))
+            qemu_threads = max(2, min(cpu_count, 4))
+            safe_makeopts = f"-j{qemu_threads}"
+            load_avg = str(qemu_threads)
+            emerge_opts = f"--jobs={safe_jobs} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
             features_val = "binpkg-logs parallel-fetch buildpkg"
-            logger.info("[PORTAGE] QEMU emulation detected: forcing --jobs=1 MAKEOPTS=-j1 (no parallel-install)")
+            logger.info(f"[PORTAGE] QEMU emulation detected: using MAKEOPTS={safe_makeopts} --jobs={safe_jobs}")
         else:
-            # Calculate balanced parallel emerge jobs and MAKEOPTS for maximum performance without OOM
-            # Memory-heavy packages (nodejs, webkit-gtk, rust, gcc, spidermonkey) are individually throttled via package.env
-            safe_jobs = max(1, min(cpu_count // 3, mem_total_gb // 6, 4))
-
-            # Standard packages use up to -j20 threads, heavy packages use -j4/-j8 via package.env
-            if mem_total_gb <= 32:
-                safe_makeopts = f"-j{min(cpu_count, 20)}"
-            else:
-                safe_makeopts = f"-j{cpu_count}"
-
-            load_avg = str(min(cpu_count, 24))
+            # Native execution (x86_64 and i686/i386 on x86_64 host): MAX PERFORMANCE WITH ALL CPU CORES!
+            safe_jobs = max(1, min(cpu_count // 2, mem_total_gb // 3, 12))
+            safe_makeopts = f"-j{cpu_count}"
+            load_avg = str(cpu_count)
             emerge_opts = f"--jobs={safe_jobs} --load-average={load_avg} --ask=n --autounmask-write=y --autounmask-continue=y --binpkg-respect-use=y --buildpkg --usepkg"
             features_val = "binpkg-logs parallel-install parallel-fetch buildpkg"
+            logger.info(f"[PORTAGE] Native execution detected ({self.config.get('arch')}): using FULL CPU power MAKEOPTS={safe_makeopts} --jobs={safe_jobs}")
 
         # CFLAGS: always comes from arch JSON (e.g. arm64.json has -march=armv8-a).
         # Fall back to a generic safe value if somehow missing.
